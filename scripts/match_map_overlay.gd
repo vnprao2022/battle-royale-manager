@@ -7,17 +7,31 @@ signal zoom_requested(local_position: Vector2, step: float)
 signal pan_requested(relative: Vector2)
 signal editor_item_moved(kind: String, index: int, normalized_position: Vector2)
 signal editor_item_selected(kind: String, index: int)
+signal editor_brush_completed(kind: String, normalized_path: Array, brush_width: float)
+signal editor_rect_completed(normalized_rect: Rect2)
 
 var state: Dictionary = {}
 var map_data: Dictionary = {}
 var _dragging := false
 var editor_enabled := false
+var design_layers_visible := false
 var editor_selection := {"kind":"","index":-1}
 var _editor_drag_kind := ""
 var _editor_drag_index := -1
+var editor_tool := "select"
+var editor_brush_width := 0.04
+var _brush_path: Array = []
+var _rect_start := Vector2.ZERO
+var _rect_current := Vector2.ZERO
 
 func enable_editor(value:bool=true)->void:
-	editor_enabled=value; queue_redraw()
+	editor_enabled=value; design_layers_visible=value or design_layers_visible; queue_redraw()
+
+func set_design_layers_visible(value:bool=true)->void:
+	design_layers_visible=value; queue_redraw()
+
+func set_editor_tool(tool: String, brush_width: float) -> void:
+	editor_tool=tool; editor_brush_width=clampf(brush_width,0.008,0.18); _brush_path.clear(); queue_redraw()
 
 func set_state(value: Dictionary) -> void:
 	state = value
@@ -32,40 +46,58 @@ func _p(normalized: Variant) -> Vector2:
 
 func _draw() -> void:
 	if map_data.is_empty(): return
-	var font:=ThemeDB.fallback_font
-	for road in map_data.get("roads", []):
+	var font:=ThemeDB.fallback_font; var design_data:Dictionary=map_data if design_layers_visible or editor_enabled else {}
+	for stroke in design_data.get("terrain_strokes", []):
+		var path := PackedVector2Array(); for point in stroke.get("path",[]): path.append(_p(point))
+		var terrain := str(stroke.get("terrain","forest")); var color := Color(0.12,0.55,0.92,0.52) if terrain=="water" else Color(0.08,0.42,0.18,0.42)
+		if path.size()>=2: draw_polyline(path,color,float(stroke.get("width",0.05))*minf(size.x,size.y),true)
+	for road in design_data.get("roads", []):
 		var path := PackedVector2Array()
 		for point in road.get("path", []): path.append(_p(point))
 		var road_class := str(road.get("road_class", "secondary"))
-		var width := 5.0 if road_class == "highway" else 3.0 if road_class == "secondary" else 1.5
+		var width := float(road.get("width",0.0))*minf(size.x,size.y) if float(road.get("width",0.0))>0.0 else 5.0 if road_class == "highway" else 3.0 if road_class == "secondary" else 1.5
 		var color := Color(0.92,0.85,0.62,0.72) if road_class == "highway" else Color(0.78,0.82,0.84,0.62) if road_class == "secondary" else Color(0.63,0.48,0.28,0.58)
 		if path.size() >= 2: draw_polyline(path,color,width,true)
-	for region_index in map_data.get("regions", []).size():
-		var region:Dictionary=map_data.regions[region_index]
+	for building_index in design_data.get("buildings", []).size():
+		var building: Dictionary=design_data.buildings[building_index]; var rect_data:Array=building.get("rect",[])
+		if rect_data.size()!=4 or not bool(building.get("enabled",true)): continue
+		var rect:=Rect2(float(rect_data[0])*size.x,float(rect_data[1])*size.y,float(rect_data[2])*size.x,float(rect_data[3])*size.y)
+		var selected:bool=editor_enabled and str(editor_selection.kind)=="building" and int(editor_selection.index)==building_index
+		draw_rect(rect,Color(0.08,0.12,0.15,0.7),true); draw_rect(rect,Color("2ee6b1") if selected else Color(0.95,0.95,0.88,0.82),false,3.0 if selected else 1.4)
+		if editor_enabled: draw_string(font,rect.position+Vector2(4,12),str(building.get("name","House")),HORIZONTAL_ALIGNMENT_LEFT,rect.size.x-8,9,Color.WHITE)
+	for region_index in design_data.get("regions", []).size():
+		var region:Dictionary=design_data.regions[region_index]
 		var center := _p(region.position)
 		var radius := float(region.get("radius", 0.06)) * minf(size.x, size.y)
 		var loot := float(region.get("loot_multiplier", 1.0))
 		draw_circle(center, radius, Color(1.0, 0.72, 0.08, 0.08 + loot * 0.05))
 		draw_arc(center, radius, 0.0, TAU, 48, Color("2ee6b1") if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else Color(1.0, 0.78, 0.16, 0.62),3.0 if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else 1.5)
 		if editor_enabled: draw_circle(center,6.0,Color("2ee6b1")); draw_string(font,center+Vector2(9,-7),str(region.get("name","Region")),HORIZONTAL_ALIGNMENT_LEFT,140,11,Color.WHITE)
-	for compound_index in map_data.get("compounds", []).size():
-		var compound: Dictionary = map_data.compounds[compound_index]
+	for compound_index in design_data.get("compounds", []).size():
+		var compound: Dictionary = design_data.compounds[compound_index]
 		var center := _p(compound.position); var radius := float(compound.get("radius",0.04))*minf(size.x,size.y)
 		var selected: bool = editor_enabled and str(editor_selection.kind)=="compound" and int(editor_selection.index)==compound_index
 		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color(0.95,0.66,0.14,0.12),true)
 		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color("2ee6b1") if selected else Color(0.96,0.72,0.24,0.72),false,2.5 if selected else 1.2)
 		if editor_enabled: draw_string(font,center+Vector2(7,-5),str(compound.get("name","Compound")),HORIZONTAL_ALIGNMENT_LEFT,125,9,Color(1,0.86,0.55,0.95))
-	for point_index in map_data.get("points", []).size():
-		var point:Dictionary=map_data.points[point_index]
+	for point_index in design_data.get("points", []).size():
+		var point:Dictionary=design_data.points[point_index]
 		if bool(point.get("enabled", true)):
 			var pos := _p(point.position)
 			var selected:bool=editor_enabled and str(editor_selection.kind)=="point" and int(editor_selection.index)==point_index
 			draw_rect(Rect2(pos - Vector2(6 if selected else 4, 6 if selected else 4), Vector2(12 if selected else 8,12 if selected else 8)),Color("2ee6b1") if selected else Color("ffd34e"),true)
 			if editor_enabled: draw_string(font,pos+Vector2(8,12),str(point.get("name","Node")),HORIZONTAL_ALIGNMENT_LEFT,120,10,Color("ffd34e"))
-	for node in map_data.get("transport_nodes", []):
+	for node in design_data.get("transport_nodes", []):
 		var pos := _p(node.position)
 		draw_circle(pos,5.5,Color(0.18,0.78,1.0,0.86)); draw_circle(pos,2.0,Color(0.02,0.08,0.12,1.0))
 		if editor_enabled: draw_string(font,pos+Vector2(8,-7),str(node.get("name","Vehicle")),HORIZONTAL_ALIGNMENT_LEFT,120,9,Color(0.4,0.85,1.0,0.95))
+	if editor_enabled and _brush_path.size()>=2:
+		var preview:=PackedVector2Array(); for point in _brush_path: preview.append(_p(point))
+		var preview_color:=Color(0.12,0.65,1.0,0.72) if editor_tool=="river" else Color(0.15,0.62,0.24,0.65) if editor_tool=="forest" else Color(1.0,0.72,0.22,0.8)
+		draw_polyline(preview,preview_color,editor_brush_width*minf(size.x,size.y),true)
+	if editor_enabled and editor_tool=="building" and _rect_start!=_rect_current:
+		var preview_rect:=Rect2(_p([minf(_rect_start.x,_rect_current.x),minf(_rect_start.y,_rect_current.y)]),Vector2(absf(_rect_current.x-_rect_start.x)*size.x,absf(_rect_current.y-_rect_start.y)*size.y))
+		draw_rect(preview_rect,Color(0.1,0.9,0.7,0.22),true); draw_rect(preview_rect,Color("2ee6b1"),false,2.0)
 	if state.is_empty(): return
 	var flight: Array = state.get("flight_path", [])
 	if flight.size() == 2 and float(state.get("plane_progress",0.0))<1.0:
@@ -144,6 +176,25 @@ func _draw_status_icon(pos:Vector2,status:String,team_color:Color)->void:
 
 func _gui_input(event: InputEvent) -> void:
 	if editor_enabled:
+		if editor_tool!="select":
+			if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
+				var normalized:=Vector2(clampf(event.position.x/maxf(size.x,1.0),0.0,1.0),clampf(event.position.y/maxf(size.y,1.0),0.0,1.0))
+				if event.pressed:
+					if editor_tool=="building": _rect_start=normalized; _rect_current=normalized
+					else: _brush_path=[[normalized.x,normalized.y]]
+				else:
+					if editor_tool=="building":
+						var rect:=Rect2(minf(_rect_start.x,_rect_current.x),minf(_rect_start.y,_rect_current.y),absf(_rect_current.x-_rect_start.x),absf(_rect_current.y-_rect_start.y)); if rect.size.x>=0.012 and rect.size.y>=0.012: editor_rect_completed.emit(rect)
+						_rect_start=Vector2.ZERO; _rect_current=Vector2.ZERO
+					elif _brush_path.size()>=2: editor_brush_completed.emit(editor_tool,_brush_path.duplicate(true),editor_brush_width); _brush_path.clear()
+					queue_redraw()
+				accept_event(); return
+			if event is InputEventMouseMotion:
+				var normalized:=Vector2(clampf(event.position.x/maxf(size.x,1.0),0.0,1.0),clampf(event.position.y/maxf(size.y,1.0),0.0,1.0))
+				if editor_tool=="building" and _rect_start!=Vector2.ZERO: _rect_current=normalized; queue_redraw(); accept_event(); return
+				if not _brush_path.is_empty():
+					var previous:=Vector2(float(_brush_path[-1][0]),float(_brush_path[-1][1])); if previous.distance_to(normalized)>=0.008: _brush_path.append([normalized.x,normalized.y]); queue_redraw()
+					accept_event(); return
 		if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				var hit:=_editor_hit_test(event.position); _editor_drag_kind=str(hit.kind); _editor_drag_index=int(hit.index)
@@ -172,6 +223,9 @@ func _gui_input(event: InputEvent) -> void:
 
 func _editor_hit_test(position:Vector2)->Dictionary:
 	var best:={"kind":"","index":-1}; var best_distance:=24.0
+	for building_index in map_data.get("buildings",[]).size():
+		var rect:Array=map_data.buildings[building_index].get("rect",[])
+		if rect.size()==4 and Rect2(float(rect[0])*size.x,float(rect[1])*size.y,float(rect[2])*size.x,float(rect[3])*size.y).has_point(position): return {"kind":"building","index":building_index}
 	for compound_index in map_data.get("compounds",[]).size():
 		var distance:=_p(map_data.compounds[compound_index].position).distance_to(position)
 		if distance<best_distance: best={"kind":"compound","index":compound_index}; best_distance=distance

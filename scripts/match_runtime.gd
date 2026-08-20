@@ -28,6 +28,15 @@ const LEGACY_WEAPON_PROFILES := {
 	"G36C":{"category":"AR","ideal_min":0.02,"ideal_max":0.15,"accuracy":0.85,"damage":41}, "FAMAS":{"category":"AR","ideal_min":0.02,"ideal_max":0.14,"accuracy":0.86,"damage":42}, "M16A4":{"category":"AR","ideal_min":0.04,"ideal_max":0.20,"accuracy":0.80,"damage":43}, "Mutant":{"category":"AR","ideal_min":0.04,"ideal_max":0.18,"accuracy":0.82,"damage":44},
 	"Tommy Gun":{"category":"SMG","ideal_min":0.0,"ideal_max":0.06,"accuracy":0.76,"damage":40}, "PP-19 Bizon":{"category":"SMG","ideal_min":0.0,"ideal_max":0.07,"accuracy":0.80,"damage":35}, "S1897":{"category":"SHOTGUN","ideal_min":0.0,"ideal_max":0.04,"accuracy":0.78,"damage":91}, "O12":{"category":"SHOTGUN","ideal_min":0.0,"ideal_max":0.05,"accuracy":0.81,"damage":84}, "P18C":{"category":"PISTOL","ideal_min":0.0,"ideal_max":0.04,"accuracy":0.74,"damage":29}, "Lynx AMR":{"category":"SR","ideal_min":0.20,"ideal_max":0.54,"accuracy":0.92,"damage":118}
 }
+const WEAPON_RANGE_RULES := {
+	"SHOTGUN":{"optimal_m":12.0,"max_m":40.0,"falloff_floor":0.34,"display_rounds":5},
+	"SMG":{"optimal_m":60.0,"max_m":180.0,"falloff_floor":0.44,"display_rounds":30},
+	"AR":{"optimal_m":180.0,"max_m":450.0,"falloff_floor":0.52,"display_rounds":30},
+	"LMG":{"optimal_m":220.0,"max_m":520.0,"falloff_floor":0.52,"display_rounds":50},
+	"DMR":{"optimal_m":380.0,"max_m":850.0,"falloff_floor":0.62,"display_rounds":10},
+	"SR":{"optimal_m":700.0,"max_m":1250.0,"falloff_floor":0.72,"display_rounds":5},
+	"PISTOL":{"optimal_m":45.0,"max_m":120.0,"falloff_floor":0.42,"display_rounds":15}
+}
 const HEAL_ITEMS := {
 	"Bandage":{"heal":10,"cap":75,"use_time":4.0},
 	"First Aid Kit":{"heal_to":75,"cap":75,"use_time":6.0},
@@ -234,7 +243,7 @@ func _update_deployment(scaled_delta: float) -> void:
 			if elapsed >= float(p.land_time): p.state = "LOOTING"; p.position = p.destination; p.loot_until = elapsed + randf_range(24.0,38.0); p.next_loot_at = elapsed; _emit_event("land","%s đã tiếp đất và bắt đầu loot." % p.name,"LOOT")
 		elif p.state == "LOOTING" and elapsed >= float(p.get("loot_until", elapsed + 1.0)):
 			p.state = "ALIVE"; p.position = p.position.lerp(_regroup_point(), clampf((elapsed-72.0)/90.0,0.0,1.0))
-		if p.state=="LOOTING" and elapsed>=float(p.get("next_loot_at",0.0)): p=_loot_player(p); p.next_loot_at=elapsed+randf_range(5.0,8.0)
+		if p.state=="LOOTING" and elapsed>=float(p.get("next_loot_at",0.0)): p=_loot_player(p); p.next_loot_at=elapsed+_loot_interval(p)
 		roster[i] = p
 	for i in team_positions.size():
 		var t: Dictionary = team_positions[i]
@@ -258,7 +267,7 @@ func _update_deployment(scaled_delta: float) -> void:
 					if elapsed >= float(member.land_time): member.state = "LOOTING"; member.position = member.destination; member.loot_until = elapsed + randf_range(24.0,38.0); member.next_loot_at = elapsed
 				elif member.state in ["LOOTING","ALIVE","WALKING","DRIVING","SWIMMING"]:
 					if member.state=="LOOTING" and elapsed < float(member.get("loot_until", elapsed + 1.0)):
-						if elapsed>=float(member.get("next_loot_at",0.0)): member=_loot_player(member); member.next_loot_at=elapsed+randf_range(5.0,8.0)
+						if elapsed>=float(member.get("next_loot_at",0.0)): member=_loot_player(member); member.next_loot_at=elapsed+_loot_interval(member)
 						t.members[m]=member; continue
 					var move_target := Vector2(member.move_target)
 					if zone_number>0 and Vector2(member.position).distance_to(target_zone_center)>maxf(0.02,target_zone_radius*0.88): move_target=_tactical_zone_target(i)+_formation_offset(m,i); member.move_target=move_target
@@ -272,8 +281,10 @@ func _update_deployment(scaled_delta: float) -> void:
 						member.vehicle_durability=maxf(0.0,float(member.get("vehicle_durability",100.0))-scaled_delta*0.004*float(member.get("route_risk",0.0)+1.0))
 						if member.vehicle_fuel <= 0.0 or member.vehicle_durability <= 0.0: member.vehicle_until=0.0; use_vehicle=false; _emit_event("vehicle","Vehicle route ended: fuel or durability depleted.","VEHICLE")
 					member.state = "DRIVING" if use_vehicle else "WALKING"; member.transport = "vehicle" if use_vehicle else "foot"
+					var member_terrain:=_nearest_terrain(Vector2(member.position)); var member_profile:Dictionary=catalog.movement_profile(map_data,member_terrain,"vehicle" if use_vehicle else "walk",Vector2(member.position)); var brush_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(member.position)); if bool(brush_profile.inside) and not use_vehicle: member_profile.speed_multiplier=float(brush_profile.movement_multiplier)
+					if not bool(member_profile.allowed): use_vehicle=false; member.state="SWIMMING" if member_terrain=="water" else "WALKING"; member.transport="swim" if member_terrain=="water" else "foot"; member_profile=catalog.movement_profile(map_data,member_terrain,"walk",Vector2(member.position)); if bool(brush_profile.inside): member_profile.speed_multiplier=float(brush_profile.movement_multiplier)
 					var urgency:=1.0+float(zone_number)*0.22+(1.4 if zone_number>=5 else 0.0); var move_speed := (0.0018 if use_vehicle else 0.00068)*urgency
-					member.position = Vector2(member.position).move_toward(move_target, move_speed * scaled_delta)
+					member.position = Vector2(member.position).move_toward(move_target, move_speed * float(member_profile.get("speed_multiplier",1.0)) * scaled_delta)
 				t.members[m] = member
 		var living: Array = t.members.filter(func(member): return str(member.state) != "DEAD")
 		if not living.is_empty():
@@ -330,7 +341,7 @@ func _update_player_movement(scaled_delta: float) -> void:
 		if zone_number>0 and Vector2(p.position).distance_to(target_zone_center)>maxf(0.02,target_zone_radius*0.88): target=_tactical_zone_target(0)+_formation_offset(i,0); p.move_target=target
 		if Vector2(p.position).distance_to(target) < 0.025:
 			target = _tactical_zone_target(0) if zone_number > 0 else _regroup_point(); target += Vector2(randf_range(-0.04,0.04),randf_range(-0.04,0.04)); p.move_target = target
-		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and _can_acquire_vehicle(Vector2(p.position), 0.002*scaled_delta)) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport,Vector2(p.position))
+		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and _can_acquire_vehicle(Vector2(p.position), 0.002*scaled_delta)) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport,Vector2(p.position)); var brush_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(p.position)); if bool(brush_profile.inside) and transport!="vehicle": profile.speed_multiplier=float(brush_profile.movement_multiplier)
 		if transport=="vehicle" and not keep_vehicle: p.vehicle_until=elapsed+randf_range(18.0,42.0)
 		if transport=="vehicle" and profile.allowed: p.state="DRIVING"; p.transport="vehicle"; resources.fuel=maxi(0,int(resources.fuel)-roundi(scaled_delta*0.04))
 		elif terrain=="water": p.state="SWIMMING"; p.transport="swim"
@@ -340,6 +351,9 @@ func _update_player_movement(scaled_delta: float) -> void:
 
 func _can_acquire_vehicle(position: Vector2, base_chance: float) -> bool:
 	var need_factor := catalog.vehicle_need_factor(map_data) * float(simulation_overrides.get("vehicle_density_scale", 1.0))
+	var road:Dictionary=catalog.road_profile(map_data,position)
+	if float(road.get("distance",99.0))<=float(road.get("width",0.025))*0.6 and float(road.get("vehicle_spawn_chance",0.0))>0.0:
+		if randf()<base_chance*need_factor*float(road.vehicle_spawn_chance): return true
 	for node in map_data.get("transport_nodes", []):
 		if position.distance_to(Vector2(float(node.position[0]), float(node.position[1]))) <= 0.065:
 			return randf() < base_chance * need_factor * float(node.get("spawn_chance", 0.5))
@@ -469,7 +483,7 @@ func _update_airdrops() -> void:
 		if distance < nearest_distance: nearest_distance = distance; nearest_player = player
 	if not nearest_player.is_empty() and nearest_distance <= 0.13 and str(coach_plan.get("engagement", "SELECTIVE")) != "AVOID":
 		var loadout: Dictionary = nearest_player.loadout
-		loadout.primary = "AWM"; loadout.primary_ammo = 15; loadout.helmet = maxi(3, int(loadout.get("helmet", 0))); loadout.vest = maxi(3, int(loadout.get("vest", 0))); loadout.helmet_durability = 100.0; loadout.vest_durability = 100.0; nearest_player.loadout = loadout
+		loadout.primary = "AWM"; loadout.primary_ammo = 3; loadout.helmet = "Lv.3"; loadout.vest = "Lv.3"; loadout.helmet_durability = 90.0; loadout.vest_durability = 120.0; nearest_player.loadout = loadout
 		_store_team_member(team_positions[0], nearest_player); roster = team_positions[0].members
 		_emit_event("airdrop_loot", "%s secured AWM and level-3 armor from airdrop #%d." % [nearest_player.name, airdrops_spawned], "AIRDROP")
 
@@ -564,19 +578,20 @@ func _update_red_zone(_scaled_delta: float) -> void:
 		team.alive = team.members.filter(func(member): return str(member.state) != "DEAD").size(); team_positions[team_index] = team
 	_update_scoreboard()
 
-func _knock_squad_member(squad:Array,player_index:int,actor:String,team_tag:String,weapon:String="—")->void:
+func _knock_squad_member(squad:Array,player_index:int,actor:String,team_tag:String,weapon:String="—",distance_m:float=-1.0)->void:
 	var player:Dictionary=squad[player_index]
 	if str(player.state) in ["KNOCKED","DEAD"]: return
-	player.health=0; player.health_float=0.0; player.dbno=100.0; player.state="KNOCKED"; player.action=""; player.action_item=""; player.knocked_at=elapsed; squad[player_index]=player
-	_push_kill_feed(actor,str(player.name),weapon,"KNOCK"); _emit_event("knock","%s [%s] knock %s." % [actor,weapon,player.name],"KILLFEED")
+	player.health=0; player.health_float=0.0; player.dbno=100.0; player.state="KNOCKED"; player.action=""; player.action_item=""; player.knocked_at=elapsed; player.knocked_distance_m=distance_m; squad[player_index]=player
+	_push_kill_feed(actor,str(player.name),weapon,"KNOCK",distance_m); _emit_event("knock","%s [%s] knock %s%s." % [actor,weapon,player.name," ở %dm"%roundi(distance_m) if distance_m>=0.0 else ""],"KILLFEED")
 
-func _finish_squad_member(squad:Array,player_index:int,actor:String,cause:String="FLUSH",weapon:String="—")->void:
+func _finish_squad_member(squad:Array,player_index:int,actor:String,cause:String="FLUSH",weapon:String="—",distance_m:float=-1.0)->void:
 	var player:Dictionary=squad[player_index]
 	if str(player.state)=="DEAD": return
 	player.health=0; player.health_float=0.0; player.dbno=0.0; player.state="DEAD"; player.action=""; squad[player_index]=player; players_alive=maxi(0,players_alive-1)
-	_push_kill_feed(actor,str(player.name),weapon,cause); _emit_event("finish","%s bị loại hoàn toàn (%s)." % [player.name,cause],"KILLFEED")
+	if distance_m<0.0: distance_m=float(player.get("knocked_distance_m",-1.0))
+	_push_kill_feed(actor,str(player.name),weapon,cause,distance_m); _emit_event("finish","%s bị loại hoàn toàn (%s%s)." % [player.name,cause," • %dm"%roundi(distance_m) if distance_m>=0.0 else ""],"KILLFEED")
 
-func _apply_damage(squad:Array,player_index:int,amount:float,cause:String,actor:String,team_tag:String,weapon:String="—",headshot:bool=false)->Dictionary:
+func _apply_damage(squad:Array,player_index:int,amount:float,cause:String,actor:String,team_tag:String,weapon:String="—",headshot:bool=false,distance_m:float=-1.0)->Dictionary:
 	if player_index < 0 or player_index >= squad.size(): return {"applied":0,"absorbed":0,"knocked":false,"eliminated":false}
 	var player:Dictionary=squad[player_index]
 	if cause == "WEAPON":
@@ -585,25 +600,24 @@ func _apply_damage(squad:Array,player_index:int,amount:float,cause:String,actor:
 	if str(player.get("state", "")) in ["DEAD","IN_PLANE","AIRBORNE"]: return {"applied":0,"absorbed":0,"knocked":false,"eliminated":false}
 	if str(player.state)=="KNOCKED":
 		player.dbno=maxf(0.0,float(player.get("dbno",100.0))-amount); squad[player_index]=player
-		if float(player.dbno)<=0.0 or cause in ["VEHICLE","FRAG","FIRE","RED_ZONE"]: _finish_squad_member(squad,player_index,actor,cause,weapon); return {"applied":roundi(amount),"absorbed":0,"knocked":false,"eliminated":true}
+		if float(player.dbno)<=0.0 or cause in ["VEHICLE","FRAG","FIRE","RED_ZONE"]: _finish_squad_member(squad,player_index,actor,cause,weapon,distance_m); return {"applied":roundi(amount),"absorbed":0,"knocked":false,"eliminated":true}
 		return {"applied":roundi(amount),"absorbed":0,"knocked":false,"eliminated":false}
 	var loadout:Dictionary=player.get("loadout", {})
 	var armor_key := "helmet" if headshot else "vest"
 	var durability_key := "helmet_durability" if headshot else "vest_durability"
-	var armor_level := str(loadout.get(armor_key, "None"))
 	var durability := float(loadout.get(durability_key, 0.0))
-	var protection := 0.0 if armor_level=="None" or durability<=0.0 else 0.30 if armor_level=="Lv.1" else 0.40 if armor_level=="Lv.2" else 0.50
-	var absorbed := minf(amount*protection,durability)
+	var armor_level := str(loadout.get(armor_key, "None"))
+	var absorbed := minf(amount,durability) if armor_level!="None" and durability>0.0 else 0.0
 	loadout[durability_key]=maxf(0.0,durability-absorbed)
 	if float(loadout[durability_key])<=0.0 and armor_level!="None": loadout[armor_key]="Broken"
-	var hp_damage:=maxf(1.0,amount-absorbed)
+	var hp_damage:=maxf(0.0,amount-absorbed)
 	var before_hp:=float(player.get("health_float",player.get("health",100)))
 	player.health_float=maxf(0.0,before_hp-hp_damage); player.health=ceili(player.health_float); player.loadout=loadout
-	player.last_damage={"time":elapsed,"cause":cause,"actor":actor,"weapon":weapon,"raw":roundi(amount),"absorbed":roundi(absorbed),"applied":roundi(hp_damage)}
+	player.last_damage={"time":elapsed,"cause":cause,"actor":actor,"weapon":weapon,"raw":roundi(amount),"absorbed":roundi(absorbed),"applied":roundi(hp_damage),"distance_m":roundi(distance_m)}
 	if str(player.get("action", ""))!="": _cancel_player_action(player)
 	squad[player_index]=player
 	_emit_event("damage","%s gây %d damage lên %s bằng %s (%d armor)." % [actor,roundi(hp_damage),player.name,weapon,roundi(absorbed)],"COMBAT")
-	if int(player.health)<=0: _knock_squad_member(squad,player_index,actor,team_tag,weapon); return {"applied":roundi(hp_damage),"absorbed":roundi(absorbed),"knocked":true,"eliminated":false}
+	if int(player.health)<=0: _knock_squad_member(squad,player_index,actor,team_tag,weapon,distance_m); return {"applied":roundi(hp_damage),"absorbed":roundi(absorbed),"knocked":true,"eliminated":false}
 	return {"applied":roundi(hp_damage),"absorbed":roundi(absorbed),"knocked":false,"eliminated":false}
 
 func _resolve_squad_wipe(squad:Array,team_tag:String)->void:
@@ -674,8 +688,8 @@ func _resolve_throwable_damage(user: Dictionary, _position: Vector2, kind: Strin
 	if bool(outcome.eliminated): user.kills = int(user.get("kills",0)) + 1
 	victim.alive = victim.members.filter(func(member): return str(member.state) != "DEAD").size(); _store_team_member(team_positions[0], user); _commit_combat_team(0, team_positions[0]); team_positions[victim_index] = victim; _update_scoreboard()
 
-func _push_kill_feed(actor: String, target: String, weapon: String, outcome: String) -> void:
-	kill_feed.push_front({"time":elapsed,"actor":actor,"target":target,"weapon":weapon,"outcome":outcome}); if kill_feed.size()>30: kill_feed.resize(30)
+func _push_kill_feed(actor: String, target: String, weapon: String, outcome: String, distance_m:float=-1.0) -> void:
+	kill_feed.push_front({"time":elapsed,"actor":actor,"target":target,"weapon":weapon,"outcome":outcome,"distance_m":roundi(distance_m)}); if kill_feed.size()>30: kill_feed.resize(30)
 
 func _sync_team(changed: Dictionary) -> void:
 	for i in team_positions.size(): if str(team_positions[i].tag)==str(changed.tag): team_positions[i]=changed
@@ -733,24 +747,25 @@ func _world_fire_between(attacker_index:int,victim_index:int)->void:
 	var shooters:Array=attacker.members.filter(func(member): return str(member.state) not in ["DEAD","KNOCKED","IN_PLANE","AIRBORNE"] and str(member.loadout.primary)!="Unarmed")
 	var knocked:Array=victim.members.filter(func(member): return str(member.state)=="KNOCKED"); var standing:Array=victim.members.filter(func(member): return str(member.state) not in ["DEAD","KNOCKED","IN_PLANE","AIRBORNE"])
 	if shooters.is_empty() or (standing.is_empty() and knocked.is_empty()): return
-	var shooter:Dictionary=shooters.pick_random(); shooter.shots=int(shooter.get("shots",0))+1; var target:Dictionary=_select_combat_target(attacker,victim,standing,knocked,attacker_index); var distance:=Vector2(shooter.position).distance_to(Vector2(target.position)); var weapon:=_select_combat_weapon(shooter,distance); shooter=_consume_weapon_ammo(shooter,weapon)
+	var shooter:Dictionary=shooters.pick_random(); shooter.shots=int(shooter.get("shots",0))+1; var target:Dictionary=_select_combat_target(attacker,victim,standing,knocked,attacker_index); var distance:=Vector2(shooter.position).distance_to(Vector2(target.position)); var distance_m:=distance*float(map_data.get("world_size_m",5000)); var weapon:=_select_combat_weapon(shooter,distance); shooter=_consume_weapon_ammo(shooter,weapon)
 	var vehicle_impact:=str(shooter.get("state",""))=="DRIVING" and randf()<0.16
 	if vehicle_impact:
 		for target_index in victim.members.size():
 			if str(victim.members[target_index].name)!=str(target.name): continue
-			var outcome:=_apply_damage(victim.members,target_index,120.0,"VEHICLE",str(shooter.name),str(victim.tag),"VEHICLE")
+			var outcome:=_apply_damage(victim.members,target_index,120.0,"VEHICLE",str(shooter.name),str(victim.tag),"VEHICLE",false,distance_m)
 			shooter.damage=int(shooter.get("damage",0))+int(outcome.applied)
 			if bool(outcome.eliminated): attacker.kills=int(attacker.kills)+1; shooter.kills=int(shooter.get("kills",0))+1
 		_store_team_member(attacker,shooter)
 		_resolve_squad_wipe(victim.members,str(victim.tag)); victim.alive=victim.members.filter(func(member): return str(member.state)!="DEAD").size(); _commit_combat_team(attacker_index,attacker); _commit_combat_team(victim_index,victim); _update_scoreboard(); return
-	var weapon_accuracy:=float(_weapon_profile(weapon).get("accuracy",0.72)); var competitive_modifier := 0.07 if victim_index==0 else -0.035 if attacker_index==0 else 0.0; var hit_chance:=clampf(float(shooter.get("aim",60))/115.0*weapon_accuracy-distance*0.55+competitive_modifier+_combat_plan_bonus(attacker_index,distance),0.12,0.84); var shot_hit:=randf()<hit_chance
+	var weapon_accuracy:=float(_weapon_profile(weapon).get("accuracy",0.72)); var range_rule:=_weapon_range_rule(weapon); var max_range:=float(range_rule.max_m); var range_accuracy:=clampf(1.0-distance_m/maxf(max_range,1.0)*0.58,0.18,1.0); var target_building:=catalog.building_profile_at(map_data,Vector2(target.position)); var cover_penalty:=float(target_building.get("cover_rating",0.0))*0.38; var competitive_modifier := 0.07 if victim_index==0 else -0.035 if attacker_index==0 else 0.0; var hit_chance:=0.01 if distance_m>max_range else clampf(float(shooter.get("aim",60))/115.0*weapon_accuracy*range_accuracy+competitive_modifier+_combat_plan_bonus(attacker_index,distance)-cover_penalty,0.05,0.84); var shot_hit:=randf()<hit_chance
 	bullet_trails.append({"from":shooter.position,"to":target.position,"ttl":3.5,"weapon":weapon,"outcome":"HIT" if shot_hit else "MISS"})
 	if not shot_hit: _store_team_member(attacker,shooter); _commit_combat_team(attacker_index,attacker); _emit_event("shot_miss","%s [%s] bắn hụt %s." % [shooter.name,weapon,target.name],"COMBAT"); return
 	shooter.hits=int(shooter.get("hits",0))+1
 	for target_index in victim.members.size():
 		if str(victim.members[target_index].name)!=str(target.name): continue
-		var raw_damage:=float(_weapon_profile(weapon).get("damage", 40))*randf_range(0.82,1.18)
-		var outcome:=_apply_damage(victim.members,target_index,raw_damage,"WEAPON",str(shooter.name),str(victim.tag),weapon,randf()<0.16)
+		var category:=str(_weapon_profile(weapon).get("category","AR")); var raw_damage:=float(_weapon_profile(weapon).get("damage", 40))*randf_range(0.82,1.18)*_weapon_damage_at_distance(weapon,distance_m); if category in ["SHOTGUN","SR"] and distance_m<=float(range_rule.optimal_m): raw_damage=maxf(raw_damage,105.0)
+		var headshot:=randf()<0.16; if headshot: raw_damage*=1.5
+		var outcome:=_apply_damage(victim.members,target_index,raw_damage,"WEAPON",str(shooter.name),str(victim.tag),weapon,headshot,distance_m)
 		shooter.damage=int(shooter.get("damage",0))+int(outcome.applied)
 		if bool(outcome.eliminated): attacker.kills=int(attacker.kills)+1; shooter.kills=int(shooter.get("kills",0))+1
 		elif not bool(outcome.knocked): _emit_event("shot_hit","%s [%s] hit %s (%d HP)." % [shooter.name,weapon,target.name,victim.members[target_index].health],"COMBAT")
@@ -767,6 +782,19 @@ func _commit_combat_team(team_index:int,team:Dictionary)->void:
 
 func _weapon_profile(weapon: String) -> Dictionary:
 	return WEAPON_PROFILES.get(weapon, LEGACY_WEAPON_PROFILES.get(weapon, {"ideal_min":0.0,"ideal_max":0.12,"accuracy":0.70,"damage":30}))
+
+func _weapon_range_rule(weapon:String)->Dictionary:
+	return WEAPON_RANGE_RULES.get(str(_weapon_profile(weapon).get("category","AR")),WEAPON_RANGE_RULES.AR)
+
+func _weapon_damage_at_distance(weapon:String,distance_m:float)->float:
+	var rule:=_weapon_range_rule(weapon); var optimal:=float(rule.optimal_m); var maximum:=float(rule.max_m)
+	if distance_m<=optimal: return 1.0
+	if distance_m>=maximum: return float(rule.falloff_floor)
+	return lerpf(1.0,float(rule.falloff_floor),(distance_m-optimal)/maxf(1.0,maximum-optimal))
+
+func display_ammo_for_weapon(weapon:String,simulation_shots:int)->int:
+	if weapon in ["Unarmed","—",""]: return 0
+	return simulation_shots*int(_weapon_range_rule(weapon).get("display_rounds",30))
 
 func _attachment_slot(attachment:String) -> String:
 	if attachment in ["Red Dot","2x","3x","4x","6x","8x"]: return "scope"
@@ -805,9 +833,9 @@ func _select_combat_weapon(player:Dictionary,distance:float)->String:
 		var weapon:=str(candidate.weapon)
 		if weapon in ["Unarmed","—",""]: continue
 		if int(candidate.ammo) <= 0 or elapsed < float(loadout.get(str(candidate.slot)+"_reload_until", 0.0)): continue
-		var profile:Dictionary=_weapon_profile(weapon)
-		var minimum:=float(profile.ideal_min); var maximum:=float(profile.ideal_max)
-		var range_penalty:=0.0 if distance>=minimum and distance<=maximum else minf(absf(distance-minimum),absf(distance-maximum))*8.0
+		var profile:Dictionary=_weapon_profile(weapon); var distance_m:=distance*float(map_data.get("world_size_m",5000)); var rule:=_weapon_range_rule(weapon); var maximum:=float(rule.max_m); var optimal:=float(rule.optimal_m)
+		var range_penalty:=0.0 if distance_m<=optimal else (distance_m-optimal)/maxf(1.0,maximum-optimal)
+		if distance_m>maximum: range_penalty+=2.0
 		var score:=float(profile.accuracy)-range_penalty
 		if str(candidate.slot)=="secondary": score+=0.035
 		if score>best_score: best_score=score; best_weapon=weapon; loadout.active_slot=str(candidate.slot)
@@ -848,31 +876,100 @@ func _initialize_loot_stock()->void:
 	var custom_loot_scale := float(simulation_overrides.get("loot_density_scale", 1.0))
 	for source in catalog.loot_sources(map_data):
 		var key := "%s:%s" % [str(source.source_kind), str(source.id)]
-		var capacity := int(source.get("capacity", roundi(float(source.get("building_count", 1)) * 4.0)))
-		loot_stock[key] = {"remaining":roundi(capacity * catalog.loot_density_factor(map_data) * custom_loot_scale),"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name)}
+		var slots:=maxi(1,roundi(catalog.loot_slot_count(source)*float(source.get("effective_multiplier",1.0))*custom_loot_scale)); var items:=_generate_source_loot(source,slots)
+		loot_stock[key] = {"remaining":items.size(),"items":items,"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name),"slots":slots}
+
+func _generate_source_loot(source:Dictionary,slots:int)->Array:
+	var items:Array=[]
+	for index in slots:
+		if index==0: items.append({"kind":"weapon","weapon":_roll_loot_weapon(float(source.get("effective_multiplier",1.0)))})
+		elif index==1: items.append({"kind":"ammo","shots":randi_range(1,3)})
+		else:
+			var roll:=randf()
+			if roll<0.24: items.append({"kind":"weapon","weapon":_roll_loot_weapon(float(source.get("effective_multiplier",1.0)))})
+			elif roll<0.46: items.append({"kind":"ammo","shots":randi_range(1,3)})
+			elif roll<0.58: items.append({"kind":"armor","slot":"vest","level":1 if randf()<0.76 else 2})
+			elif roll<0.68: items.append({"kind":"armor","slot":"helmet","level":1 if randf()<0.8 else 2})
+			elif roll<0.82: items.append({"kind":"heal","item":"bandage" if randf()<0.62 else "first_aid"})
+			elif roll<0.91: items.append({"kind":"boost","item":"energy_drink" if randf()<0.74 else "painkiller"})
+			else: items.append({"kind":"throwable","item":["smoke","frag","molotov","flash"].pick_random()})
+	return items
+
+func _roll_loot_weapon(source_multiplier:float)->String:
+	var roll:=randf(); var category:="SMG"
+	if roll<0.30: category="SMG"
+	elif roll<0.60: category="AR"
+	elif roll<0.73: category="SHOTGUN"
+	elif roll<0.88: category="DMR"
+	elif roll<0.94: category="LMG"
+	elif roll<0.985: category="PISTOL"
+	else: category="SR"
+	if source_multiplier>=1.45 and randf()<0.035: category="SR"
+	var pool:=WEAPONS.filter(func(weapon): return str(_weapon_profile(str(weapon)).get("category",""))==category and str(weapon) not in ["AWM","Lynx AMR"])
+	return str(pool.pick_random()) if not pool.is_empty() else "M416"
+
+func _role_weapon_score(player:Dictionary,weapon:String)->float:
+	var category:=str(_weapon_profile(weapon).get("category","AR")); var role:=str(player.get("role","Flex")).to_upper(); var preferred:Array
+	if "SNIP" in role or "SCOUT" in role: preferred=["SR","DMR","AR"]
+	elif "ENTRY" in role or "FRAG" in role: preferred=["SMG","SHOTGUN","AR"]
+	elif "SUPPORT" in role: preferred=["DMR","AR","LMG"]
+	else: preferred=["AR","DMR","SMG"]
+	var rank:=preferred.find(category); return 3.0-float(rank) if rank>=0 else 0.35
+
+func _choose_loot_item(player:Dictionary,items:Array)->int:
+	var loadout:Dictionary=player.loadout; var resource_plan:=str(player.get("tactical_resource","MINIMAL")); var best_index:=-1; var best_score:=-999.0
+	for index in items.size():
+		var item:Dictionary=items[index]; var score:=0.0; var kind:=str(item.kind)
+		if kind=="weapon":
+			score=_role_weapon_score(player,str(item.weapon))*2.0
+			if str(loadout.primary)=="Unarmed": score+=8.0
+			elif str(loadout.secondary)=="—": score+=3.0
+			else: score-= _role_weapon_score(player,str(loadout.primary))
+		elif kind=="ammo": score=4.0 if int(loadout.get("ammo",0))<8 else 0.8
+		elif kind=="armor":
+			var current_level:=int(str(loadout.get(str(item.slot),"None")).trim_prefix("Lv.")) if str(loadout.get(str(item.slot),"None")).begins_with("Lv.") else 0; score=5.0 if int(item.level)>current_level else -1.0
+		elif kind=="heal": score=3.0 if int(loadout.get(str(item.item),0))<4 else -0.5
+		elif kind=="boost": score=2.2 if int(loadout.get(str(item.item),0))<3 else -0.5
+		elif kind=="throwable": score=1.8 if int(loadout.get(str(item.item),0))<3 else -0.5
+		if resource_plan=="HEAL" and kind in ["heal","boost"]: score+=4.0
+		elif resource_plan=="UTILITY" and kind=="throwable": score+=4.0
+		elif resource_plan=="FULL": score+=0.5
+		if score>best_score: best_score=score; best_index=index
+	return best_index if best_score>0.0 else -1
+
+func _loot_interval(player:Dictionary)->float:
+	var efficiency:=clampf(float(player.get("loot_efficiency",60))/60.0,0.65,1.45); var resource_plan:=str(player.get("tactical_resource","MINIMAL")); var plan_multiplier:=1.3 if resource_plan=="MINIMAL" else 0.75 if resource_plan=="FULL" else 1.0
+	return randf_range(5.0,8.0)*plan_multiplier/efficiency
+
+func _pickup_loot_item(player:Dictionary,item:Dictionary)->Dictionary:
+	var loadout:Dictionary=player.loadout; var kind:=str(item.kind)
+	if kind=="weapon":
+		var weapon:=str(item.weapon)
+		if str(loadout.primary)=="Unarmed" or _role_weapon_score(player,weapon)>_role_weapon_score(player,str(loadout.primary)): loadout.secondary=loadout.primary if str(loadout.primary)!="Unarmed" else loadout.secondary; loadout.secondary_ammo=loadout.primary_ammo if str(loadout.primary)!="Unarmed" else loadout.secondary_ammo; loadout.primary=weapon; loadout.primary_ammo=maxi(1,int(loadout.get("primary_ammo",0)))
+		elif str(loadout.secondary)=="—": loadout.secondary=weapon; loadout.secondary_ammo=1
+	elif kind=="ammo":
+		if str(loadout.primary)!="Unarmed": loadout.primary_ammo=int(loadout.primary_ammo)+int(item.shots)
+		elif str(loadout.secondary)!="—": loadout.secondary_ammo=int(loadout.secondary_ammo)+int(item.shots)
+	elif kind=="armor":
+		var level:=int(item.level); loadout[str(item.slot)]="Lv.%d"%level; loadout[str(item.slot)+"_durability"]=[0,35,60,90][level] if str(item.slot)=="helmet" else [0,50,80,120][level]
+	elif kind in ["heal","boost","throwable"]: loadout[str(item.item)]=int(loadout.get(str(item.item),0))+1
+	loadout.ammo=int(loadout.get("primary_ammo",0))+int(loadout.get("secondary_ammo",0)); loadout.loot_stage=int(loadout.get("loot_stage",0))+1; player.loadout=loadout; _enforce_loadout_capacity(player); return player
 
 func _loot_player(player:Dictionary)->Dictionary:
 	var candidates:Array=[]; var position:=Vector2(player.position)
 	for source in catalog.loot_sources(map_data):
-		if position.distance_to(Vector2(float(source.position[0]),float(source.position[1])))<=float(source.get("radius",0.035)):
+		var inside:=position.distance_to(Vector2(float(source.position[0]),float(source.position[1])))<=float(source.get("radius",0.035))
+		if str(source.get("source_kind",""))=="building":
+			var rect:Array=source.get("rect",[]); inside=rect.size()==4 and Rect2(float(rect[0]),float(rect[1]),float(rect[2]),float(rect[3])).has_point(position)
+		if inside:
 			candidates.append({"key":"%s:%s" % [str(source.source_kind),str(source.id)],"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name)})
 	if candidates.is_empty(): return player
 	candidates.sort_custom(func(a,b): return float(a.multiplier)>float(b.multiplier))
-	var source:Dictionary=candidates[0]; var stock:Dictionary=loot_stock.get(source.key,{"remaining":0,"multiplier":0.0})
-	if int(stock.remaining)<=0: return player
-	var resource_plan := str(player.get("tactical_resource","MINIMAL")); var loot_factor := 0.70 if resource_plan == "MINIMAL" else 1.35 if resource_plan == "FULL" else 1.0
-	var take:=mini(int(stock.remaining),maxi(1,roundi(2.0*float(source.multiplier)*loot_factor))); stock.remaining=int(stock.remaining)-take; loot_stock[source.key]=stock
-	var loadout:Dictionary=player.loadout; var stage:=int(loadout.get("loot_stage",0))+1; loadout.loot_stage=stage; loadout.last_loot_source=source.get("name",source.key); loadout.last_loot_source_kind=source.get("source_kind","")
-	if stage==1: loadout.primary=WEAPONS[int(loadout.weapon_seed)%WEAPONS.size()]; loadout.primary_ammo=30+take*5; loadout.ammo=loadout.primary_ammo
-	elif stage==2: loadout.helmet="Lv.1"; loadout.helmet_durability=80.0; loadout.vest="Lv.1"; loadout.vest_durability=200.0; loadout.backpack="Lv.1"; loadout.bandage=3+take
-	elif stage==3:
-		loadout.secondary=WEAPONS[(int(loadout.weapon_seed)+12)%WEAPONS.size()]; loadout.secondary_ammo=20+take*4
-		var scope_candidate:=str(["Red Dot","3x","4x","6x"][int(loadout.weapon_seed)%4]); _equip_attachment(loadout,"primary",scope_candidate)
-		loadout.first_aid=1; loadout.energy_drink=1
-	else: loadout.primary_ammo=int(loadout.get("primary_ammo",0))+take*5; loadout.secondary_ammo=int(loadout.get("secondary_ammo",0))+(take*3 if str(loadout.get("secondary","—"))!="—" else 0); loadout.ammo=int(loadout.primary_ammo)+int(loadout.secondary_ammo); loadout.bandage=mini(10,int(loadout.bandage)+1); loadout.first_aid=mini(4,int(loadout.first_aid)+(1 if randf()<0.35 else 0)); loadout.energy_drink=mini(6,int(loadout.energy_drink)+(1 if randf()<0.45 else 0)); loadout.smoke=mini(5,int(loadout.smoke)+(1 if randf()<0.3 else 0)); loadout.frag=mini(3,int(loadout.frag)+(1 if randf()<0.2 else 0)); loadout.molotov=mini(3,int(loadout.molotov)+(1 if randf()<0.16 else 0)); loadout.flash=mini(3,int(loadout.flash)+(1 if randf()<0.13 else 0))
-	if resource_plan == "HEAL": loadout.first_aid = mini(4, int(loadout.first_aid) + 1); loadout.energy_drink = mini(6, int(loadout.energy_drink) + 1)
-	elif resource_plan == "UTILITY": loadout.smoke = mini(5, int(loadout.smoke) + 1); loadout.frag = mini(3, int(loadout.frag) + 1)
-	player.loadout=loadout; _enforce_loadout_capacity(player); return player
+	var source:Dictionary=candidates[0]; var stock:Dictionary=loot_stock.get(source.key,{"remaining":0,"items":[],"multiplier":0.0}); var items:Array=stock.get("items",[])
+	if items.is_empty(): return player
+	var item_index:=_choose_loot_item(player,items); if item_index<0: return player
+	var item:Dictionary=items[item_index]; items.remove_at(item_index); stock.items=items; stock.remaining=items.size(); loot_stock[source.key]=stock
+	player=_pickup_loot_item(player,item); player.loadout.last_loot_source=source.get("name",source.key); player.loadout.last_loot_source_kind=source.get("source_kind",""); player.loadout.last_loot_offer=item.duplicate(true); return player
 
 func _recalculate_loadout_weight(loadout: Dictionary) -> void:
 	var weight := float(loadout.get("ammo", 0)) * 0.02
@@ -923,14 +1020,14 @@ func _contact_event() -> void:
 	if observers.is_empty(): return
 	var enemy_teams:=team_positions.filter(func(team): return str(team.tag)!="MR" and int(team.alive)>0)
 	if enemy_teams.is_empty(): return
-	var observer: Dictionary = observers.pick_random(); var enemy: Dictionary = enemy_teams.pick_random(); var distance: float = Vector2(observer.position).distance_to(Vector2(enemy.position)); var terrain: String = _nearest_terrain(Vector2(observer.position)); var concealment: float = 0.28 if terrain in ["forest","urban"] else 0.12 if terrain in ["rock","industrial"] else 0.04
+	var observer: Dictionary = observers.pick_random(); var enemy: Dictionary = enemy_teams.pick_random(); var distance: float = Vector2(observer.position).distance_to(Vector2(enemy.position)); var terrain: String = _nearest_terrain(Vector2(observer.position)); var terrain_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(observer.position)); var vision_multiplier:=float(terrain_profile.get("vision_multiplier",0.55 if terrain=="forest" else 1.0)); var concealment: float = 0.28 if terrain in ["forest","urban"] else 0.12 if terrain in ["rock","industrial"] else 0.04
 	var formation_vision: float = float({"STACK":-0.08,"TWO_TWO":0.12,"ONE_THREE":0.18,"FOUR_WAY":0.28,"ANCHOR_THREE":0.14}.get(str(coach_plan.formation),0.0))
 	var noise: float = randf_range(0.0,0.35) + (0.22 if randf()<0.25 else 0.0)
 	var information_plan := str(coach_plan.get("information","INFO_FIRST")); var information_bonus: float = float({"INFO_FIRST":0.08,"SCOUT_FIRST":0.13,"CONFIRM_PUSH":0.10,"IMMEDIATE":-0.03}.get(information_plan,0.0))
-	var our_score: float = float(observer.vision)/100.0*0.46 + float(observer.hearing)/100.0*0.16 + float(observer.game_sense)/100.0*0.18 + formation_vision + information_bonus + noise - distance*0.42 - concealment
+	var our_score: float = float(observer.vision)/100.0*0.46*vision_multiplier + float(observer.hearing)/100.0*0.16 + float(observer.game_sense)/100.0*0.18 + formation_vision + information_bonus + noise - distance*0.42 - concealment
 	var enemy_score: float = randf_range(0.32,0.82) + noise*0.35 - float(observer.stealth)/100.0*0.28 - distance*0.30
 	var ours := randf() < clampf(our_score,0.04,0.94); var theirs := randf() < clampf(enemy_score,0.04,0.92); detection_attempts += 1; if ours: confirmed_contacts += 1
-	var contact := {"time":elapsed,"observer":observer.name,"distance":roundi(distance*8000.0),"ours_detected":ours,"enemy_detected":theirs,"confidence":clampf(our_score,0.0,1.0),"terrain":terrain,"noise":noise}; contacts.push_front(contact); if contacts.size()>12: contacts.resize(12)
+	var contact := {"time":elapsed,"observer":observer.name,"distance":roundi(distance*float(map_data.get("world_size_m",5000))),"ours_detected":ours,"enemy_detected":theirs,"confidence":clampf(our_score,0.0,1.0),"terrain":terrain,"noise":noise}; contacts.push_front(contact); if contacts.size()>12: contacts.resize(12)
 	var outcome := "hai đội chưa xác nhận nhau"
 	if ours and theirs: outcome = "hai đội phát hiện lẫn nhau"
 	elif ours: outcome = "ta phát hiện trước, địch chưa thấy"
@@ -938,6 +1035,8 @@ func _contact_event() -> void:
 	_emit_event("contact","%s: %s ở %dm (%s)." % [observer.name,outcome,contact.distance,terrain],"VISION")
 
 func _nearest_terrain(position: Vector2) -> String:
+	var painted:Dictionary=catalog.terrain_profile_at(map_data,position)
+	if bool(painted.get("inside",false)): return str(painted.terrain)
 	var best := "field"; var best_distance := 99.0
 	for region in map_data.get("regions",[]):
 		var p := Vector2(float(region.position[0]),float(region.position[1])); var d := position.distance_to(p)

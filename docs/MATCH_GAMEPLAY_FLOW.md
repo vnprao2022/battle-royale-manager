@@ -46,13 +46,17 @@ Tất cả map là hình vuông và dùng tọa độ chuẩn hóa `0.0–1.0` t
 | Sunscorch Basin | 6×6 km | ×0.82 | ×1.35 |
 | Highland Reserve | 6×6 km | ×0.82 | ×1.35 |
 
-Mỗi descriptor schema v2 có năm layer:
+Mỗi descriptor schema v2 có các layer dữ liệu sau:
 
 1. `regions`: Landmark/POI có tên, loại (`city`, `port`, `military_base`, `village`, `industrial`, `landmark`), bán kính, terrain, loot multiplier và hotness.
 2. `compounds`: khu nhỏ thuộc `poi_id`; có vị trí, bán kính, số/tipo building, cover, hotness, loot multiplier và stock capacity. Runtime loot trực tiếp từ layer này.
-3. `roads`: polyline thuộc `highway`, `secondary` hoặc `dirt`. Khi xe ở gần đường (≤ 0.025 normalized), tốc độ terrain được nhân thêm với `vehicle_speed` của đường.
+3. `roads`: polyline thuộc `highway`, `secondary` hoặc `dirt`; mỗi đường có `width`, `vehicle_speed` và `vehicle_spawn_chance` riêng.
 4. `points`: nhà/camp biệt lập, safety cao và loot thấp. Đây là lựa chọn thực tế cho `FIXED_SAFE`/`LOOT_ROUTE`.
-5. `transport_nodes`: garage/motorpool; xe chỉ có thể được lấy khi player ở gần node (≤ 0.065 normalized). Spawn chance chịu ảnh hưởng bởi map size và Custom Rules.
+5. `transport_nodes`: garage/motorpool có xác suất cấp xe riêng.
+6. `terrain_strokes`: nét brush sông hoặc rừng, lưu path, width, movement multiplier và vision multiplier. Sông mặc định cho bơi ở tốc độ ×0.50; rừng mặc định di chuyển ×0.82 và tầm nhìn ×0.55.
+7. `buildings`: hình chữ nhật có vị trí/kích thước, cover rating, loot multiplier và số loot slot. Đây là dữ liệu gameplay 2D, không phải hình trang trí.
+
+Hai layer mới là tùy chọn để sáu descriptor cũ vẫn load được; `MapCatalog.load_map()` bổ sung mảng rỗng nếu descriptor chưa có. Khi lưu override từ LAB, toàn bộ nét vẽ/path/width/rectangle được serialize vào `user://map_overrides`. Runtime đọc chung schema này nên không có logic riêng hard-code cho từng map.
 
 `MapCatalog.validate()` từ chối map không vuông, sai kích thước 4/5/6, thiếu layer, road class không hợp lệ, compound không thuộc POI, hoặc compound không có building.
 
@@ -67,14 +71,17 @@ Mỗi descriptor schema v2 có năm layer:
 
 ### Loot theo kích thước map
 
-Nguồn loot hiệu lực là `compounds + enabled isolated points`. Named POI không tự phát đồ; POI tổ chức các compound và quyết định drop/hotness.
+Nguồn loot hiệu lực là `compounds + enabled isolated points + enabled buildings`. Named POI không tự phát đồ; POI tổ chức các compound và quyết định drop/hotness.
 
 ```text
-effective multiplier = source loot_multiplier × map size_density_factor
-initial stock = source capacity × map size_density_factor × Custom Rules loot_density_scale
+effective multiplier = source loot_multiplier × map size_density_factor × Custom Rules loot_density_scale
+base slots = explicit loot_slots, nếu có
+           = 3 với isolated point/building
+           = building_count × 2 với compound
+generated slots = base slots × effective multiplier (tối thiểu 1)
 ```
 
-Do đó map 4×4 có nhiều stock hơn; map 6×6 ít hơn và có vehicle need cao hơn. Isolated point có multiplier thấp hơn compound, nhưng safety cao và được safe-drop ưu tiên.
+Do đó map 4×4 có mật độ item cao hơn; map 6×6 ít item hơn và có vehicle need cao hơn. Isolated point/building mặc định sinh khoảng ba offer trước hệ số; compound lớn có nhiều offer theo số building.
 
 ## 3. Deployment và state của player
 
@@ -92,21 +99,37 @@ Plane hoàn thành đường bay trong 75 giây. Vòng simulation bắt đầu m
 
 ## 4. Loot và inventory
 
-Mỗi lượt loot lấy stock từ source có multiplier cao nhất đang phủ vị trí player; multiplier không cộng dồn khi overlap. Coach resource plan điều chỉnh lượng lấy:
+Khi match khởi tạo, mỗi loot source sinh một mảng item thật theo số slot. Slot đầu ưu tiên weapon, slot hai ưu tiên ammo; các slot sau roll từ weapon/ammo/armor/heal/boost/throwable bằng trọng số. SR rất hiếm trong normal loot (AWM/Lynx không nằm trong normal pool); AWM hiện chỉ được cấp bởi airdrop.
 
-- `MINIMAL`: ×0.70.
-- `FULL`: ×1.35.
-- `HEAL`: thêm First Aid và Energy Drink.
-- `UTILITY`: thêm Smoke và Frag.
+Mỗi lượt loot chọn source có multiplier cao nhất đang phủ vị trí player; multiplier không cộng dồn khi overlap. Với building, player phải thực sự nằm trong rectangle. Player chấm điểm từng offer rồi có thể nhặt hoặc bỏ qua:
 
-Loot stage:
+- Sniper/Scout ưu tiên SR → DMR → AR.
+- Entry/Fragger ưu tiên SMG/Shotgun/AR.
+- Support ưu tiên DMR/AR/LMG.
+- Các role còn lại ưu tiên AR/DMR/SMG.
+- Weapon hiện có, armor durability, lượng ammo và nhu cầu heal/utility đều tham gia quyết định.
 
-1. Primary weapon + đạn.
-2. Helmet Lv.1, Vest Lv.1, Backpack Lv.1, Bandage.
-3. Secondary weapon, scope hợp lệ, First Aid, Energy Drink.
-4+. Bổ sung đạn, heal, boost và throwable theo xác suất.
+Item đã nhặt bị xóa khỏi source. Loot efficiency điều chỉnh thời gian giữa hai quyết định; Coach resource plan thay đổi nhịp và ưu tiên:
+
+- `MINIMAL`: interval chậm hơn ×1.30.
+- `FULL`: interval nhanh hơn ×0.75 và cộng điểm nhẹ cho mọi offer hợp lệ.
+- `HEAL`: cộng ưu tiên lớn cho heal/boost.
+- `UTILITY`: cộng ưu tiên lớn cho throwable.
 
 Backpack capacity: không backpack 50; Lv.1 150; Lv.2 220; cấp cao hơn 270. Khi overweight, runtime bỏ Bandage trước rồi bỏ từng 10 ammo; danh sách `discarded` được ghi trong result.
+
+Ammo trong simulation vẫn là **shot unit**: một lần bắn tiêu thụ một unit. UI chỉ quy đổi để tạo cảm giác số viên theo băng/loại súng:
+
+| Category | 1 internal unit hiển thị thành |
+|---|---:|
+| Shotgun | 5 |
+| SMG / AR | 30 |
+| LMG | 50 |
+| DMR | 10 |
+| SR | 5 |
+| Pistol | 15 |
+
+Ví dụ AR có `ammo = 3` trong runtime sẽ hiện `90` trên HUD; SR có `ammo = 3` sẽ hiện `15`. Việc quy đổi chỉ là presentation, không thay đổi số fire event.
 
 ## 5. Movement, road và vehicle
 
@@ -117,8 +140,9 @@ Movement đọc terrain gần POI nhất và `terrain_rules`. Foot/swim/vehicle 
 - Xe base: `0.0022`.
 - AI squad dùng base `0.00068` foot và `0.0018` vehicle.
 - Urgency: `1 + zone_number × 0.22`, cộng thêm `1.4` từ bo 5.
-- Trên đường, vehicle multiplier của terrain được nhân với highway/secondary/dirt multiplier.
-- Player chỉ lấy xe gần transport node; chance chịu `vehicle_need_factor` và `vehicle_density_scale`.
+- Trên đường, vehicle multiplier được nhân với highway/secondary/dirt multiplier; khoảng cách nhận đường dùng chính `width` của nét vẽ.
+- Player có thể lấy xe gần transport node hoặc roll xe khi ở trên road. Road chance mặc định: highway 45%, secondary 25%, dirt 8%; sau đó còn chịu `vehicle_need_factor` và `vehicle_density_scale`.
+- Terrain brush tham gia movement tại vị trí hiện tại: river chuyển state thành `SWIMMING` và movement ×0.50; forest movement ×0.82.
 - Xe có fuel/durability; cạn một trong hai sẽ kết thúc route.
 - Người đang lái có 16% xác suất tạo vehicle impact khi fire event, gây raw 120.
 
@@ -147,7 +171,7 @@ Damage ngoài blue zone:
 
 Red Zone đầu tiên xuất hiện ngẫu nhiên ở 145–190 giây, chỉ khi còn hơn hai team. Tâm và bán kính luôn nằm trong active circle. Một đợt kéo dài 24–38 giây; sau đó chờ 135–210 giây. Mỗi update có 10% chance bắn shell; shell trong phạm vi 0.032 gây raw 140 và có thể finish knocked player.
 
-Airdrop đầu tiên ở 285 giây, các đợt sau cách 210–280 giây. Drop nằm trong 72% active circle. Nếu player team mình cách ≤ 0.13 và engagement không phải `AVOID`, player lấy AWM, 15 đạn và armor Lv.3.
+Airdrop đầu tiên ở 285 giây, các đợt sau cách 210–280 giây. Drop nằm trong 72% active circle. Nếu player team mình cách ≤ 0.13 và engagement không phải `AVOID`, player lấy AWM với 3 internal shot units (HUD hiển thị 15), Helmet Lv.3 durability 90 và Vest Lv.3 durability 120.
 
 ## 8. Súng, attachment và combat
 
@@ -161,23 +185,41 @@ Danh sách weapon pool hiện có 41 súng:
 - Shotgun: S12K, DBS, S686, S1897, O12.
 - Pistol: P92, Deagle, R1895, P18C.
 
-Mỗi profile có category, ideal range, accuracy, damage. `WEAPON_PROFILES` và `LEGACY_WEAPON_PROFILES` đều được runtime đọc; “legacy” là tên bảng trong code, không có nghĩa súng bị vô hiệu.
+Mỗi profile có category, ideal range, accuracy, damage. `WEAPON_PROFILES` và `LEGACY_WEAPON_PROFILES` đều được runtime đọc; “legacy” là tên bảng trong code, không có nghĩa súng bị vô hiệu. Khoảng cách normalized giữa hai player được đổi sang mét bằng cạnh map (`map_size_km × 1000`).
+
+| Category | Optimal | Max | Damage giữ lại ở max | Ý nghĩa implementation |
+|---|---:|---:|---:|---|
+| Shotgun | 12 m | 40 m | 34% | Rất mạnh ở sát mục tiêu; raw damage tối thiểu 105 trong optimal range. |
+| Pistol | 45 m | 120 m | 42% | Sidearm ngắn-trung bình. |
+| SMG | 60 m | 180 m | 44% | Xa hơn shotgun nhưng giảm damage theo cự ly. |
+| AR | 180 m | 450 m | 52% | Tầm trung. |
+| LMG | 220 m | 520 m | 52% | Tầm trung-dài. |
+| DMR | 380 m | 850 m | 62% | Tầm xa hơn rifle. |
+| SR | 700 m | 1,250 m | 72% | Xa nhất; raw damage tối thiểu 105 trong optimal range. |
+
+Ngoài max range, hit chance bị hạ xuống 1%. Trong range, damage nội suy từ 100% ở optimal tới cột “giữ lại ở max”. Shotgun/SR đủ gây knock một phát khi trúng mục tiêu không có armor; headshot vẫn nhân 1.5. Kết quả thực tế còn phụ thuộc accuracy, falloff, cover và virtual HP của helmet/vest.
 
 ```text
 hit chance = clamp(
   aim / 115 × weapon_accuracy
-  - normalized_distance × 0.55
+  - range_progress × distance_penalty
+  - building_cover_rating × 0.38
   + competitive_modifier
   + tactical_plan_bonus,
   0.12, 0.84)
 
-raw damage = weapon_damage × random(0.82, 1.18)
+raw damage = weapon_damage × category_distance_falloff × random(0.82, 1.18)
 headshot chance = 16%
 ```
 
 Competitive modifier hiện tại: AI bắn team người chơi `+0.07`; team người chơi bắn AI `-0.035`. Đây là implementation hiện tại và là điểm cần cân bằng tiếp, không phải difficulty setting tổng quát.
 
-Armor giảm 30%/40%/50% ở Lv.1/Lv.2/Lv.3, giới hạn bởi durability; lượng absorb làm giảm durability. Damage tối thiểu sau armor là 1. Damage làm hủy action đang thực hiện.
+Armor/mũ là **virtual HP theo durability**, không giảm theo phần trăm. Damage trước tiên trừ trực tiếp durability của item phù hợp; phần vượt quá mới vào HP. Một hit có thể gây 0 HP damage nếu virtual HP hấp thụ hết. Capacity hiện tại:
+
+- Helmet Lv.1/Lv.2/Lv.3: 35/60/90 virtual HP.
+- Vest Lv.1/Lv.2/Lv.3: 50/80/120 virtual HP.
+
+Headshot dùng helmet; body shot dùng vest. Item vỡ khi durability về 0. Damage làm hủy action đang thực hiện. Kill feed lưu và hiển thị khoảng cách mét của knock/kill đã xác nhận.
 
 Attachment slot: scope, muzzle, magazine, grip, stock. Scope bị giới hạn theo category; grip chỉ AR/SMG; stock AR/SMG/DMR/SR; pistol không nhận scope.
 
@@ -235,6 +277,7 @@ Career match mới gọi `GameState.apply_match_runtime_result()`. Match chạy 
 - Xem map vuông, flight path, bo hiện tại/bo kế, Red Zone, airdrop/effect, bullet trail và mọi player.
 - Chọn team/player, xem HP, state, loadout, accuracy, boost, kill feed và ranking.
 - Zoom, pan, reset 1:1, lọc team, ẩn/hiện player đã chết.
+- Không hiển thị layer thiết kế chi tiết (POI/road/river/forest/building); đây là ranh giới có chủ ý giữa broadcast observer và công cụ phân tích.
 
 ### LAB (cần bật Custom Rules / developer mode)
 
@@ -242,15 +285,25 @@ Career match mới gọi `GameState.apply_match_runtime_result()`. Match chạy 
 - Chỉnh drop policy, zone macro, formation và engagement trước/new match.
 - Xem resources và decision/event log.
 - Custom Rules được runtime tiêu thụ: weapon damage, zone damage, loot density, AI aggression, vehicle density và per-weapon modifier.
+- Mở Map Manager để xem/chỉnh các gameplay layer. Layer thiết kế cũng được hiển thị trên map LAB.
 - LAB không cho điều khiển player trực tiếp hoặc ép một kết quả combat cụ thể.
 
 ### Map Manager
 
-- Chọn cả sáu map; preview đúng khung vuông.
-- Hiển thị POI, compound, highway/secondary/dirt road, isolated loot point và transport node.
+- Chọn cả sáu map bằng selector; preview đúng khung vuông.
+- Hiển thị POI, compound, highway/secondary/dirt road, isolated loot point, transport node, river/forest brush và building rectangle.
 - Drag POI/compound/point; chỉnh vị trí, radius, loot, hotness, capacity, terrain và traversal rule tương ứng.
-- Thêm/xóa POI, compound, isolated loot point; save override vào `user://map_overrides`; reset về descriptor mặc định.
-- Road path và transport node hiện được hiển thị và runtime dùng, nhưng UI editor chưa có công cụ thêm/xóa waypoint road hoặc chỉnh transport node. Muốn thay đổi hai layer này hiện phải sửa JSON.
+- Thêm/xóa POI, compound, isolated loot point.
+- Freehand brush tạo highway/secondary/dirt road, river hoặc forest; `SIZE` chỉnh độ rộng normalized trước khi vẽ.
+- House Rectangle kéo từ góc này sang góc kia để tạo building; inspector chỉnh cover, loot multiplier và loot slots.
+- Có thể chọn/xóa road, terrain stroke, building trong Master List; save override vào `user://map_overrides`; reset về descriptor mặc định.
+- Transport node được hiển thị và runtime dùng nhưng chưa có editor riêng; muốn thay đổi node hiện phải sửa JSON/override data.
+
+### Analyst Map
+
+- Team Analysis có `ANALYST MAP • READ ONLY`, load descriptor của map sắp thi đấu và hiển thị toàn bộ layer thiết kế.
+- Không bật editor gesture và không ghi override; chức năng này chỉ để đọc/phân tích.
+- Nếu LAB đã save override cho map đó, Analyst Map đọc override ở lần load tiếp theo.
 
 ## 13. Liên kết với gameplay ngoài match
 
@@ -265,11 +318,12 @@ Career match mới gọi `GameState.apply_match_runtime_result()`. Match chạy 
 
 ## 14. Giới hạn đã xác nhận
 
-- Không có interior navigation, door/window interaction, vật lý projectile hay line-of-sight theo từng building; compound hiện là vùng gameplay có stock/cover metadata, không phải level geometry 3D.
-- `cover_rating` và `building_types` đã là dữ liệu thật và được LAB hiển thị/validate, nhưng chưa đi vào damage/hit formula. UI exists; combat effect chưa được triển khai.
+- Không có interior navigation, door/window interaction, vật lý projectile hay line-of-sight theo từng building; rectangle building là vùng 2D có loot và cover, không phải level geometry 3D.
+- `cover_rating` của building rectangle đã giảm hit chance khi target đứng trong rect. `building_types` của compound chưa tạo geometry/LOS riêng.
 - Road tác động tốc độ xe, nhưng AI pathfinding chưa tìm shortest path theo graph; player vẫn move-toward target thẳng và nhận road bonus khi ở gần polyline.
-- Vehicle node kiểm soát acquisition, nhưng node chưa bị consume; nhiều player có thể roll cùng node ở các thời điểm khác nhau.
+- Vehicle node/road kiểm soát acquisition, nhưng spawn chưa bị consume; nhiều player có thể roll cùng nguồn ở các thời điểm khác nhau.
 - Flash chưa có debuff; Smoke chưa block contact formula; airdrop chỉ cấp trực tiếp cho player team mình đủ gần.
+- Player loot hiện là quyết định AI theo role/loadout, chưa có màn tương tác để người dùng bấm chọn từng item giữa live match.
 - Weather, day/night, destructible cover, boat, train, plane crash, recoil pattern và per-ammo caliber chưa có implementation được xác nhận.
 - LAB chưa có timeline scrub/replay seek; nó quan sát simulation live và tăng tốc.
 
@@ -280,3 +334,5 @@ Career match mới gọi `GameState.apply_match_runtime_result()`. Match chạy 
 - `tests/game_systems_test.gd`: gameplay và career systems.
 - `tests/state_integrity_test.gd`: tính toàn vẹn state.
 - `tests/redesign_systems_test.gd`: sáu map load/validate trong regression rộng.
+- `tests/map_editor_combat_test.gd`: schema layer tùy chỉnh, river/forest/building/road, ammo UI, range falloff, virtual HP armor, distance kill feed và loot preference.
+- `tests/map_lab_ui_test.gd`: Map Manager + Analyst Map ở 1280×720 và 1920×1080, bao gồm tạo road/river/forest/building bằng editor events.
