@@ -1,0 +1,23 @@
+{
+  "assets": {
+    "branding.command_center": {"kind":"background","lazy":true,"path":"res://assets/generated/backgrounds/operations_hall.png"},
+    "player.avatar.fallback": {"kind":"player_avatar","lazy":true,"path":"res://assets/generated/branding/players/player_avatar_fallback.png","size":[1024,1024]},
+    "tournament.global_survival_circuit.logo": {"kind":"tournament_logo","lazy":true,"path":"res://assets/generated/branding/tournaments/global_survival_invitational.png","size":[512,512],"tournament_id":"gsi_2026_s1"},
+    "team.mekong_reapers.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_phoenix.png"},
+    "team.crimson_owls.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_owl.png"},
+    "team.neon_tigers.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_tiger.png"},
+    "team.astra_nine.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_fox.png"},
+    "team.iron_pulse.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_dragon.png"},
+    "team.silent_wave.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_shark.png"},
+    "team.titan_forge.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_bull.png"},
+    "team.azure_foxes.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_fox.png"},
+    "team.quantum_raid.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_raven.png"},
+    "team.solar_vipers.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_viper.png"},
+    "team.night_lotus.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_lotus.png"},
+    "team.vertex_guard.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_wolf.png"},
+    "team.ember_crown.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_crown.png"},
+    "team.polar_ace.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_falcon.png"},
+    "team.orbit_seven.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_panther.png"},
+    "team.rift_kings.logo": {"kind":"team_logo","lazy":true,"path":"res://assets/generated/branding/teams/team_scorpion.png"}
+  }
+}

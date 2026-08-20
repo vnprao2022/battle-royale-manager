@@ -1,0 +1,119 @@
+{
+  "branding": {
+    "loading_asset_id": "ui.loading.tournament_fallback",
+    "logo_asset_id": "tournament.global_survival_circuit.logo"
+  },
+  "currency": "USD",
+  "format": {
+    "map_rotation": [
+      "verdant_reach",
+      "sunscorch_basin",
+      "verdant_reach",
+      "sunscorch_basin",
+      "verdant_reach",
+      "sunscorch_basin"
+    ],
+    "maps": [
+      "verdant_reach",
+      "sunscorch_basin"
+    ],
+    "match_days": 3,
+    "matches_per_day": 6,
+    "stage": "Grand Final",
+    "total_matches": 18
+  },
+  "id": "gsi_2026_s1",
+  "name": "Global Survival Invitational",
+  "organizer": "Global Survival Federation",
+  "player_count": 64,
+  "prize_distribution": {
+    "1": 120000,
+    "2": 60000,
+    "3": 36000,
+    "4": 24000,
+    "5-8": 10000,
+    "9-16": 2500
+  },
+  "prize_pool": 300000,
+  "qualification": {
+    "champion_to": "Global Series Qualifier",
+    "pgs_points": true
+  },
+  "region": "Global",
+  "rules_id": "pubg_pc_esports_v1",
+  "schedule": {
+    "end_date": "2026-03-22",
+    "match_days": [
+      {
+        "date": "2026-03-20",
+        "day": 1,
+        "matches": 6
+      },
+      {
+        "date": "2026-03-21",
+        "day": 2,
+        "matches": 6
+      },
+      {
+        "date": "2026-03-22",
+        "day": 3,
+        "matches": 6
+      }
+    ],
+    "start_date": "2026-03-20",
+    "timezone": "Asia/Bangkok"
+  },
+  "schema_version": 1,
+  "scoring": {
+    "kill_point": 1,
+    "placement_points": {
+      "1": 10,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "2": 6,
+      "3": 5,
+      "4": 4,
+      "5": 3,
+      "6": 2,
+      "7": 1,
+      "8": 1,
+      "9": 0
+    },
+    "tiebreakers": [
+      "total_wins",
+      "total_kills",
+      "last_match_placement",
+      "last_match_kills"
+    ]
+  },
+  "season": 1,
+  "short_name": "GSI",
+  "status": "scheduled",
+  "team_count": 16,
+  "team_ids": [
+    "mekong_reapers",
+    "crimson_owls",
+    "neon_tigers",
+    "astra_nine",
+    "iron_pulse",
+    "silent_wave",
+    "titan_forge",
+    "azure_foxes",
+    "quantum_raid",
+    "solar_vipers",
+    "night_lotus",
+    "vertex_guard",
+    "ember_crown",
+    "polar_ace",
+    "orbit_seven",
+    "rift_kings"
+  ],
+  "team_size": 4,
+  "tier": "A",
+  "year": 2026
+}

@@ -1,0 +1,1073 @@
+[
+  {
+    "id": 1,
+    "name": "FaZe Clan",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20251023/0leKdaEp/faze.png",
+    "logo_file": "pubg_teams\\logos\\1.png",
+    "source_url": "https://pubgesports.com/vi/teams/1"
+  },
+  {
+    "id": 2,
+    "name": "Natus Vincere",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240318/LEm4E42C.png",
+    "logo_file": "pubg_teams\\logos\\2.png",
+    "source_url": "https://pubgesports.com/vi/teams/2"
+  },
+  {
+    "id": 4,
+    "name": "Virtus.pro",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20240506/1TbvUQpa/vp.png",
+    "logo_file": "pubg_teams\\logos\\4.png",
+    "source_url": "https://pubgesports.com/vi/teams/4"
+  },
+  {
+    "id": 7,
+    "name": "Buriram United Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231010/eH5EBuTz.png",
+    "logo_file": "pubg_teams\\logos\\7.png",
+    "source_url": "https://pubgesports.com/vi/teams/7"
+  },
+  {
+    "id": 14,
+    "name": "FOUR ANGRY MEN",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/vll3G4ZY.png",
+    "logo_file": "pubg_teams\\logos\\14.png",
+    "source_url": "https://pubgesports.com/vi/teams/14"
+  },
+  {
+    "id": 22,
+    "name": "FURIA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/esports-legacy/resources/images/team/logo_furia.png",
+    "logo_file": "pubg_teams\\logos\\22.png",
+    "source_url": "https://pubgesports.com/vi/teams/22"
+  },
+  {
+    "id": 24,
+    "name": "17Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/4hdPxuri.png",
+    "logo_file": "pubg_teams\\logos\\24.png",
+    "source_url": "https://pubgesports.com/vi/teams/24"
+  },
+  {
+    "id": 28,
+    "name": "Petrichor Road",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250312/LW6pA9KX/pero.png",
+    "logo_file": "pubg_teams\\logos\\28.png",
+    "source_url": "https://pubgesports.com/vi/teams/28"
+  },
+  {
+    "id": 29,
+    "name": "Gen.G Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/0sT283K2/GEN-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\29.png",
+    "source_url": "https://pubgesports.com/vi/teams/29"
+  },
+  {
+    "id": 41,
+    "name": "Sharper Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231010/bFG3B8oh.png",
+    "logo_file": "pubg_teams\\logos\\41.png",
+    "source_url": "https://pubgesports.com/vi/teams/41"
+  },
+  {
+    "id": 44,
+    "name": "GAM The Expendables",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260722/ZNgqlnJO/TE-X-GAM-OPT-2-(1).png",
+    "logo_file": "pubg_teams\\logos\\44.png",
+    "source_url": "https://pubgesports.com/vi/teams/44"
+  },
+  {
+    "id": 58,
+    "name": "TEAM LIQUID",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/1CQsMdaH.png",
+    "logo_file": "pubg_teams\\logos\\58.png",
+    "source_url": "https://pubgesports.com/vi/teams/58"
+  },
+  {
+    "id": 94,
+    "name": "NEWHAPPY-ESPORTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/XmZsZT7i.png",
+    "logo_file": "pubg_teams\\logos\\94.png",
+    "source_url": "https://pubgesports.com/vi/teams/94"
+  },
+  {
+    "id": 95,
+    "name": "FINHAY CERBERUS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240322/ysMVNYKb.png",
+    "logo_file": "pubg_teams\\logos\\95.png",
+    "source_url": "https://pubgesports.com/vi/teams/95"
+  },
+  {
+    "id": 149,
+    "name": "Falcons",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240315/SVZvjjdR.png",
+    "logo_file": "pubg_teams\\logos\\149.png",
+    "source_url": "https://pubgesports.com/vi/teams/149"
+  },
+  {
+    "id": 159,
+    "name": "BB Team",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20241001/as0ap1TS/bb.png",
+    "logo_file": "pubg_teams\\logos\\159.png",
+    "source_url": "https://pubgesports.com/vi/teams/159"
+  },
+  {
+    "id": 165,
+    "name": "Made in Thailand",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231010/WXAZRaE6.png",
+    "logo_file": "pubg_teams\\logos\\165.png",
+    "source_url": "https://pubgesports.com/vi/teams/165"
+  },
+  {
+    "id": 166,
+    "name": "Change The Game",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/QY2ARob6/CTG-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\166.png",
+    "source_url": "https://pubgesports.com/vi/teams/166"
+  },
+  {
+    "id": 168,
+    "name": "GNL ESPORTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240314/RO0NqQoQ.png",
+    "logo_file": "pubg_teams\\logos\\168.png",
+    "source_url": "https://pubgesports.com/vi/teams/168"
+  },
+  {
+    "id": 186,
+    "name": "DN SOOPers",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/nOE7IQnZ/DNS-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\186.png",
+    "source_url": "https://pubgesports.com/vi/teams/186"
+  },
+  {
+    "id": 188,
+    "name": "Eagle Owls",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240314/N9XHVSwi.png",
+    "logo_file": "pubg_teams\\logos\\188.png",
+    "source_url": "https://pubgesports.com/vi/teams/188"
+  },
+  {
+    "id": 189,
+    "name": "Yaho",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/esports-legacy/upload/T_GAME_TEAM/20220412/4568601f86eb725c_202204120836462981.png",
+    "logo_file": "pubg_teams\\logos\\189.png",
+    "source_url": "https://pubgesports.com/vi/teams/189"
+  },
+  {
+    "id": 195,
+    "name": "Theerathon Five",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260529/SSYu3lej/LOGO_T5_OK06-01.png",
+    "logo_file": "pubg_teams\\logos\\195.png",
+    "source_url": "https://pubgesports.com/vi/teams/195"
+  },
+  {
+    "id": 200,
+    "name": "Alter Ego",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/esports-legacy/upload/T_GAME_TEAM/20220412/c091933f36a2e74c_202204121216386491.png",
+    "logo_file": "pubg_teams\\logos\\200.png",
+    "source_url": "https://pubgesports.com/vi/teams/200"
+  },
+  {
+    "id": 202,
+    "name": "FUT Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240318/YQBYsB1T.png",
+    "logo_file": "pubg_teams\\logos\\202.png",
+    "source_url": "https://pubgesports.com/vi/teams/202"
+  },
+  {
+    "id": 206,
+    "name": "Sakura Zensen",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20240920/CNQWq3Mq/sakura.png",
+    "logo_file": "pubg_teams\\logos\\206.png",
+    "source_url": "https://pubgesports.com/vi/teams/206"
+  },
+  {
+    "id": 209,
+    "name": "TYLOO",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/iKklTrHt.png",
+    "logo_file": "pubg_teams\\logos\\209.png",
+    "source_url": "https://pubgesports.com/vi/teams/209"
+  },
+  {
+    "id": 235,
+    "name": "eArena",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240322/AMNrIpof.png",
+    "logo_file": "pubg_teams\\logos\\235.png",
+    "source_url": "https://pubgesports.com/vi/teams/235"
+  },
+  {
+    "id": 246,
+    "name": "Baegopa",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250307/0MqwptO6/bgp.png",
+    "logo_file": "pubg_teams\\logos\\246.png",
+    "source_url": "https://pubgesports.com/vi/teams/246"
+  },
+  {
+    "id": 248,
+    "name": "Acend",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240318/K93Wzvzm.png",
+    "logo_file": "pubg_teams\\logos\\248.png",
+    "source_url": "https://pubgesports.com/vi/teams/248"
+  },
+  {
+    "id": 250,
+    "name": "winordie",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240318/3Lq3LG0P.png",
+    "logo_file": "pubg_teams\\logos\\250.png",
+    "source_url": "https://pubgesports.com/vi/teams/250"
+  },
+  {
+    "id": 257,
+    "name": "Twisted Minds",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20251023/igT8VOdr/twis.png",
+    "logo_file": "pubg_teams\\logos\\257.png",
+    "source_url": "https://pubgesports.com/vi/teams/257"
+  },
+  {
+    "id": 261,
+    "name": "AZLA PENTAGRAM",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240314/JudYAd54.png",
+    "logo_file": "pubg_teams\\logos\\261.png",
+    "source_url": "https://pubgesports.com/vi/teams/261"
+  },
+  {
+    "id": 297,
+    "name": "Dream Set Sail",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/YAaPHXPk.png",
+    "logo_file": "pubg_teams\\logos\\297.png",
+    "source_url": "https://pubgesports.com/vi/teams/297"
+  },
+  {
+    "id": 298,
+    "name": "Game start win",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250312/Prmqkll2/gsw.png",
+    "logo_file": "pubg_teams\\logos\\298.png",
+    "source_url": "https://pubgesports.com/vi/teams/298"
+  },
+  {
+    "id": 333,
+    "name": "FW ESPORTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231010/ClUlrbBT.png",
+    "logo_file": "pubg_teams\\logos\\333.png",
+    "source_url": "https://pubgesports.com/vi/teams/333"
+  },
+  {
+    "id": 337,
+    "name": "Armory Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240322/jhnzT0C2.png",
+    "logo_file": "pubg_teams\\logos\\337.png",
+    "source_url": "https://pubgesports.com/vi/teams/337"
+  },
+  {
+    "id": 344,
+    "name": "HALOQUEEN",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/zbFxg92V.png",
+    "logo_file": "pubg_teams\\logos\\344.png",
+    "source_url": "https://pubgesports.com/vi/teams/344"
+  },
+  {
+    "id": 346,
+    "name": "Rainbow Style",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/grhTWZn7.png",
+    "logo_file": "pubg_teams\\logos\\346.png",
+    "source_url": "https://pubgesports.com/vi/teams/346"
+  },
+  {
+    "id": 347,
+    "name": "Soy Milk Squad",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/c2aRvDrw.png",
+    "logo_file": "pubg_teams\\logos\\347.png",
+    "source_url": "https://pubgesports.com/vi/teams/347"
+  },
+  {
+    "id": 357,
+    "name": "NEW HOUSE ESPORTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231011/Kar0ZY1D.png",
+    "logo_file": "pubg_teams\\logos\\357.png",
+    "source_url": "https://pubgesports.com/vi/teams/357"
+  },
+  {
+    "id": 368,
+    "name": "+55 e-Sports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250317/aZIXMx7n/55.png",
+    "logo_file": "pubg_teams\\logos\\368.png",
+    "source_url": "https://pubgesports.com/vi/teams/368"
+  },
+  {
+    "id": 375,
+    "name": "IFYOUMINE GAME PT",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240314/hKqgur0J.png",
+    "logo_file": "pubg_teams\\logos\\375.png",
+    "source_url": "https://pubgesports.com/vi/teams/375"
+  },
+  {
+    "id": 382,
+    "name": "Xavage Men Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250318/8SmSwdNc.png",
+    "logo_file": "pubg_teams\\logos\\382.png",
+    "source_url": "https://pubgesports.com/vi/teams/382"
+  },
+  {
+    "id": 398,
+    "name": "Divine",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250224/wiZi4eNB/divine.png",
+    "logo_file": "pubg_teams\\logos\\398.png",
+    "source_url": "https://pubgesports.com/vi/teams/398"
+  },
+  {
+    "id": 405,
+    "name": "Zhu Chao Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240418/jP0yyxNf.png",
+    "logo_file": "pubg_teams\\logos\\405.png",
+    "source_url": "https://pubgesports.com/vi/teams/405"
+  },
+  {
+    "id": 420,
+    "name": "Vorpal Swords",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20231006/aPggKEbZ.png",
+    "logo_file": "pubg_teams\\logos\\420.png",
+    "source_url": "https://pubgesports.com/vi/teams/420"
+  },
+  {
+    "id": 497,
+    "name": "e-sports FROM",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250221/jAivLdQV/esportsfrom.png",
+    "logo_file": "pubg_teams\\logos\\497.png",
+    "source_url": "https://pubgesports.com/vi/teams/497"
+  },
+  {
+    "id": 499,
+    "name": "Sentinel",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240314/1XLwUTyJ.png",
+    "logo_file": "pubg_teams\\logos\\499.png",
+    "source_url": "https://pubgesports.com/vi/teams/499"
+  },
+  {
+    "id": 501,
+    "name": "SUPERFECT Academy",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20240920/Wpj6tb5I/spf.png",
+    "logo_file": "pubg_teams\\logos\\501.png",
+    "source_url": "https://pubgesports.com/vi/teams/501"
+  },
+  {
+    "id": 506,
+    "name": "Bestia",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240315/31tmoGWx.png",
+    "logo_file": "pubg_teams\\logos\\506.png",
+    "source_url": "https://pubgesports.com/vi/teams/506"
+  },
+  {
+    "id": 507,
+    "name": "Bonde do Galo",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240315/gsccJ9St.png",
+    "logo_file": "pubg_teams\\logos\\507.png",
+    "source_url": "https://pubgesports.com/vi/teams/507"
+  },
+  {
+    "id": 541,
+    "name": "WEIBO GAMING",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20240517/siJzWz7b/wbg.png",
+    "logo_file": "pubg_teams\\logos\\541.png",
+    "source_url": "https://pubgesports.com/vi/teams/541"
+  },
+  {
+    "id": 543,
+    "name": "TOYO ESPORTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250317/5qTNQ9xe/toyo.png",
+    "logo_file": "pubg_teams\\logos\\543.png",
+    "source_url": "https://pubgesports.com/vi/teams/543"
+  },
+  {
+    "id": 545,
+    "name": "Qiao Ying Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250312/a69ciBjD/qy.png",
+    "logo_file": "pubg_teams\\logos\\545.png",
+    "source_url": "https://pubgesports.com/vi/teams/545"
+  },
+  {
+    "id": 580,
+    "name": "Anyone's Legend",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/nCZGytzj/AL-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\580.png",
+    "source_url": "https://pubgesports.com/vi/teams/580"
+  },
+  {
+    "id": 581,
+    "name": "Eternal Fire",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20240826/C7xgbhrm/eternal fire.png",
+    "logo_file": "pubg_teams\\logos\\581.png",
+    "source_url": "https://pubgesports.com/vi/teams/581"
+  },
+  {
+    "id": 584,
+    "name": "Jian Rong Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250312/WHoSBYhz/jrg.png",
+    "logo_file": "pubg_teams\\logos\\584.png",
+    "source_url": "https://pubgesports.com/vi/teams/584"
+  },
+  {
+    "id": 594,
+    "name": "Potentially Dangerous",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20241001/dx9KOmCc/danger.png",
+    "logo_file": "pubg_teams\\logos\\594.png",
+    "source_url": "https://pubgesports.com/vi/teams/594"
+  },
+  {
+    "id": 600,
+    "name": "WuJuTu",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20240920/VexZ5Icu.png",
+    "logo_file": "pubg_teams\\logos\\600.png",
+    "source_url": "https://pubgesports.com/vi/teams/600"
+  },
+  {
+    "id": 603,
+    "name": "TDT Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20241008/YE9Q1RJi/tdt.png",
+    "logo_file": "pubg_teams\\logos\\603.png",
+    "source_url": "https://pubgesports.com/vi/teams/603"
+  },
+  {
+    "id": 606,
+    "name": "FN Pocheon",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250206/6Ksb4ttQ/FN.png",
+    "logo_file": "pubg_teams\\logos\\606.png",
+    "source_url": "https://pubgesports.com/vi/teams/606"
+  },
+  {
+    "id": 607,
+    "name": "KXGaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250221/bKn9cysc/kxg.png",
+    "logo_file": "pubg_teams\\logos\\607.png",
+    "source_url": "https://pubgesports.com/vi/teams/607"
+  },
+  {
+    "id": 608,
+    "name": "SGA INCHEON",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250827/mgLhV7Qx/sga.png",
+    "logo_file": "pubg_teams\\logos\\608.png",
+    "source_url": "https://pubgesports.com/vi/teams/608"
+  },
+  {
+    "id": 609,
+    "name": "PHANTOM HEARTS_E",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250221/l1MzkUT0/phe.png",
+    "logo_file": "pubg_teams\\logos\\609.png",
+    "source_url": "https://pubgesports.com/vi/teams/609"
+  },
+  {
+    "id": 624,
+    "name": "Golden Quester Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250312/bv21qMFr.png",
+    "logo_file": "pubg_teams\\logos\\624.png",
+    "source_url": "https://pubgesports.com/vi/teams/624"
+  },
+  {
+    "id": 626,
+    "name": "Team Magic",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250312/aUQslCZ9.png",
+    "logo_file": "pubg_teams\\logos\\626.png",
+    "source_url": "https://pubgesports.com/vi/teams/626"
+  },
+  {
+    "id": 627,
+    "name": "Ninjas in Pyjamas",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250312/FwpTsmDK.png",
+    "logo_file": "pubg_teams\\logos\\627.png",
+    "source_url": "https://pubgesports.com/vi/teams/627"
+  },
+  {
+    "id": 628,
+    "name": "Papillons Dangereux",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250312/Ss3XvRmV.png",
+    "logo_file": "pubg_teams\\logos\\628.png",
+    "source_url": "https://pubgesports.com/vi/teams/628"
+  },
+  {
+    "id": 631,
+    "name": "AlQadsiah",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/xsz7Tk0O.png",
+    "logo_file": "pubg_teams\\logos\\631.png",
+    "source_url": "https://pubgesports.com/vi/teams/631"
+  },
+  {
+    "id": 636,
+    "name": "Gooners",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/c1X4s7Iu.png",
+    "logo_file": "pubg_teams\\logos\\636.png",
+    "source_url": "https://pubgesports.com/vi/teams/636"
+  },
+  {
+    "id": 640,
+    "name": "HYPEBEASTS",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250612/2aVPTTLk/hype.png",
+    "logo_file": "pubg_teams\\logos\\640.png",
+    "source_url": "https://pubgesports.com/vi/teams/640"
+  },
+  {
+    "id": 643,
+    "name": "Bushido",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/6faHfOd4.png",
+    "logo_file": "pubg_teams\\logos\\643.png",
+    "source_url": "https://pubgesports.com/vi/teams/643"
+  },
+  {
+    "id": 644,
+    "name": "Creff",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/7LKnVdL9.png",
+    "logo_file": "pubg_teams\\logos\\644.png",
+    "source_url": "https://pubgesports.com/vi/teams/644"
+  },
+  {
+    "id": 646,
+    "name": "Geekay Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/uQpCowEd.png",
+    "logo_file": "pubg_teams\\logos\\646.png",
+    "source_url": "https://pubgesports.com/vi/teams/646"
+  },
+  {
+    "id": 648,
+    "name": "The Myth of",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250314/UW23lyBf.png",
+    "logo_file": "pubg_teams\\logos\\648.png",
+    "source_url": "https://pubgesports.com/vi/teams/648"
+  },
+  {
+    "id": 653,
+    "name": "Team Flash",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250922/QIUtdNOM/team flash.png",
+    "logo_file": "pubg_teams\\logos\\653.png",
+    "source_url": "https://pubgesports.com/vi/teams/653"
+  },
+  {
+    "id": 654,
+    "name": "WinD Esport",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250918/NmZWgTSR/wde.png",
+    "logo_file": "pubg_teams\\logos\\654.png",
+    "source_url": "https://pubgesports.com/vi/teams/654"
+  },
+  {
+    "id": 659,
+    "name": "Happie SQUAD",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250318/jGDqgaGp.png",
+    "logo_file": "pubg_teams\\logos\\659.png",
+    "source_url": "https://pubgesports.com/vi/teams/659"
+  },
+  {
+    "id": 661,
+    "name": "MuZaVi",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250826/89te3mcw/mzv.png",
+    "logo_file": "pubg_teams\\logos\\661.png",
+    "source_url": "https://pubgesports.com/vi/teams/661"
+  },
+  {
+    "id": 666,
+    "name": "ROC Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250415/9AFYs6yp/roc.png",
+    "logo_file": "pubg_teams\\logos\\666.png",
+    "source_url": "https://pubgesports.com/vi/teams/666"
+  },
+  {
+    "id": 667,
+    "name": "Green Tea",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250909/FawbFmaS/grt.png",
+    "logo_file": "pubg_teams\\logos\\667.png",
+    "source_url": "https://pubgesports.com/vi/teams/667"
+  },
+  {
+    "id": 671,
+    "name": "Cheon Sang Gye",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250610/n8fFHBXK.png",
+    "logo_file": "pubg_teams\\logos\\671.png",
+    "source_url": "https://pubgesports.com/vi/teams/671"
+  },
+  {
+    "id": 672,
+    "name": "Hive",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/MdGMvVKW.png",
+    "logo_file": "pubg_teams\\logos\\672.png",
+    "source_url": "https://pubgesports.com/vi/teams/672"
+  },
+  {
+    "id": 679,
+    "name": "010 Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250612/4aOsHBaN/010.png",
+    "logo_file": "pubg_teams\\logos\\679.png",
+    "source_url": "https://pubgesports.com/vi/teams/679"
+  },
+  {
+    "id": 681,
+    "name": "JD Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/oAuVqbYY/JDG-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\681.png",
+    "source_url": "https://pubgesports.com/vi/teams/681"
+  },
+  {
+    "id": 682,
+    "name": "EDWARD GAMING",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/RFCKyyQX.png",
+    "logo_file": "pubg_teams\\logos\\682.png",
+    "source_url": "https://pubgesports.com/vi/teams/682"
+  },
+  {
+    "id": 683,
+    "name": "Nirvana Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/dVKuMCAw.png",
+    "logo_file": "pubg_teams\\logos\\683.png",
+    "source_url": "https://pubgesports.com/vi/teams/683"
+  },
+  {
+    "id": 684,
+    "name": "The Chosen Youth",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/fd0EP25q.png",
+    "logo_file": "pubg_teams\\logos\\684.png",
+    "source_url": "https://pubgesports.com/vi/teams/684"
+  },
+  {
+    "id": 685,
+    "name": "LvErGaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/gkBJvm7d.png",
+    "logo_file": "pubg_teams\\logos\\685.png",
+    "source_url": "https://pubgesports.com/vi/teams/685"
+  },
+  {
+    "id": 691,
+    "name": "Team MIRA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/y3XGRlQh.png",
+    "logo_file": "pubg_teams\\logos\\691.png",
+    "source_url": "https://pubgesports.com/vi/teams/691"
+  },
+  {
+    "id": 694,
+    "name": "YING YANG",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250612/vy2ZBkcQ.png",
+    "logo_file": "pubg_teams\\logos\\694.png",
+    "source_url": "https://pubgesports.com/vi/teams/694"
+  },
+  {
+    "id": 708,
+    "name": "Justice For Tomorrow Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250616/cOhc1tAP.png",
+    "logo_file": "pubg_teams\\logos\\708.png",
+    "source_url": "https://pubgesports.com/vi/teams/708"
+  },
+  {
+    "id": 717,
+    "name": "FULL SENSE",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/ZjX6y0b0/FS-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\717.png",
+    "source_url": "https://pubgesports.com/vi/teams/717"
+  },
+  {
+    "id": 718,
+    "name": "MAYBE",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250826/fLi9pDSR/may.png",
+    "logo_file": "pubg_teams\\logos\\718.png",
+    "source_url": "https://pubgesports.com/vi/teams/718"
+  },
+  {
+    "id": 719,
+    "name": "7Royal",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250826/UerXyp9r/7l.png",
+    "logo_file": "pubg_teams\\logos\\719.png",
+    "source_url": "https://pubgesports.com/vi/teams/719"
+  },
+  {
+    "id": 720,
+    "name": "GOGOPUSH",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250826/WNttglq1/ggp.png",
+    "logo_file": "pubg_teams\\logos\\720.png",
+    "source_url": "https://pubgesports.com/vi/teams/720"
+  },
+  {
+    "id": 721,
+    "name": "ProDreamEsports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250826/QLN5zp8A/pde.png",
+    "logo_file": "pubg_teams\\logos\\721.png",
+    "source_url": "https://pubgesports.com/vi/teams/721"
+  },
+  {
+    "id": 723,
+    "name": "Sunny",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250829/CVAtuLnM/sun.png",
+    "logo_file": "pubg_teams\\logos\\723.png",
+    "source_url": "https://pubgesports.com/vi/teams/723"
+  },
+  {
+    "id": 726,
+    "name": "Fatal X",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250902/RWpiNARS/fx.png",
+    "logo_file": "pubg_teams\\logos\\726.png",
+    "source_url": "https://pubgesports.com/vi/teams/726"
+  },
+  {
+    "id": 727,
+    "name": "Collector",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/iTEAwR84.png",
+    "logo_file": "pubg_teams\\logos\\727.png",
+    "source_url": "https://pubgesports.com/vi/teams/727"
+  },
+  {
+    "id": 728,
+    "name": "DEPORTIVO MERLO",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/2EOkOfqe.png",
+    "logo_file": "pubg_teams\\logos\\728.png",
+    "source_url": "https://pubgesports.com/vi/teams/728"
+  },
+  {
+    "id": 729,
+    "name": "4DOGZ",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/L5fRJtDK.png",
+    "logo_file": "pubg_teams\\logos\\729.png",
+    "source_url": "https://pubgesports.com/vi/teams/729"
+  },
+  {
+    "id": 730,
+    "name": "MAXWIN",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/6wC8Drdm.png",
+    "logo_file": "pubg_teams\\logos\\730.png",
+    "source_url": "https://pubgesports.com/vi/teams/730"
+  },
+  {
+    "id": 732,
+    "name": "NO WAY",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/DTp6JUOe.png",
+    "logo_file": "pubg_teams\\logos\\732.png",
+    "source_url": "https://pubgesports.com/vi/teams/732"
+  },
+  {
+    "id": 733,
+    "name": "PEST Control",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250903/7AM136Tj.png",
+    "logo_file": "pubg_teams\\logos\\733.png",
+    "source_url": "https://pubgesports.com/vi/teams/733"
+  },
+  {
+    "id": 735,
+    "name": "Circus Crew",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250904/KtX0Q7Xd/circus.png",
+    "logo_file": "pubg_teams\\logos\\735.png",
+    "source_url": "https://pubgesports.com/vi/teams/735"
+  },
+  {
+    "id": 736,
+    "name": "CRYNT",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250904/pwbiDSyr/crynt.png",
+    "logo_file": "pubg_teams\\logos\\736.png",
+    "source_url": "https://pubgesports.com/vi/teams/736"
+  },
+  {
+    "id": 737,
+    "name": "Hands of Hope",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250904/M9mRJwbp/hands.png",
+    "logo_file": "pubg_teams\\logos\\737.png",
+    "source_url": "https://pubgesports.com/vi/teams/737"
+  },
+  {
+    "id": 738,
+    "name": "Kitchen",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250904/vO1f06eu/kitchen.png",
+    "logo_file": "pubg_teams\\logos\\738.png",
+    "source_url": "https://pubgesports.com/vi/teams/738"
+  },
+  {
+    "id": 739,
+    "name": "Respawn",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250904/uDFzfPuN/respawn.png",
+    "logo_file": "pubg_teams\\logos\\739.png",
+    "source_url": "https://pubgesports.com/vi/teams/739"
+  },
+  {
+    "id": 740,
+    "name": "Joga Bonito",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/PRjid335.png",
+    "logo_file": "pubg_teams\\logos\\740.png",
+    "source_url": "https://pubgesports.com/vi/teams/740"
+  },
+  {
+    "id": 742,
+    "name": "GamDaSal",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250909/WlMSSMDT/gds.png",
+    "logo_file": "pubg_teams\\logos\\742.png",
+    "source_url": "https://pubgesports.com/vi/teams/742"
+  },
+  {
+    "id": 743,
+    "name": "Mercedes",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250923/Zdcej1FZ/mcd.png",
+    "logo_file": "pubg_teams\\logos\\743.png",
+    "source_url": "https://pubgesports.com/vi/teams/743"
+  },
+  {
+    "id": 744,
+    "name": "Baguette",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20250916/h4UXt61m/bgt.png",
+    "logo_file": "pubg_teams\\logos\\744.png",
+    "source_url": "https://pubgesports.com/vi/teams/744"
+  },
+  {
+    "id": 747,
+    "name": "RUW Homie",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/59yOkq8U.png",
+    "logo_file": "pubg_teams\\logos\\747.png",
+    "source_url": "https://pubgesports.com/vi/teams/747"
+  },
+  {
+    "id": 748,
+    "name": "Fight For Life",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/Upnba3qY.png",
+    "logo_file": "pubg_teams\\logos\\748.png",
+    "source_url": "https://pubgesports.com/vi/teams/748"
+  },
+  {
+    "id": 749,
+    "name": "Iconic Esport",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/eLeOOWaq.png",
+    "logo_file": "pubg_teams\\logos\\749.png",
+    "source_url": "https://pubgesports.com/vi/teams/749"
+  },
+  {
+    "id": 750,
+    "name": "Aurora",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/nlRRnvig.png",
+    "logo_file": "pubg_teams\\logos\\750.png",
+    "source_url": "https://pubgesports.com/vi/teams/750"
+  },
+  {
+    "id": 752,
+    "name": "Shadow Esport",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20250917/2PHmqyrj.png",
+    "logo_file": "pubg_teams\\logos\\752.png",
+    "source_url": "https://pubgesports.com/vi/teams/752"
+  },
+  {
+    "id": 753,
+    "name": "Nemiga Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20251106/Ih13G4kX/nemiga.png",
+    "logo_file": "pubg_teams\\logos\\753.png",
+    "source_url": "https://pubgesports.com/vi/teams/753"
+  },
+  {
+    "id": 754,
+    "name": "Copenhagen Wolves",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20251106/qY14ukv9/copenhagen.png",
+    "logo_file": "pubg_teams\\logos\\754.png",
+    "source_url": "https://pubgesports.com/vi/teams/754"
+  },
+  {
+    "id": 755,
+    "name": "Team Orchid",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20251117/HtuoNp3F/teamorchid.png",
+    "logo_file": "pubg_teams\\logos\\755.png",
+    "source_url": "https://pubgesports.com/vi/teams/755"
+  },
+  {
+    "id": 757,
+    "name": "Crazy Raccoon",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260316/rMAwf0BS/CR-SQ-LIGHT 1.png",
+    "logo_file": "pubg_teams\\logos\\757.png",
+    "source_url": "https://pubgesports.com/vi/teams/757"
+  },
+  {
+    "id": 758,
+    "name": "S2G Esports",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260223/zOLASeag/S2G.png",
+    "logo_file": "pubg_teams\\logos\\758.png",
+    "source_url": "https://pubgesports.com/vi/teams/758"
+  },
+  {
+    "id": 759,
+    "name": "Team Vitality",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260223/ABF61rZS/Team Vitality.png",
+    "logo_file": "pubg_teams\\logos\\759.png",
+    "source_url": "https://pubgesports.com/vi/teams/759"
+  },
+  {
+    "id": 761,
+    "name": "KOREA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260618/xZ8ib0hv/Frame 68.png",
+    "logo_file": "pubg_teams\\logos\\761.png",
+    "source_url": "https://pubgesports.com/vi/teams/761"
+  },
+  {
+    "id": 762,
+    "name": "ARGENTINA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/vRzd7DZS.png",
+    "logo_file": "pubg_teams\\logos\\762.png",
+    "source_url": "https://pubgesports.com/vi/teams/762"
+  },
+  {
+    "id": 763,
+    "name": "AUSTRALIA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/sCvatLWN.png",
+    "logo_file": "pubg_teams\\logos\\763.png",
+    "source_url": "https://pubgesports.com/vi/teams/763"
+  },
+  {
+    "id": 764,
+    "name": "BRAZIL",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/ap9vZsjz.png",
+    "logo_file": "pubg_teams\\logos\\764.png",
+    "source_url": "https://pubgesports.com/vi/teams/764"
+  },
+  {
+    "id": 765,
+    "name": "CANADA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/bQaDw5e1.png",
+    "logo_file": "pubg_teams\\logos\\765.png",
+    "source_url": "https://pubgesports.com/vi/teams/765"
+  },
+  {
+    "id": 766,
+    "name": "CHINA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/fT9kaD9m.png",
+    "logo_file": "pubg_teams\\logos\\766.png",
+    "source_url": "https://pubgesports.com/vi/teams/766"
+  },
+  {
+    "id": 767,
+    "name": "CHINESE TAIPEI",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/hvTMNtrb.png",
+    "logo_file": "pubg_teams\\logos\\767.png",
+    "source_url": "https://pubgesports.com/vi/teams/767"
+  },
+  {
+    "id": 768,
+    "name": "DENMARK",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/hSjGGluI.png",
+    "logo_file": "pubg_teams\\logos\\768.png",
+    "source_url": "https://pubgesports.com/vi/teams/768"
+  },
+  {
+    "id": 769,
+    "name": "UKRAINE",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/a05neCHK.png",
+    "logo_file": "pubg_teams\\logos\\769.png",
+    "source_url": "https://pubgesports.com/vi/teams/769"
+  },
+  {
+    "id": 770,
+    "name": "GERMANY",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/NFeSpKbj.png",
+    "logo_file": "pubg_teams\\logos\\770.png",
+    "source_url": "https://pubgesports.com/vi/teams/770"
+  },
+  {
+    "id": 771,
+    "name": "INDIA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/FyGMdaNp.png",
+    "logo_file": "pubg_teams\\logos\\771.png",
+    "source_url": "https://pubgesports.com/vi/teams/771"
+  },
+  {
+    "id": 772,
+    "name": "INDONESIA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/cthi4FyR.png",
+    "logo_file": "pubg_teams\\logos\\772.png",
+    "source_url": "https://pubgesports.com/vi/teams/772"
+  },
+  {
+    "id": 773,
+    "name": "JAPAN",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/o468MF2r.png",
+    "logo_file": "pubg_teams\\logos\\773.png",
+    "source_url": "https://pubgesports.com/vi/teams/773"
+  },
+  {
+    "id": 774,
+    "name": "MALAYSIA",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/n5MCzHuJ.png",
+    "logo_file": "pubg_teams\\logos\\774.png",
+    "source_url": "https://pubgesports.com/vi/teams/774"
+  },
+  {
+    "id": 775,
+    "name": "NORWAY",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/TrwimK3Q.png",
+    "logo_file": "pubg_teams\\logos\\775.png",
+    "source_url": "https://pubgesports.com/vi/teams/775"
+  },
+  {
+    "id": 776,
+    "name": "NEUTRAL TEAM",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/gV2ttv3B.png",
+    "logo_file": "pubg_teams\\logos\\776.png",
+    "source_url": "https://pubgesports.com/vi/teams/776"
+  },
+  {
+    "id": 777,
+    "name": "KAZAKHSTAN",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/DV6pASqv.png",
+    "logo_file": "pubg_teams\\logos\\777.png",
+    "source_url": "https://pubgesports.com/vi/teams/777"
+  },
+  {
+    "id": 778,
+    "name": "FINLAND",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/6fL9JdIh.png",
+    "logo_file": "pubg_teams\\logos\\778.png",
+    "source_url": "https://pubgesports.com/vi/teams/778"
+  },
+  {
+    "id": 779,
+    "name": "THAILAND",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/ylicxTM3.png",
+    "logo_file": "pubg_teams\\logos\\779.png",
+    "source_url": "https://pubgesports.com/vi/teams/779"
+  },
+  {
+    "id": 780,
+    "name": "TURKIYE",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/ITbmiq1p.png",
+    "logo_file": "pubg_teams\\logos\\780.png",
+    "source_url": "https://pubgesports.com/vi/teams/780"
+  },
+  {
+    "id": 781,
+    "name": "UNITED KINGDOM",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/39mXPQuZ.png",
+    "logo_file": "pubg_teams\\logos\\781.png",
+    "source_url": "https://pubgesports.com/vi/teams/781"
+  },
+  {
+    "id": 782,
+    "name": "UNITED STATES",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/pymarOU1.png",
+    "logo_file": "pubg_teams\\logos\\782.png",
+    "source_url": "https://pubgesports.com/vi/teams/782"
+  },
+  {
+    "id": 783,
+    "name": "VIETNAM",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/entry/player/20260618/iodEtBH7.png",
+    "logo_file": "pubg_teams\\logos\\783.png",
+    "source_url": "https://pubgesports.com/vi/teams/783"
+  },
+  {
+    "id": 784,
+    "name": "PHILIPPINES",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260618/M52lz07Q/Frame 72.png",
+    "logo_file": "pubg_teams\\logos\\784.png",
+    "source_url": "https://pubgesports.com/vi/teams/784"
+  },
+  {
+    "id": 785,
+    "name": "Team Nemesis",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260722/OinWsIpL/NMSS.png",
+    "logo_file": "pubg_teams\\logos\\785.png",
+    "source_url": "https://pubgesports.com/vi/teams/785"
+  },
+  {
+    "id": 786,
+    "name": "Alpha Gaming",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260804/VAvYI86k/Frame 6398.png",
+    "logo_file": "pubg_teams\\logos\\786.png",
+    "source_url": "https://pubgesports.com/vi/teams/786"
+  },
+  {
+    "id": 788,
+    "name": "Godlike",
+    "logo_url": "https://wstatic-prod-boc.krafton.com/common/team/20260804/4a3E0F1M/Frame 6399.png",
+    "logo_file": "pubg_teams\\logos\\788.png",
+    "source_url": "https://pubgesports.com/vi/teams/788"
+  }
+]

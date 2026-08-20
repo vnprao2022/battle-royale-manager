@@ -1,0 +1,28 @@
+{
+  "active_tournament_id": "gsi_2026_s1",
+  "collections": {
+    "players": {
+      "count": 637,
+      "path": "res://database/pubg_players/players.json"
+    },
+    "career_content": {
+      "count": 1,
+      "path": "res://database/career/career_content.json"
+    },
+    "rules": {
+      "count": 1,
+      "path": "res://database/rules/competitive_rules.json"
+    },
+    "teams": {
+      "count": 153,
+      "path": "res://database/pubg_teams/teams.json"
+    },
+    "tournaments": {
+      "count": 7,
+      "path": "res://database/tournaments/tournaments.json"
+    }
+  },
+  "database_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "schema_version": 1
+}

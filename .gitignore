@@ -1,0 +1,19 @@
+# Godot editor cache and imported resources
+.godot/
+*.import
+
+# Local exports and generated test captures
+build/
+tests/output/
+
+# Temporary files and logs
+tmp/
+*.log
+*.tmp
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

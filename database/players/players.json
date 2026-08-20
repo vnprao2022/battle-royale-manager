@@ -1,0 +1,5831 @@
+{
+  "count": 64,
+  "entity": "players",
+  "players": [
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 77,
+        "game_sense": 85,
+        "hearing": 73,
+        "information_memory": 81,
+        "reaction": 73,
+        "vision": 81
+      },
+      "career": {
+        "assists": 20,
+        "damage": 18000,
+        "earnings": 124500,
+        "kills": 55,
+        "knocks": 70,
+        "matches": 40,
+        "revives": 8,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 77,
+        "close_range": 69,
+        "clutch": 77,
+        "long_range": 65,
+        "mid_range": 73,
+        "recoil_control": 69,
+        "survival": 73,
+        "throwable_accuracy": 65,
+        "utility_timing": 69,
+        "weapon_swap": 69
+      },
+      "contract": {
+        "market_value": 787500,
+        "monthly_salary": 16000,
+        "months_remaining": 12,
+        "release_clause": 1237500
+      },
+      "display_name": "Kiro Nguyen",
+      "handle": "Kiro",
+      "id": "player_001",
+      "macro": {
+        "driving": 73,
+        "loot_efficiency": 77,
+        "pathfinding": 81,
+        "risk_assessment": 85,
+        "rotation": 85,
+        "scouting": 85,
+        "zone_reading": 80
+      },
+      "nationality": "Vietnam",
+      "physical": {
+        "fatigue_resistance": 73,
+        "stamina": 69,
+        "stress_recovery": 77
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 60,
+        "morale": 64,
+        "overall": 75,
+        "potential": 78
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 77,
+        "concealment": 69,
+        "movement_noise": 73,
+        "prone_control": 69
+      },
+      "team_id": "mekong_reapers",
+      "teamplay": {
+        "communication": 76,
+        "composure": 77,
+        "discipline": 77,
+        "leadership": 84,
+        "revive_judgement": 69,
+        "teamwork": 77,
+        "trade_timing": 69,
+        "trust": 73
+      },
+      "tier": "A"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 70,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 78,
+        "vision": 75
+      },
+      "career": {
+        "assists": 31,
+        "damage": 20900,
+        "earnings": 121520,
+        "kills": 72,
+        "knocks": 89,
+        "matches": 53,
+        "revives": 13,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 70,
+        "close_range": 74,
+        "clutch": 70,
+        "long_range": 71,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 71,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 766640,
+        "monthly_salary": 15860,
+        "months_remaining": 17,
+        "release_clause": 1204720
+      },
+      "display_name": "Lynx Kim",
+      "handle": "Lynx",
+      "id": "player_002",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 70,
+        "pathfinding": 74,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "Vietnam",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 70
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 67,
+        "morale": 68,
+        "overall": 74,
+        "potential": 78
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 70,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "mekong_reapers",
+      "teamplay": {
+        "communication": 79,
+        "composure": 70,
+        "discipline": 70,
+        "leadership": 67,
+        "revive_judgement": 75,
+        "teamwork": 70,
+        "trade_timing": 74,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 75,
+        "game_sense": 67,
+        "hearing": 71,
+        "information_memory": 67,
+        "reaction": 71,
+        "vision": 67
+      },
+      "career": {
+        "assists": 42,
+        "damage": 23800,
+        "earnings": 115680,
+        "kills": 89,
+        "knocks": 108,
+        "matches": 66,
+        "revives": 18,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 75,
+        "close_range": 67,
+        "clutch": 75,
+        "long_range": 76,
+        "mid_range": 71,
+        "recoil_control": 67,
+        "survival": 71,
+        "throwable_accuracy": 75,
+        "utility_timing": 70,
+        "weapon_swap": 67
+      },
+      "contract": {
+        "market_value": 725760,
+        "monthly_salary": 15580,
+        "months_remaining": 22,
+        "release_clause": 1140480
+      },
+      "display_name": "Mika Tan",
+      "handle": "Mika",
+      "id": "player_003",
+      "macro": {
+        "driving": 71,
+        "loot_efficiency": 75,
+        "pathfinding": 79,
+        "risk_assessment": 67,
+        "rotation": 71,
+        "scouting": 67,
+        "zone_reading": 67
+      },
+      "nationality": "Vietnam",
+      "physical": {
+        "fatigue_resistance": 71,
+        "stamina": 67,
+        "stress_recovery": 75
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 74,
+        "morale": 72,
+        "overall": 72,
+        "potential": 77
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 75,
+        "concealment": 67,
+        "movement_noise": 71,
+        "prone_control": 67
+      },
+      "team_id": "mekong_reapers",
+      "teamplay": {
+        "communication": 71,
+        "composure": 75,
+        "discipline": 75,
+        "leadership": 72,
+        "revive_judgement": 70,
+        "teamwork": 75,
+        "trade_timing": 67,
+        "trust": 71
+      },
+      "tier": "A"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 70,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 79,
+        "vision": 75
+      },
+      "career": {
+        "assists": 53,
+        "damage": 26700,
+        "earnings": 118580,
+        "kills": 106,
+        "knocks": 127,
+        "matches": 79,
+        "revives": 23,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 70,
+        "close_range": 75,
+        "clutch": 70,
+        "long_range": 70,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 71,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 746060,
+        "monthly_salary": 15720,
+        "months_remaining": 27,
+        "release_clause": 1172380
+      },
+      "display_name": "Jett Park",
+      "handle": "Jett",
+      "id": "player_004",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 70,
+        "pathfinding": 74,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "Vietnam",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 70
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 81,
+        "morale": 76,
+        "overall": 73,
+        "potential": 79
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 70,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "mekong_reapers",
+      "teamplay": {
+        "communication": 79,
+        "composure": 70,
+        "discipline": 70,
+        "leadership": 67,
+        "revive_judgement": 75,
+        "teamwork": 70,
+        "trade_timing": 74,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 94,
+        "game_sense": 89,
+        "hearing": 90,
+        "information_memory": 97,
+        "reaction": 90,
+        "vision": 97
+      },
+      "career": {
+        "assists": 64,
+        "damage": 29600,
+        "earnings": 174000,
+        "kills": 123,
+        "knocks": 146,
+        "matches": 92,
+        "revives": 28,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 94,
+        "close_range": 86,
+        "clutch": 94,
+        "long_range": 95,
+        "mid_range": 90,
+        "recoil_control": 86,
+        "survival": 90,
+        "throwable_accuracy": 95,
+        "utility_timing": 86,
+        "weapon_swap": 86
+      },
+      "contract": {
+        "market_value": 1134000,
+        "monthly_salary": 18100,
+        "months_remaining": 32,
+        "release_clause": 1782000
+      },
+      "display_name": "Valk Smith",
+      "handle": "Valk",
+      "id": "player_005",
+      "macro": {
+        "driving": 90,
+        "loot_efficiency": 94,
+        "pathfinding": 97,
+        "risk_assessment": 89,
+        "rotation": 89,
+        "scouting": 89,
+        "zone_reading": 97
+      },
+      "nationality": "Germany",
+      "physical": {
+        "fatigue_resistance": 90,
+        "stamina": 86,
+        "stress_recovery": 94
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 88,
+        "morale": 80,
+        "overall": 90,
+        "potential": 97
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 94,
+        "concealment": 86,
+        "movement_noise": 90,
+        "prone_control": 86
+      },
+      "team_id": "crimson_owls",
+      "teamplay": {
+        "communication": 93,
+        "composure": 94,
+        "discipline": 94,
+        "leadership": 97,
+        "revive_judgement": 86,
+        "teamwork": 94,
+        "trade_timing": 86,
+        "trust": 90
+      },
+      "tier": "S"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 87,
+        "game_sense": 92,
+        "hearing": 96,
+        "information_memory": 92,
+        "reaction": 95,
+        "vision": 92
+      },
+      "career": {
+        "assists": 75,
+        "damage": 32500,
+        "earnings": 170420,
+        "kills": 140,
+        "knocks": 165,
+        "matches": 105,
+        "revives": 33,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 87,
+        "close_range": 91,
+        "clutch": 87,
+        "long_range": 88,
+        "mid_range": 96,
+        "recoil_control": 92,
+        "survival": 96,
+        "throwable_accuracy": 88,
+        "utility_timing": 92,
+        "weapon_swap": 92
+      },
+      "contract": {
+        "market_value": 1108940,
+        "monthly_salary": 17960,
+        "months_remaining": 12,
+        "release_clause": 1742620
+      },
+      "display_name": "Raze Silva",
+      "handle": "Raze",
+      "id": "player_006",
+      "macro": {
+        "driving": 96,
+        "loot_efficiency": 87,
+        "pathfinding": 91,
+        "risk_assessment": 92,
+        "rotation": 96,
+        "scouting": 92,
+        "zone_reading": 92
+      },
+      "nationality": "Germany",
+      "physical": {
+        "fatigue_resistance": 96,
+        "stamina": 92,
+        "stress_recovery": 87
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 64,
+        "morale": 84,
+        "overall": 89,
+        "potential": 97
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 87,
+        "concealment": 92,
+        "movement_noise": 96,
+        "prone_control": 92
+      },
+      "team_id": "crimson_owls",
+      "teamplay": {
+        "communication": 96,
+        "composure": 87,
+        "discipline": 87,
+        "leadership": 84,
+        "revive_judgement": 92,
+        "teamwork": 87,
+        "trade_timing": 91,
+        "trust": 96
+      },
+      "tier": "S"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 92,
+        "game_sense": 84,
+        "hearing": 88,
+        "information_memory": 84,
+        "reaction": 88,
+        "vision": 84
+      },
+      "career": {
+        "assists": 86,
+        "damage": 35400,
+        "earnings": 163380,
+        "kills": 157,
+        "knocks": 184,
+        "matches": 118,
+        "revives": 38,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 92,
+        "close_range": 84,
+        "clutch": 92,
+        "long_range": 80,
+        "mid_range": 88,
+        "recoil_control": 84,
+        "survival": 88,
+        "throwable_accuracy": 92,
+        "utility_timing": 87,
+        "weapon_swap": 84
+      },
+      "contract": {
+        "market_value": 1059660,
+        "monthly_salary": 17680,
+        "months_remaining": 17,
+        "release_clause": 1665180
+      },
+      "display_name": "Nox Chen",
+      "handle": "Nox",
+      "id": "player_007",
+      "macro": {
+        "driving": 88,
+        "loot_efficiency": 92,
+        "pathfinding": 96,
+        "risk_assessment": 84,
+        "rotation": 88,
+        "scouting": 84,
+        "zone_reading": 84
+      },
+      "nationality": "Germany",
+      "physical": {
+        "fatigue_resistance": 88,
+        "stamina": 84,
+        "stress_recovery": 92
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 71,
+        "morale": 88,
+        "overall": 87,
+        "potential": 96
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 92,
+        "concealment": 84,
+        "movement_noise": 88,
+        "prone_control": 84
+      },
+      "team_id": "crimson_owls",
+      "teamplay": {
+        "communication": 88,
+        "composure": 92,
+        "discipline": 92,
+        "leadership": 89,
+        "revive_judgement": 87,
+        "teamwork": 92,
+        "trade_timing": 84,
+        "trust": 88
+      },
+      "tier": "S"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 87,
+        "game_sense": 92,
+        "hearing": 83,
+        "information_memory": 92,
+        "reaction": 83,
+        "vision": 92
+      },
+      "career": {
+        "assists": 97,
+        "damage": 38300,
+        "earnings": 166880,
+        "kills": 174,
+        "knocks": 203,
+        "matches": 131,
+        "revives": 43,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 87,
+        "close_range": 92,
+        "clutch": 87,
+        "long_range": 87,
+        "mid_range": 83,
+        "recoil_control": 92,
+        "survival": 83,
+        "throwable_accuracy": 88,
+        "utility_timing": 92,
+        "weapon_swap": 92
+      },
+      "contract": {
+        "market_value": 1084160,
+        "monthly_salary": 17820,
+        "months_remaining": 22,
+        "release_clause": 1703680
+      },
+      "display_name": "Eira Sato",
+      "handle": "Eira",
+      "id": "player_008",
+      "macro": {
+        "driving": 83,
+        "loot_efficiency": 87,
+        "pathfinding": 91,
+        "risk_assessment": 92,
+        "rotation": 83,
+        "scouting": 92,
+        "zone_reading": 92
+      },
+      "nationality": "Germany",
+      "physical": {
+        "fatigue_resistance": 83,
+        "stamina": 92,
+        "stress_recovery": 87
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 78,
+        "morale": 92,
+        "overall": 88,
+        "potential": 98
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 87,
+        "concealment": 92,
+        "movement_noise": 83,
+        "prone_control": 92
+      },
+      "team_id": "crimson_owls",
+      "teamplay": {
+        "communication": 83,
+        "composure": 87,
+        "discipline": 87,
+        "leadership": 84,
+        "revive_judgement": 92,
+        "teamwork": 87,
+        "trade_timing": 91,
+        "trust": 83
+      },
+      "tier": "S"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 94,
+        "game_sense": 89,
+        "hearing": 90,
+        "information_memory": 85,
+        "reaction": 90,
+        "vision": 85
+      },
+      "career": {
+        "assists": 108,
+        "damage": 41200,
+        "earnings": 166880,
+        "kills": 191,
+        "knocks": 222,
+        "matches": 144,
+        "revives": 48,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 94,
+        "close_range": 86,
+        "clutch": 94,
+        "long_range": 82,
+        "mid_range": 90,
+        "recoil_control": 86,
+        "survival": 90,
+        "throwable_accuracy": 82,
+        "utility_timing": 86,
+        "weapon_swap": 86
+      },
+      "contract": {
+        "market_value": 1084160,
+        "monthly_salary": 17820,
+        "months_remaining": 27,
+        "release_clause": 1703680
+      },
+      "display_name": "Haneul Nguyen",
+      "handle": "Haneul",
+      "id": "player_009",
+      "macro": {
+        "driving": 90,
+        "loot_efficiency": 94,
+        "pathfinding": 85,
+        "risk_assessment": 89,
+        "rotation": 89,
+        "scouting": 89,
+        "zone_reading": 97
+      },
+      "nationality": "Korea",
+      "physical": {
+        "fatigue_resistance": 90,
+        "stamina": 86,
+        "stress_recovery": 94
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 85,
+        "morale": 66,
+        "overall": 88,
+        "potential": 91
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 94,
+        "concealment": 86,
+        "movement_noise": 90,
+        "prone_control": 86
+      },
+      "team_id": "neon_tigers",
+      "teamplay": {
+        "communication": 93,
+        "composure": 94,
+        "discipline": 94,
+        "leadership": 97,
+        "revive_judgement": 86,
+        "teamwork": 94,
+        "trade_timing": 86,
+        "trust": 90
+      },
+      "tier": "S"
+    },
+    {
+      "age": 23,
+      "awareness": {
+        "enemy_tracking": 87,
+        "game_sense": 92,
+        "hearing": 83,
+        "information_memory": 92,
+        "reaction": 95,
+        "vision": 92
+      },
+      "career": {
+        "assists": 119,
+        "damage": 44100,
+        "earnings": 163380,
+        "kills": 208,
+        "knocks": 241,
+        "matches": 157,
+        "revives": 53,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 87,
+        "close_range": 91,
+        "clutch": 87,
+        "long_range": 88,
+        "mid_range": 83,
+        "recoil_control": 92,
+        "survival": 83,
+        "throwable_accuracy": 88,
+        "utility_timing": 92,
+        "weapon_swap": 92
+      },
+      "contract": {
+        "market_value": 1059660,
+        "monthly_salary": 17680,
+        "months_remaining": 32,
+        "release_clause": 1665180
+      },
+      "display_name": "Viper Kim",
+      "handle": "Viper",
+      "id": "player_010",
+      "macro": {
+        "driving": 83,
+        "loot_efficiency": 87,
+        "pathfinding": 91,
+        "risk_assessment": 92,
+        "rotation": 83,
+        "scouting": 92,
+        "zone_reading": 92
+      },
+      "nationality": "Korea",
+      "physical": {
+        "fatigue_resistance": 83,
+        "stamina": 92,
+        "stress_recovery": 87
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 61,
+        "morale": 70,
+        "overall": 87,
+        "potential": 91
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 87,
+        "concealment": 92,
+        "movement_noise": 83,
+        "prone_control": 92
+      },
+      "team_id": "neon_tigers",
+      "teamplay": {
+        "communication": 83,
+        "composure": 87,
+        "discipline": 87,
+        "leadership": 84,
+        "revive_judgement": 92,
+        "teamwork": 87,
+        "trade_timing": 91,
+        "trust": 83
+      },
+      "tier": "S"
+    },
+    {
+      "age": 26,
+      "awareness": {
+        "enemy_tracking": 92,
+        "game_sense": 84,
+        "hearing": 88,
+        "information_memory": 84,
+        "reaction": 88,
+        "vision": 84
+      },
+      "career": {
+        "assists": 130,
+        "damage": 47000,
+        "earnings": 156500,
+        "kills": 225,
+        "knocks": 260,
+        "matches": 170,
+        "revives": 58,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 92,
+        "close_range": 84,
+        "clutch": 92,
+        "long_range": 80,
+        "mid_range": 88,
+        "recoil_control": 84,
+        "survival": 88,
+        "throwable_accuracy": 92,
+        "utility_timing": 87,
+        "weapon_swap": 84
+      },
+      "contract": {
+        "market_value": 1011500,
+        "monthly_salary": 17400,
+        "months_remaining": 12,
+        "release_clause": 1589500
+      },
+      "display_name": "Dawn Tan",
+      "handle": "Dawn",
+      "id": "player_011",
+      "macro": {
+        "driving": 88,
+        "loot_efficiency": 92,
+        "pathfinding": 83,
+        "risk_assessment": 84,
+        "rotation": 88,
+        "scouting": 84,
+        "zone_reading": 84
+      },
+      "nationality": "Korea",
+      "physical": {
+        "fatigue_resistance": 88,
+        "stamina": 84,
+        "stress_recovery": 92
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 68,
+        "morale": 74,
+        "overall": 85,
+        "potential": 90
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 92,
+        "concealment": 84,
+        "movement_noise": 88,
+        "prone_control": 84
+      },
+      "team_id": "neon_tigers",
+      "teamplay": {
+        "communication": 88,
+        "composure": 92,
+        "discipline": 92,
+        "leadership": 89,
+        "revive_judgement": 87,
+        "teamwork": 92,
+        "trade_timing": 84,
+        "trust": 88
+      },
+      "tier": "S"
+    },
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 87,
+        "game_sense": 92,
+        "hearing": 83,
+        "information_memory": 92,
+        "reaction": 83,
+        "vision": 92
+      },
+      "career": {
+        "assists": 21,
+        "damage": 49900,
+        "earnings": 159920,
+        "kills": 242,
+        "knocks": 279,
+        "matches": 183,
+        "revives": 63,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 87,
+        "close_range": 92,
+        "clutch": 87,
+        "long_range": 87,
+        "mid_range": 83,
+        "recoil_control": 92,
+        "survival": 83,
+        "throwable_accuracy": 88,
+        "utility_timing": 92,
+        "weapon_swap": 92
+      },
+      "contract": {
+        "market_value": 1035440,
+        "monthly_salary": 17540,
+        "months_remaining": 17,
+        "release_clause": 1627120
+      },
+      "display_name": "Kestrel Park",
+      "handle": "Kestrel",
+      "id": "player_012",
+      "macro": {
+        "driving": 83,
+        "loot_efficiency": 87,
+        "pathfinding": 91,
+        "risk_assessment": 92,
+        "rotation": 83,
+        "scouting": 92,
+        "zone_reading": 92
+      },
+      "nationality": "Korea",
+      "physical": {
+        "fatigue_resistance": 83,
+        "stamina": 92,
+        "stress_recovery": 87
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 75,
+        "morale": 78,
+        "overall": 86,
+        "potential": 92
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 87,
+        "concealment": 92,
+        "movement_noise": 83,
+        "prone_control": 92
+      },
+      "team_id": "neon_tigers",
+      "teamplay": {
+        "communication": 83,
+        "composure": 87,
+        "discipline": 87,
+        "leadership": 84,
+        "revive_judgement": 92,
+        "teamwork": 87,
+        "trade_timing": 91,
+        "trust": 83
+      },
+      "tier": "S"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 91,
+        "game_sense": 86,
+        "hearing": 87,
+        "information_memory": 82,
+        "reaction": 87,
+        "vision": 82
+      },
+      "career": {
+        "assists": 32,
+        "damage": 52800,
+        "earnings": 149780,
+        "kills": 259,
+        "knocks": 298,
+        "matches": 196,
+        "revives": 68,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 91,
+        "close_range": 83,
+        "clutch": 91,
+        "long_range": 79,
+        "mid_range": 87,
+        "recoil_control": 83,
+        "survival": 87,
+        "throwable_accuracy": 79,
+        "utility_timing": 83,
+        "weapon_swap": 83
+      },
+      "contract": {
+        "market_value": 964460,
+        "monthly_salary": 17120,
+        "months_remaining": 22,
+        "release_clause": 1515580
+      },
+      "display_name": "Ares Smith",
+      "handle": "Ares",
+      "id": "player_013",
+      "macro": {
+        "driving": 87,
+        "loot_efficiency": 91,
+        "pathfinding": 82,
+        "risk_assessment": 86,
+        "rotation": 86,
+        "scouting": 86,
+        "zone_reading": 94
+      },
+      "nationality": "Finland",
+      "physical": {
+        "fatigue_resistance": 87,
+        "stamina": 83,
+        "stress_recovery": 91
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 82,
+        "morale": 82,
+        "overall": 83,
+        "potential": 90
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 91,
+        "concealment": 83,
+        "movement_noise": 87,
+        "prone_control": 83
+      },
+      "team_id": "astra_nine",
+      "teamplay": {
+        "communication": 90,
+        "composure": 91,
+        "discipline": 91,
+        "leadership": 85,
+        "revive_judgement": 83,
+        "teamwork": 91,
+        "trade_timing": 83,
+        "trust": 87
+      },
+      "tier": "A"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 84,
+        "game_sense": 76,
+        "hearing": 80,
+        "information_memory": 76,
+        "reaction": 92,
+        "vision": 76
+      },
+      "career": {
+        "assists": 43,
+        "damage": 55700,
+        "earnings": 146480,
+        "kills": 276,
+        "knocks": 317,
+        "matches": 209,
+        "revives": 8,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 84,
+        "close_range": 88,
+        "clutch": 84,
+        "long_range": 85,
+        "mid_range": 80,
+        "recoil_control": 76,
+        "survival": 80,
+        "throwable_accuracy": 85,
+        "utility_timing": 76,
+        "weapon_swap": 76
+      },
+      "contract": {
+        "market_value": 941360,
+        "monthly_salary": 16980,
+        "months_remaining": 27,
+        "release_clause": 1479280
+      },
+      "display_name": "Morrow Silva",
+      "handle": "Morrow",
+      "id": "player_014",
+      "macro": {
+        "driving": 80,
+        "loot_efficiency": 84,
+        "pathfinding": 88,
+        "risk_assessment": 76,
+        "rotation": 80,
+        "scouting": 76,
+        "zone_reading": 76
+      },
+      "nationality": "Finland",
+      "physical": {
+        "fatigue_resistance": 80,
+        "stamina": 76,
+        "stress_recovery": 84
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 89,
+        "morale": 86,
+        "overall": 82,
+        "potential": 90
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 84,
+        "concealment": 76,
+        "movement_noise": 80,
+        "prone_control": 76
+      },
+      "team_id": "astra_nine",
+      "teamplay": {
+        "communication": 80,
+        "composure": 84,
+        "discipline": 84,
+        "leadership": 81,
+        "revive_judgement": 76,
+        "teamwork": 84,
+        "trade_timing": 88,
+        "trust": 80
+      },
+      "tier": "A"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 76,
+        "game_sense": 81,
+        "hearing": 85,
+        "information_memory": 81,
+        "reaction": 85,
+        "vision": 81
+      },
+      "career": {
+        "assists": 54,
+        "damage": 58600,
+        "earnings": 140000,
+        "kills": 293,
+        "knocks": 336,
+        "matches": 52,
+        "revives": 13,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 76,
+        "close_range": 81,
+        "clutch": 76,
+        "long_range": 77,
+        "mid_range": 85,
+        "recoil_control": 81,
+        "survival": 85,
+        "throwable_accuracy": 76,
+        "utility_timing": 84,
+        "weapon_swap": 81
+      },
+      "contract": {
+        "market_value": 896000,
+        "monthly_salary": 16700,
+        "months_remaining": 32,
+        "release_clause": 1408000
+      },
+      "display_name": "Frost Chen",
+      "handle": "Frost",
+      "id": "player_015",
+      "macro": {
+        "driving": 85,
+        "loot_efficiency": 76,
+        "pathfinding": 80,
+        "risk_assessment": 81,
+        "rotation": 85,
+        "scouting": 81,
+        "zone_reading": 81
+      },
+      "nationality": "Finland",
+      "physical": {
+        "fatigue_resistance": 85,
+        "stamina": 81,
+        "stress_recovery": 76
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 65,
+        "morale": 90,
+        "overall": 80,
+        "potential": 89
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 76,
+        "concealment": 81,
+        "movement_noise": 85,
+        "prone_control": 81
+      },
+      "team_id": "astra_nine",
+      "teamplay": {
+        "communication": 85,
+        "composure": 76,
+        "discipline": 76,
+        "leadership": 73,
+        "revive_judgement": 84,
+        "teamwork": 76,
+        "trade_timing": 81,
+        "trust": 85
+      },
+      "tier": "A"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 84,
+        "game_sense": 76,
+        "hearing": 80,
+        "information_memory": 76,
+        "reaction": 80,
+        "vision": 76
+      },
+      "career": {
+        "assists": 65,
+        "damage": 61500,
+        "earnings": 143220,
+        "kills": 310,
+        "knocks": 355,
+        "matches": 65,
+        "revives": 18,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 84,
+        "close_range": 76,
+        "clutch": 84,
+        "long_range": 84,
+        "mid_range": 80,
+        "recoil_control": 76,
+        "survival": 80,
+        "throwable_accuracy": 85,
+        "utility_timing": 76,
+        "weapon_swap": 76
+      },
+      "contract": {
+        "market_value": 918540,
+        "monthly_salary": 16840,
+        "months_remaining": 12,
+        "release_clause": 1443420
+      },
+      "display_name": "Ivy Sato",
+      "handle": "Ivy",
+      "id": "player_016",
+      "macro": {
+        "driving": 80,
+        "loot_efficiency": 84,
+        "pathfinding": 88,
+        "risk_assessment": 76,
+        "rotation": 80,
+        "scouting": 76,
+        "zone_reading": 76
+      },
+      "nationality": "Finland",
+      "physical": {
+        "fatigue_resistance": 80,
+        "stamina": 76,
+        "stress_recovery": 84
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 72,
+        "morale": 64,
+        "overall": 81,
+        "potential": 91
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 84,
+        "concealment": 76,
+        "movement_noise": 80,
+        "prone_control": 76
+      },
+      "team_id": "astra_nine",
+      "teamplay": {
+        "communication": 80,
+        "composure": 84,
+        "discipline": 84,
+        "leadership": 81,
+        "revive_judgement": 76,
+        "teamwork": 84,
+        "trade_timing": 88,
+        "trust": 80
+      },
+      "tier": "A"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 77,
+        "game_sense": 85,
+        "hearing": 86,
+        "information_memory": 81,
+        "reaction": 86,
+        "vision": 81
+      },
+      "career": {
+        "assists": 76,
+        "damage": 64400,
+        "earnings": 140000,
+        "kills": 327,
+        "knocks": 374,
+        "matches": 78,
+        "revives": 23,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 77,
+        "close_range": 82,
+        "clutch": 77,
+        "long_range": 78,
+        "mid_range": 86,
+        "recoil_control": 82,
+        "survival": 86,
+        "throwable_accuracy": 78,
+        "utility_timing": 82,
+        "weapon_swap": 82
+      },
+      "contract": {
+        "market_value": 896000,
+        "monthly_salary": 16700,
+        "months_remaining": 17,
+        "release_clause": 1408000
+      },
+      "display_name": "Colt Nguyen",
+      "handle": "Colt",
+      "id": "player_017",
+      "macro": {
+        "driving": 86,
+        "loot_efficiency": 77,
+        "pathfinding": 81,
+        "risk_assessment": 85,
+        "rotation": 85,
+        "scouting": 85,
+        "zone_reading": 80
+      },
+      "nationality": "USA",
+      "physical": {
+        "fatigue_resistance": 86,
+        "stamina": 82,
+        "stress_recovery": 77
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 79,
+        "morale": 68,
+        "overall": 80,
+        "potential": 83
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 77,
+        "concealment": 82,
+        "movement_noise": 86,
+        "prone_control": 82
+      },
+      "team_id": "iron_pulse",
+      "teamplay": {
+        "communication": 89,
+        "composure": 77,
+        "discipline": 77,
+        "leadership": 84,
+        "revive_judgement": 82,
+        "teamwork": 77,
+        "trade_timing": 82,
+        "trust": 86
+      },
+      "tier": "A"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 83,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 78,
+        "vision": 75
+      },
+      "career": {
+        "assists": 87,
+        "damage": 67300,
+        "earnings": 136820,
+        "kills": 344,
+        "knocks": 393,
+        "matches": 91,
+        "revives": 28,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 83,
+        "close_range": 87,
+        "clutch": 83,
+        "long_range": 84,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 84,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 873740,
+        "monthly_salary": 16560,
+        "months_remaining": 22,
+        "release_clause": 1373020
+      },
+      "display_name": "Rook Kim",
+      "handle": "Rook",
+      "id": "player_018",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 83,
+        "pathfinding": 87,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "USA",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 83
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 86,
+        "morale": 72,
+        "overall": 79,
+        "potential": 83
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 83,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "iron_pulse",
+      "teamplay": {
+        "communication": 79,
+        "composure": 83,
+        "discipline": 83,
+        "leadership": 80,
+        "revive_judgement": 75,
+        "teamwork": 83,
+        "trade_timing": 87,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 75,
+        "game_sense": 80,
+        "hearing": 84,
+        "information_memory": 80,
+        "reaction": 84,
+        "vision": 80
+      },
+      "career": {
+        "assists": 98,
+        "damage": 70200,
+        "earnings": 130580,
+        "kills": 361,
+        "knocks": 412,
+        "matches": 104,
+        "revives": 33,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 75,
+        "close_range": 80,
+        "clutch": 75,
+        "long_range": 76,
+        "mid_range": 84,
+        "recoil_control": 80,
+        "survival": 84,
+        "throwable_accuracy": 75,
+        "utility_timing": 83,
+        "weapon_swap": 80
+      },
+      "contract": {
+        "market_value": 830060,
+        "monthly_salary": 16280,
+        "months_remaining": 27,
+        "release_clause": 1304380
+      },
+      "display_name": "Nova Tan",
+      "handle": "Nova",
+      "id": "player_019",
+      "macro": {
+        "driving": 84,
+        "loot_efficiency": 75,
+        "pathfinding": 79,
+        "risk_assessment": 80,
+        "rotation": 84,
+        "scouting": 80,
+        "zone_reading": 80
+      },
+      "nationality": "USA",
+      "physical": {
+        "fatigue_resistance": 84,
+        "stamina": 80,
+        "stress_recovery": 75
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 62,
+        "morale": 76,
+        "overall": 77,
+        "potential": 82
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 75,
+        "concealment": 80,
+        "movement_noise": 84,
+        "prone_control": 80
+      },
+      "team_id": "iron_pulse",
+      "teamplay": {
+        "communication": 84,
+        "composure": 75,
+        "discipline": 75,
+        "leadership": 72,
+        "revive_judgement": 83,
+        "teamwork": 75,
+        "trade_timing": 80,
+        "trust": 84
+      },
+      "tier": "A"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 83,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 79,
+        "vision": 75
+      },
+      "career": {
+        "assists": 109,
+        "damage": 73100,
+        "earnings": 133680,
+        "kills": 378,
+        "knocks": 71,
+        "matches": 117,
+        "revives": 38,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 83,
+        "close_range": 75,
+        "clutch": 83,
+        "long_range": 83,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 71,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 851760,
+        "monthly_salary": 16420,
+        "months_remaining": 32,
+        "release_clause": 1338480
+      },
+      "display_name": "Dash Park",
+      "handle": "Dash",
+      "id": "player_020",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 83,
+        "pathfinding": 87,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "USA",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 83
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 69,
+        "morale": 80,
+        "overall": 78,
+        "potential": 84
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 83,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "iron_pulse",
+      "teamplay": {
+        "communication": 79,
+        "composure": 83,
+        "discipline": 83,
+        "leadership": 80,
+        "revive_judgement": 75,
+        "teamwork": 83,
+        "trade_timing": 87,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 23,
+      "awareness": {
+        "enemy_tracking": 77,
+        "game_sense": 85,
+        "hearing": 73,
+        "information_memory": 81,
+        "reaction": 73,
+        "vision": 81
+      },
+      "career": {
+        "assists": 120,
+        "damage": 76000,
+        "earnings": 133680,
+        "kills": 65,
+        "knocks": 90,
+        "matches": 130,
+        "revives": 43,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 77,
+        "close_range": 82,
+        "clutch": 77,
+        "long_range": 78,
+        "mid_range": 73,
+        "recoil_control": 82,
+        "survival": 73,
+        "throwable_accuracy": 78,
+        "utility_timing": 82,
+        "weapon_swap": 82
+      },
+      "contract": {
+        "market_value": 851760,
+        "monthly_salary": 16420,
+        "months_remaining": 12,
+        "release_clause": 1338480
+      },
+      "display_name": "Siam Smith",
+      "handle": "Siam",
+      "id": "player_021",
+      "macro": {
+        "driving": 73,
+        "loot_efficiency": 77,
+        "pathfinding": 81,
+        "risk_assessment": 85,
+        "rotation": 85,
+        "scouting": 85,
+        "zone_reading": 80
+      },
+      "nationality": "Thailand",
+      "physical": {
+        "fatigue_resistance": 73,
+        "stamina": 82,
+        "stress_recovery": 77
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 76,
+        "morale": 84,
+        "overall": 78,
+        "potential": 85
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 77,
+        "concealment": 82,
+        "movement_noise": 73,
+        "prone_control": 82
+      },
+      "team_id": "silent_wave",
+      "teamplay": {
+        "communication": 89,
+        "composure": 77,
+        "discipline": 77,
+        "leadership": 84,
+        "revive_judgement": 82,
+        "teamwork": 77,
+        "trade_timing": 82,
+        "trust": 73
+      },
+      "tier": "A"
+    },
+    {
+      "age": 26,
+      "awareness": {
+        "enemy_tracking": 83,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 78,
+        "vision": 75
+      },
+      "career": {
+        "assists": 131,
+        "damage": 78900,
+        "earnings": 130580,
+        "kills": 82,
+        "knocks": 109,
+        "matches": 143,
+        "revives": 48,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 83,
+        "close_range": 74,
+        "clutch": 83,
+        "long_range": 71,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 71,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 830060,
+        "monthly_salary": 16280,
+        "months_remaining": 17,
+        "release_clause": 1304380
+      },
+      "display_name": "Mango Silva",
+      "handle": "Mango",
+      "id": "player_022",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 83,
+        "pathfinding": 74,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "Thailand",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 83
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 83,
+        "morale": 88,
+        "overall": 77,
+        "potential": 85
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 83,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "silent_wave",
+      "teamplay": {
+        "communication": 79,
+        "composure": 83,
+        "discipline": 83,
+        "leadership": 80,
+        "revive_judgement": 75,
+        "teamwork": 83,
+        "trade_timing": 74,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 75,
+        "game_sense": 80,
+        "hearing": 71,
+        "information_memory": 80,
+        "reaction": 71,
+        "vision": 80
+      },
+      "career": {
+        "assists": 22,
+        "damage": 81800,
+        "earnings": 124500,
+        "kills": 99,
+        "knocks": 128,
+        "matches": 156,
+        "revives": 53,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 75,
+        "close_range": 80,
+        "clutch": 75,
+        "long_range": 76,
+        "mid_range": 71,
+        "recoil_control": 80,
+        "survival": 71,
+        "throwable_accuracy": 75,
+        "utility_timing": 83,
+        "weapon_swap": 80
+      },
+      "contract": {
+        "market_value": 787500,
+        "monthly_salary": 16000,
+        "months_remaining": 22,
+        "release_clause": 1237500
+      },
+      "display_name": "Cobra Chen",
+      "handle": "Cobra",
+      "id": "player_023",
+      "macro": {
+        "driving": 71,
+        "loot_efficiency": 75,
+        "pathfinding": 79,
+        "risk_assessment": 80,
+        "rotation": 71,
+        "scouting": 80,
+        "zone_reading": 80
+      },
+      "nationality": "Thailand",
+      "physical": {
+        "fatigue_resistance": 71,
+        "stamina": 80,
+        "stress_recovery": 75
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 90,
+        "morale": 92,
+        "overall": 75,
+        "potential": 84
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 75,
+        "concealment": 80,
+        "movement_noise": 71,
+        "prone_control": 80
+      },
+      "team_id": "silent_wave",
+      "teamplay": {
+        "communication": 71,
+        "composure": 75,
+        "discipline": 75,
+        "leadership": 72,
+        "revive_judgement": 83,
+        "teamwork": 75,
+        "trade_timing": 80,
+        "trust": 71
+      },
+      "tier": "A"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 83,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 79,
+        "vision": 75
+      },
+      "career": {
+        "assists": 33,
+        "damage": 84700,
+        "earnings": 127520,
+        "kills": 116,
+        "knocks": 147,
+        "matches": 169,
+        "revives": 58,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 83,
+        "close_range": 75,
+        "clutch": 83,
+        "long_range": 83,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 71,
+        "utility_timing": 75,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 808640,
+        "monthly_salary": 16140,
+        "months_remaining": 27,
+        "release_clause": 1270720
+      },
+      "display_name": "Lotus Sato",
+      "handle": "Lotus",
+      "id": "player_024",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 83,
+        "pathfinding": 74,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "Thailand",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 83
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 66,
+        "morale": 66,
+        "overall": 76,
+        "potential": 86
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 83,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "silent_wave",
+      "teamplay": {
+        "communication": 79,
+        "composure": 83,
+        "discipline": 83,
+        "leadership": 80,
+        "revive_judgement": 75,
+        "teamwork": 83,
+        "trade_timing": 74,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 73,
+        "game_sense": 81,
+        "hearing": 69,
+        "information_memory": 77,
+        "reaction": 69,
+        "vision": 77
+      },
+      "career": {
+        "assists": 44,
+        "damage": 87600,
+        "earnings": 115680,
+        "kills": 133,
+        "knocks": 166,
+        "matches": 182,
+        "revives": 63,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 73,
+        "close_range": 78,
+        "clutch": 73,
+        "long_range": 74,
+        "mid_range": 69,
+        "recoil_control": 78,
+        "survival": 69,
+        "throwable_accuracy": 74,
+        "utility_timing": 78,
+        "weapon_swap": 78
+      },
+      "contract": {
+        "market_value": 725760,
+        "monthly_salary": 15580,
+        "months_remaining": 32,
+        "release_clause": 1140480
+      },
+      "display_name": "Forge Nguyen",
+      "handle": "Forge",
+      "id": "player_025",
+      "macro": {
+        "driving": 69,
+        "loot_efficiency": 73,
+        "pathfinding": 77,
+        "risk_assessment": 81,
+        "rotation": 81,
+        "scouting": 81,
+        "zone_reading": 76
+      },
+      "nationality": "Turkey",
+      "physical": {
+        "fatigue_resistance": 69,
+        "stamina": 78,
+        "stress_recovery": 73
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 73,
+        "morale": 70,
+        "overall": 72,
+        "potential": 75
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 73,
+        "concealment": 78,
+        "movement_noise": 69,
+        "prone_control": 78
+      },
+      "team_id": "titan_forge",
+      "teamplay": {
+        "communication": 72,
+        "composure": 73,
+        "discipline": 73,
+        "leadership": 80,
+        "revive_judgement": 78,
+        "teamwork": 73,
+        "trade_timing": 78,
+        "trust": 69
+      },
+      "tier": "B"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 79,
+        "game_sense": 71,
+        "hearing": 75,
+        "information_memory": 71,
+        "reaction": 74,
+        "vision": 71
+      },
+      "career": {
+        "assists": 55,
+        "damage": 90500,
+        "earnings": 112820,
+        "kills": 150,
+        "knocks": 185,
+        "matches": 195,
+        "revives": 68,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 79,
+        "close_range": 70,
+        "clutch": 79,
+        "long_range": 67,
+        "mid_range": 75,
+        "recoil_control": 71,
+        "survival": 75,
+        "throwable_accuracy": 67,
+        "utility_timing": 71,
+        "weapon_swap": 71
+      },
+      "contract": {
+        "market_value": 705740,
+        "monthly_salary": 15440,
+        "months_remaining": 12,
+        "release_clause": 1109020
+      },
+      "display_name": "Rune Kim",
+      "handle": "Rune",
+      "id": "player_026",
+      "macro": {
+        "driving": 75,
+        "loot_efficiency": 79,
+        "pathfinding": 70,
+        "risk_assessment": 71,
+        "rotation": 75,
+        "scouting": 71,
+        "zone_reading": 71
+      },
+      "nationality": "Turkey",
+      "physical": {
+        "fatigue_resistance": 75,
+        "stamina": 71,
+        "stress_recovery": 79
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 80,
+        "morale": 74,
+        "overall": 71,
+        "potential": 75
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 79,
+        "concealment": 71,
+        "movement_noise": 75,
+        "prone_control": 71
+      },
+      "team_id": "titan_forge",
+      "teamplay": {
+        "communication": 75,
+        "composure": 79,
+        "discipline": 79,
+        "leadership": 63,
+        "revive_judgement": 71,
+        "teamwork": 79,
+        "trade_timing": 70,
+        "trust": 75
+      },
+      "tier": "B"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 71,
+        "game_sense": 63,
+        "hearing": 67,
+        "information_memory": 63,
+        "reaction": 67,
+        "vision": 63
+      },
+      "career": {
+        "assists": 66,
+        "damage": 93400,
+        "earnings": 107220,
+        "kills": 167,
+        "knocks": 204,
+        "matches": 208,
+        "revives": 8,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 71,
+        "close_range": 63,
+        "clutch": 71,
+        "long_range": 72,
+        "mid_range": 67,
+        "recoil_control": 63,
+        "survival": 67,
+        "throwable_accuracy": 71,
+        "utility_timing": 79,
+        "weapon_swap": 63
+      },
+      "contract": {
+        "market_value": 666540,
+        "monthly_salary": 15160,
+        "months_remaining": 17,
+        "release_clause": 1047420
+      },
+      "display_name": "Blitz Tan",
+      "handle": "Blitz",
+      "id": "player_027",
+      "macro": {
+        "driving": 67,
+        "loot_efficiency": 71,
+        "pathfinding": 75,
+        "risk_assessment": 63,
+        "rotation": 67,
+        "scouting": 63,
+        "zone_reading": 63
+      },
+      "nationality": "Turkey",
+      "physical": {
+        "fatigue_resistance": 67,
+        "stamina": 63,
+        "stress_recovery": 71
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 87,
+        "morale": 78,
+        "overall": 69,
+        "potential": 74
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 71,
+        "concealment": 63,
+        "movement_noise": 67,
+        "prone_control": 63
+      },
+      "team_id": "titan_forge",
+      "teamplay": {
+        "communication": 67,
+        "composure": 71,
+        "discipline": 71,
+        "leadership": 68,
+        "revive_judgement": 79,
+        "teamwork": 71,
+        "trade_timing": 63,
+        "trust": 67
+      },
+      "tier": "B"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 66,
+        "game_sense": 71,
+        "hearing": 75,
+        "information_memory": 71,
+        "reaction": 75,
+        "vision": 71
+      },
+      "career": {
+        "assists": 77,
+        "damage": 96300,
+        "earnings": 110000,
+        "kills": 184,
+        "knocks": 223,
+        "matches": 51,
+        "revives": 13,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 66,
+        "close_range": 71,
+        "clutch": 66,
+        "long_range": 66,
+        "mid_range": 75,
+        "recoil_control": 71,
+        "survival": 75,
+        "throwable_accuracy": 67,
+        "utility_timing": 71,
+        "weapon_swap": 71
+      },
+      "contract": {
+        "market_value": 686000,
+        "monthly_salary": 15300,
+        "months_remaining": 22,
+        "release_clause": 1078000
+      },
+      "display_name": "Sage Park",
+      "handle": "Sage",
+      "id": "player_028",
+      "macro": {
+        "driving": 75,
+        "loot_efficiency": 66,
+        "pathfinding": 70,
+        "risk_assessment": 71,
+        "rotation": 75,
+        "scouting": 71,
+        "zone_reading": 71
+      },
+      "nationality": "Turkey",
+      "physical": {
+        "fatigue_resistance": 75,
+        "stamina": 71,
+        "stress_recovery": 66
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 63,
+        "morale": 82,
+        "overall": 70,
+        "potential": 76
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 66,
+        "concealment": 71,
+        "movement_noise": 75,
+        "prone_control": 71
+      },
+      "team_id": "titan_forge",
+      "teamplay": {
+        "communication": 75,
+        "composure": 66,
+        "discipline": 66,
+        "leadership": 63,
+        "revive_judgement": 71,
+        "teamwork": 66,
+        "trade_timing": 70,
+        "trust": 75
+      },
+      "tier": "B"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 84,
+        "game_sense": 79,
+        "hearing": 80,
+        "information_memory": 88,
+        "reaction": 80,
+        "vision": 88
+      },
+      "career": {
+        "assists": 88,
+        "damage": 99200,
+        "earnings": 143220,
+        "kills": 201,
+        "knocks": 242,
+        "matches": 64,
+        "revives": 18,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 84,
+        "close_range": 76,
+        "clutch": 84,
+        "long_range": 85,
+        "mid_range": 80,
+        "recoil_control": 76,
+        "survival": 80,
+        "throwable_accuracy": 85,
+        "utility_timing": 76,
+        "weapon_swap": 76
+      },
+      "contract": {
+        "market_value": 918540,
+        "monthly_salary": 16840,
+        "months_remaining": 27,
+        "release_clause": 1443420
+      },
+      "display_name": "Aki Smith",
+      "handle": "Aki",
+      "id": "player_029",
+      "macro": {
+        "driving": 80,
+        "loot_efficiency": 84,
+        "pathfinding": 88,
+        "risk_assessment": 79,
+        "rotation": 79,
+        "scouting": 79,
+        "zone_reading": 87
+      },
+      "nationality": "Japan",
+      "physical": {
+        "fatigue_resistance": 80,
+        "stamina": 76,
+        "stress_recovery": 84
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 70,
+        "morale": 86,
+        "overall": 81,
+        "potential": 88
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 84,
+        "concealment": 76,
+        "movement_noise": 80,
+        "prone_control": 76
+      },
+      "team_id": "azure_foxes",
+      "teamplay": {
+        "communication": 83,
+        "composure": 84,
+        "discipline": 84,
+        "leadership": 91,
+        "revive_judgement": 76,
+        "teamwork": 84,
+        "trade_timing": 76,
+        "trust": 80
+      },
+      "tier": "A"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 77,
+        "game_sense": 82,
+        "hearing": 86,
+        "information_memory": 82,
+        "reaction": 85,
+        "vision": 82
+      },
+      "career": {
+        "assists": 99,
+        "damage": 102100,
+        "earnings": 140000,
+        "kills": 218,
+        "knocks": 261,
+        "matches": 77,
+        "revives": 23,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 77,
+        "close_range": 81,
+        "clutch": 77,
+        "long_range": 78,
+        "mid_range": 86,
+        "recoil_control": 82,
+        "survival": 86,
+        "throwable_accuracy": 78,
+        "utility_timing": 82,
+        "weapon_swap": 82
+      },
+      "contract": {
+        "market_value": 896000,
+        "monthly_salary": 16700,
+        "months_remaining": 32,
+        "release_clause": 1408000
+      },
+      "display_name": "Ren Silva",
+      "handle": "Ren",
+      "id": "player_030",
+      "macro": {
+        "driving": 86,
+        "loot_efficiency": 77,
+        "pathfinding": 81,
+        "risk_assessment": 82,
+        "rotation": 86,
+        "scouting": 82,
+        "zone_reading": 82
+      },
+      "nationality": "Japan",
+      "physical": {
+        "fatigue_resistance": 86,
+        "stamina": 82,
+        "stress_recovery": 77
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 77,
+        "morale": 90,
+        "overall": 80,
+        "potential": 88
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 77,
+        "concealment": 82,
+        "movement_noise": 86,
+        "prone_control": 82
+      },
+      "team_id": "azure_foxes",
+      "teamplay": {
+        "communication": 86,
+        "composure": 77,
+        "discipline": 77,
+        "leadership": 74,
+        "revive_judgement": 82,
+        "teamwork": 77,
+        "trade_timing": 81,
+        "trust": 86
+      },
+      "tier": "A"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 82,
+        "game_sense": 74,
+        "hearing": 78,
+        "information_memory": 74,
+        "reaction": 78,
+        "vision": 74
+      },
+      "career": {
+        "assists": 110,
+        "damage": 105000,
+        "earnings": 133680,
+        "kills": 235,
+        "knocks": 280,
+        "matches": 90,
+        "revives": 28,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 82,
+        "close_range": 74,
+        "clutch": 82,
+        "long_range": 83,
+        "mid_range": 78,
+        "recoil_control": 74,
+        "survival": 78,
+        "throwable_accuracy": 82,
+        "utility_timing": 77,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 851760,
+        "monthly_salary": 16420,
+        "months_remaining": 12,
+        "release_clause": 1338480
+      },
+      "display_name": "Yuna Chen",
+      "handle": "Yuna",
+      "id": "player_031",
+      "macro": {
+        "driving": 78,
+        "loot_efficiency": 82,
+        "pathfinding": 86,
+        "risk_assessment": 74,
+        "rotation": 78,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Japan",
+      "physical": {
+        "fatigue_resistance": 78,
+        "stamina": 74,
+        "stress_recovery": 82
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 84,
+        "morale": 64,
+        "overall": 78,
+        "potential": 87
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 82,
+        "concealment": 74,
+        "movement_noise": 78,
+        "prone_control": 74
+      },
+      "team_id": "azure_foxes",
+      "teamplay": {
+        "communication": 78,
+        "composure": 82,
+        "discipline": 82,
+        "leadership": 79,
+        "revive_judgement": 77,
+        "teamwork": 82,
+        "trade_timing": 74,
+        "trust": 78
+      },
+      "tier": "A"
+    },
+    {
+      "age": 23,
+      "awareness": {
+        "enemy_tracking": 77,
+        "game_sense": 82,
+        "hearing": 86,
+        "information_memory": 82,
+        "reaction": 86,
+        "vision": 82
+      },
+      "career": {
+        "assists": 121,
+        "damage": 107900,
+        "earnings": 136820,
+        "kills": 252,
+        "knocks": 299,
+        "matches": 103,
+        "revives": 33,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 77,
+        "close_range": 82,
+        "clutch": 77,
+        "long_range": 77,
+        "mid_range": 86,
+        "recoil_control": 82,
+        "survival": 86,
+        "throwable_accuracy": 78,
+        "utility_timing": 82,
+        "weapon_swap": 82
+      },
+      "contract": {
+        "market_value": 873740,
+        "monthly_salary": 16560,
+        "months_remaining": 17,
+        "release_clause": 1373020
+      },
+      "display_name": "Kaze Sato",
+      "handle": "Kaze",
+      "id": "player_032",
+      "macro": {
+        "driving": 86,
+        "loot_efficiency": 77,
+        "pathfinding": 81,
+        "risk_assessment": 82,
+        "rotation": 86,
+        "scouting": 82,
+        "zone_reading": 82
+      },
+      "nationality": "Japan",
+      "physical": {
+        "fatigue_resistance": 86,
+        "stamina": 82,
+        "stress_recovery": 77
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 60,
+        "morale": 68,
+        "overall": 79,
+        "potential": 89
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 77,
+        "concealment": 82,
+        "movement_noise": 86,
+        "prone_control": 82
+      },
+      "team_id": "azure_foxes",
+      "teamplay": {
+        "communication": 86,
+        "composure": 77,
+        "discipline": 77,
+        "leadership": 74,
+        "revive_judgement": 82,
+        "teamwork": 77,
+        "trade_timing": 81,
+        "trust": 86
+      },
+      "tier": "A"
+    },
+    {
+      "age": 26,
+      "awareness": {
+        "enemy_tracking": 76,
+        "game_sense": 71,
+        "hearing": 72,
+        "information_memory": 80,
+        "reaction": 72,
+        "vision": 80
+      },
+      "career": {
+        "assists": 132,
+        "damage": 18800,
+        "earnings": 112820,
+        "kills": 269,
+        "knocks": 318,
+        "matches": 116,
+        "revives": 38,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 76,
+        "close_range": 68,
+        "clutch": 76,
+        "long_range": 64,
+        "mid_range": 72,
+        "recoil_control": 68,
+        "survival": 72,
+        "throwable_accuracy": 64,
+        "utility_timing": 68,
+        "weapon_swap": 68
+      },
+      "contract": {
+        "market_value": 705740,
+        "monthly_salary": 15440,
+        "months_remaining": 22,
+        "release_clause": 1109020
+      },
+      "display_name": "Quark Nguyen",
+      "handle": "Quark",
+      "id": "player_033",
+      "macro": {
+        "driving": 72,
+        "loot_efficiency": 76,
+        "pathfinding": 80,
+        "risk_assessment": 71,
+        "rotation": 71,
+        "scouting": 71,
+        "zone_reading": 79
+      },
+      "nationality": "Brazil",
+      "physical": {
+        "fatigue_resistance": 72,
+        "stamina": 68,
+        "stress_recovery": 76
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 67,
+        "morale": 72,
+        "overall": 71,
+        "potential": 74
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 76,
+        "concealment": 68,
+        "movement_noise": 72,
+        "prone_control": 68
+      },
+      "team_id": "quantum_raid",
+      "teamplay": {
+        "communication": 75,
+        "composure": 76,
+        "discipline": 76,
+        "leadership": 83,
+        "revive_judgement": 68,
+        "teamwork": 76,
+        "trade_timing": 68,
+        "trust": 72
+      },
+      "tier": "B"
+    },
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 74,
+        "hearing": 65,
+        "information_memory": 74,
+        "reaction": 77,
+        "vision": 74
+      },
+      "career": {
+        "assists": 23,
+        "damage": 21700,
+        "earnings": 110000,
+        "kills": 286,
+        "knocks": 337,
+        "matches": 129,
+        "revives": 43,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 73,
+        "clutch": 69,
+        "long_range": 70,
+        "mid_range": 65,
+        "recoil_control": 74,
+        "survival": 65,
+        "throwable_accuracy": 70,
+        "utility_timing": 74,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 686000,
+        "monthly_salary": 15300,
+        "months_remaining": 27,
+        "release_clause": 1078000
+      },
+      "display_name": "Bolt Kim",
+      "handle": "Bolt",
+      "id": "player_034",
+      "macro": {
+        "driving": 65,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 74,
+        "rotation": 65,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Brazil",
+      "physical": {
+        "fatigue_resistance": 65,
+        "stamina": 74,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 74,
+        "morale": 76,
+        "overall": 70,
+        "potential": 74
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 74,
+        "movement_noise": 65,
+        "prone_control": 74
+      },
+      "team_id": "quantum_raid",
+      "teamplay": {
+        "communication": 65,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 74,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 65
+      },
+      "tier": "B"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 74,
+        "game_sense": 66,
+        "hearing": 70,
+        "information_memory": 66,
+        "reaction": 70,
+        "vision": 66
+      },
+      "career": {
+        "assists": 34,
+        "damage": 24600,
+        "earnings": 104480,
+        "kills": 303,
+        "knocks": 356,
+        "matches": 142,
+        "revives": 48,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 74,
+        "close_range": 66,
+        "clutch": 74,
+        "long_range": 62,
+        "mid_range": 70,
+        "recoil_control": 66,
+        "survival": 70,
+        "throwable_accuracy": 74,
+        "utility_timing": 69,
+        "weapon_swap": 66
+      },
+      "contract": {
+        "market_value": 647360,
+        "monthly_salary": 15020,
+        "months_remaining": 32,
+        "release_clause": 1017280
+      },
+      "display_name": "Flux Tan",
+      "handle": "Flux",
+      "id": "player_035",
+      "macro": {
+        "driving": 70,
+        "loot_efficiency": 74,
+        "pathfinding": 65,
+        "risk_assessment": 66,
+        "rotation": 70,
+        "scouting": 66,
+        "zone_reading": 66
+      },
+      "nationality": "Brazil",
+      "physical": {
+        "fatigue_resistance": 70,
+        "stamina": 66,
+        "stress_recovery": 74
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 81,
+        "morale": 80,
+        "overall": 68,
+        "potential": 73
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 74,
+        "concealment": 66,
+        "movement_noise": 70,
+        "prone_control": 66
+      },
+      "team_id": "quantum_raid",
+      "teamplay": {
+        "communication": 70,
+        "composure": 74,
+        "discipline": 74,
+        "leadership": 71,
+        "revive_judgement": 69,
+        "teamwork": 74,
+        "trade_timing": 66,
+        "trust": 70
+      },
+      "tier": "B"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 74,
+        "hearing": 65,
+        "information_memory": 74,
+        "reaction": 65,
+        "vision": 74
+      },
+      "career": {
+        "assists": 45,
+        "damage": 27500,
+        "earnings": 107220,
+        "kills": 320,
+        "knocks": 375,
+        "matches": 155,
+        "revives": 53,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 74,
+        "clutch": 69,
+        "long_range": 69,
+        "mid_range": 65,
+        "recoil_control": 74,
+        "survival": 65,
+        "throwable_accuracy": 70,
+        "utility_timing": 74,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 666540,
+        "monthly_salary": 15160,
+        "months_remaining": 12,
+        "release_clause": 1047420
+      },
+      "display_name": "Rift Park",
+      "handle": "Rift",
+      "id": "player_036",
+      "macro": {
+        "driving": 65,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 74,
+        "rotation": 65,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Brazil",
+      "physical": {
+        "fatigue_resistance": 65,
+        "stamina": 74,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 88,
+        "morale": 84,
+        "overall": 69,
+        "potential": 75
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 74,
+        "movement_noise": 65,
+        "prone_control": 74
+      },
+      "team_id": "quantum_raid",
+      "teamplay": {
+        "communication": 65,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 74,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 65
+      },
+      "tier": "B"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 76,
+        "game_sense": 71,
+        "hearing": 72,
+        "information_memory": 67,
+        "reaction": 72,
+        "vision": 67
+      },
+      "career": {
+        "assists": 56,
+        "damage": 30400,
+        "earnings": 107220,
+        "kills": 337,
+        "knocks": 394,
+        "matches": 168,
+        "revives": 58,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 76,
+        "close_range": 68,
+        "clutch": 76,
+        "long_range": 64,
+        "mid_range": 72,
+        "recoil_control": 68,
+        "survival": 72,
+        "throwable_accuracy": 64,
+        "utility_timing": 68,
+        "weapon_swap": 68
+      },
+      "contract": {
+        "market_value": 666540,
+        "monthly_salary": 15160,
+        "months_remaining": 17,
+        "release_clause": 1047420
+      },
+      "display_name": "Sol Smith",
+      "handle": "Sol",
+      "id": "player_037",
+      "macro": {
+        "driving": 72,
+        "loot_efficiency": 76,
+        "pathfinding": 67,
+        "risk_assessment": 71,
+        "rotation": 71,
+        "scouting": 71,
+        "zone_reading": 79
+      },
+      "nationality": "Indonesia",
+      "physical": {
+        "fatigue_resistance": 72,
+        "stamina": 68,
+        "stress_recovery": 76
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 64,
+        "morale": 88,
+        "overall": 69,
+        "potential": 76
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 76,
+        "concealment": 68,
+        "movement_noise": 72,
+        "prone_control": 68
+      },
+      "team_id": "solar_vipers",
+      "teamplay": {
+        "communication": 75,
+        "composure": 76,
+        "discipline": 76,
+        "leadership": 70,
+        "revive_judgement": 68,
+        "teamwork": 76,
+        "trade_timing": 68,
+        "trust": 72
+      },
+      "tier": "B"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 74,
+        "hearing": 65,
+        "information_memory": 74,
+        "reaction": 77,
+        "vision": 74
+      },
+      "career": {
+        "assists": 67,
+        "damage": 33300,
+        "earnings": 104480,
+        "kills": 354,
+        "knocks": 413,
+        "matches": 181,
+        "revives": 63,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 73,
+        "clutch": 69,
+        "long_range": 70,
+        "mid_range": 65,
+        "recoil_control": 74,
+        "survival": 65,
+        "throwable_accuracy": 70,
+        "utility_timing": 74,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 647360,
+        "monthly_salary": 15020,
+        "months_remaining": 22,
+        "release_clause": 1017280
+      },
+      "display_name": "Echo Silva",
+      "handle": "Echo",
+      "id": "player_038",
+      "macro": {
+        "driving": 65,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 74,
+        "rotation": 65,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Indonesia",
+      "physical": {
+        "fatigue_resistance": 65,
+        "stamina": 74,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 71,
+        "morale": 92,
+        "overall": 68,
+        "potential": 76
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 74,
+        "movement_noise": 65,
+        "prone_control": 74
+      },
+      "team_id": "solar_vipers",
+      "teamplay": {
+        "communication": 65,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 74,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 65
+      },
+      "tier": "B"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 74,
+        "game_sense": 66,
+        "hearing": 70,
+        "information_memory": 66,
+        "reaction": 70,
+        "vision": 66
+      },
+      "career": {
+        "assists": 78,
+        "damage": 36200,
+        "earnings": 99120,
+        "kills": 371,
+        "knocks": 72,
+        "matches": 194,
+        "revives": 68,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 74,
+        "close_range": 66,
+        "clutch": 74,
+        "long_range": 62,
+        "mid_range": 70,
+        "recoil_control": 66,
+        "survival": 70,
+        "throwable_accuracy": 74,
+        "utility_timing": 69,
+        "weapon_swap": 66
+      },
+      "contract": {
+        "market_value": 609840,
+        "monthly_salary": 14740,
+        "months_remaining": 27,
+        "release_clause": 958320
+      },
+      "display_name": "Pyre Chen",
+      "handle": "Pyre",
+      "id": "player_039",
+      "macro": {
+        "driving": 70,
+        "loot_efficiency": 74,
+        "pathfinding": 65,
+        "risk_assessment": 66,
+        "rotation": 70,
+        "scouting": 66,
+        "zone_reading": 66
+      },
+      "nationality": "Indonesia",
+      "physical": {
+        "fatigue_resistance": 70,
+        "stamina": 66,
+        "stress_recovery": 74
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 78,
+        "morale": 66,
+        "overall": 66,
+        "potential": 75
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 74,
+        "concealment": 66,
+        "movement_noise": 70,
+        "prone_control": 66
+      },
+      "team_id": "solar_vipers",
+      "teamplay": {
+        "communication": 70,
+        "composure": 74,
+        "discipline": 74,
+        "leadership": 58,
+        "revive_judgement": 69,
+        "teamwork": 74,
+        "trade_timing": 66,
+        "trust": 70
+      },
+      "tier": "B"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 61,
+        "hearing": 65,
+        "information_memory": 61,
+        "reaction": 65,
+        "vision": 61
+      },
+      "career": {
+        "assists": 89,
+        "damage": 39100,
+        "earnings": 101780,
+        "kills": 58,
+        "knocks": 91,
+        "matches": 207,
+        "revives": 8,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 61,
+        "clutch": 69,
+        "long_range": 69,
+        "mid_range": 65,
+        "recoil_control": 61,
+        "survival": 65,
+        "throwable_accuracy": 70,
+        "utility_timing": 61,
+        "weapon_swap": 61
+      },
+      "contract": {
+        "market_value": 628460,
+        "monthly_salary": 14880,
+        "months_remaining": 32,
+        "release_clause": 987580
+      },
+      "display_name": "Drake Sato",
+      "handle": "Drake",
+      "id": "player_040",
+      "macro": {
+        "driving": 65,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 61,
+        "rotation": 65,
+        "scouting": 61,
+        "zone_reading": 61
+      },
+      "nationality": "Indonesia",
+      "physical": {
+        "fatigue_resistance": 65,
+        "stamina": 61,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 85,
+        "morale": 70,
+        "overall": 67,
+        "potential": 77
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 61,
+        "movement_noise": 65,
+        "prone_control": 61
+      },
+      "team_id": "solar_vipers",
+      "teamplay": {
+        "communication": 65,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 61,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 65
+      },
+      "tier": "B"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 82,
+        "game_sense": 90,
+        "hearing": 91,
+        "information_memory": 86,
+        "reaction": 91,
+        "vision": 86
+      },
+      "career": {
+        "assists": 100,
+        "damage": 42000,
+        "earnings": 159920,
+        "kills": 75,
+        "knocks": 110,
+        "matches": 50,
+        "revives": 13,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 82,
+        "close_range": 87,
+        "clutch": 82,
+        "long_range": 83,
+        "mid_range": 91,
+        "recoil_control": 87,
+        "survival": 91,
+        "throwable_accuracy": 83,
+        "utility_timing": 87,
+        "weapon_swap": 87
+      },
+      "contract": {
+        "market_value": 1035440,
+        "monthly_salary": 17540,
+        "months_remaining": 12,
+        "release_clause": 1627120
+      },
+      "display_name": "Nyx Nguyen",
+      "handle": "Nyx",
+      "id": "player_041",
+      "macro": {
+        "driving": 91,
+        "loot_efficiency": 82,
+        "pathfinding": 86,
+        "risk_assessment": 90,
+        "rotation": 90,
+        "scouting": 90,
+        "zone_reading": 97
+      },
+      "nationality": "China",
+      "physical": {
+        "fatigue_resistance": 91,
+        "stamina": 87,
+        "stress_recovery": 82
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 61,
+        "morale": 74,
+        "overall": 86,
+        "potential": 89
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 82,
+        "concealment": 87,
+        "movement_noise": 91,
+        "prone_control": 87
+      },
+      "team_id": "night_lotus",
+      "teamplay": {
+        "communication": 94,
+        "composure": 82,
+        "discipline": 82,
+        "leadership": 89,
+        "revive_judgement": 87,
+        "teamwork": 82,
+        "trade_timing": 87,
+        "trust": 91
+      },
+      "tier": "S"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 88,
+        "game_sense": 80,
+        "hearing": 84,
+        "information_memory": 80,
+        "reaction": 83,
+        "vision": 80
+      },
+      "career": {
+        "assists": 111,
+        "damage": 44900,
+        "earnings": 156500,
+        "kills": 92,
+        "knocks": 129,
+        "matches": 63,
+        "revives": 18,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 88,
+        "close_range": 92,
+        "clutch": 88,
+        "long_range": 89,
+        "mid_range": 84,
+        "recoil_control": 80,
+        "survival": 84,
+        "throwable_accuracy": 89,
+        "utility_timing": 80,
+        "weapon_swap": 80
+      },
+      "contract": {
+        "market_value": 1011500,
+        "monthly_salary": 17400,
+        "months_remaining": 17,
+        "release_clause": 1589500
+      },
+      "display_name": "Lumen Kim",
+      "handle": "Lumen",
+      "id": "player_042",
+      "macro": {
+        "driving": 84,
+        "loot_efficiency": 88,
+        "pathfinding": 92,
+        "risk_assessment": 80,
+        "rotation": 84,
+        "scouting": 80,
+        "zone_reading": 80
+      },
+      "nationality": "China",
+      "physical": {
+        "fatigue_resistance": 84,
+        "stamina": 80,
+        "stress_recovery": 88
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 68,
+        "morale": 78,
+        "overall": 85,
+        "potential": 89
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 88,
+        "concealment": 80,
+        "movement_noise": 84,
+        "prone_control": 80
+      },
+      "team_id": "night_lotus",
+      "teamplay": {
+        "communication": 84,
+        "composure": 88,
+        "discipline": 88,
+        "leadership": 85,
+        "revive_judgement": 80,
+        "teamwork": 88,
+        "trade_timing": 92,
+        "trust": 84
+      },
+      "tier": "S"
+    },
+    {
+      "age": 23,
+      "awareness": {
+        "enemy_tracking": 80,
+        "game_sense": 85,
+        "hearing": 89,
+        "information_memory": 85,
+        "reaction": 89,
+        "vision": 85
+      },
+      "career": {
+        "assists": 122,
+        "damage": 47800,
+        "earnings": 149780,
+        "kills": 109,
+        "knocks": 148,
+        "matches": 76,
+        "revives": 23,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 80,
+        "close_range": 85,
+        "clutch": 80,
+        "long_range": 81,
+        "mid_range": 89,
+        "recoil_control": 85,
+        "survival": 89,
+        "throwable_accuracy": 80,
+        "utility_timing": 88,
+        "weapon_swap": 85
+      },
+      "contract": {
+        "market_value": 964460,
+        "monthly_salary": 17120,
+        "months_remaining": 22,
+        "release_clause": 1515580
+      },
+      "display_name": "Cinder Tan",
+      "handle": "Cinder",
+      "id": "player_043",
+      "macro": {
+        "driving": 89,
+        "loot_efficiency": 80,
+        "pathfinding": 84,
+        "risk_assessment": 85,
+        "rotation": 89,
+        "scouting": 85,
+        "zone_reading": 85
+      },
+      "nationality": "China",
+      "physical": {
+        "fatigue_resistance": 89,
+        "stamina": 85,
+        "stress_recovery": 80
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 75,
+        "morale": 82,
+        "overall": 83,
+        "potential": 88
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 80,
+        "concealment": 85,
+        "movement_noise": 89,
+        "prone_control": 85
+      },
+      "team_id": "night_lotus",
+      "teamplay": {
+        "communication": 89,
+        "composure": 80,
+        "discipline": 80,
+        "leadership": 77,
+        "revive_judgement": 88,
+        "teamwork": 80,
+        "trade_timing": 85,
+        "trust": 89
+      },
+      "tier": "S"
+    },
+    {
+      "age": 26,
+      "awareness": {
+        "enemy_tracking": 88,
+        "game_sense": 80,
+        "hearing": 84,
+        "information_memory": 80,
+        "reaction": 84,
+        "vision": 80
+      },
+      "career": {
+        "assists": 133,
+        "damage": 50700,
+        "earnings": 153120,
+        "kills": 126,
+        "knocks": 167,
+        "matches": 89,
+        "revives": 28,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 88,
+        "close_range": 80,
+        "clutch": 88,
+        "long_range": 88,
+        "mid_range": 84,
+        "recoil_control": 80,
+        "survival": 84,
+        "throwable_accuracy": 89,
+        "utility_timing": 80,
+        "weapon_swap": 80
+      },
+      "contract": {
+        "market_value": 987840,
+        "monthly_salary": 17260,
+        "months_remaining": 27,
+        "release_clause": 1552320
+      },
+      "display_name": "Halo Park",
+      "handle": "Halo",
+      "id": "player_044",
+      "macro": {
+        "driving": 84,
+        "loot_efficiency": 88,
+        "pathfinding": 92,
+        "risk_assessment": 80,
+        "rotation": 84,
+        "scouting": 80,
+        "zone_reading": 80
+      },
+      "nationality": "China",
+      "physical": {
+        "fatigue_resistance": 84,
+        "stamina": 80,
+        "stress_recovery": 88
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 82,
+        "morale": 86,
+        "overall": 84,
+        "potential": 90
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 88,
+        "concealment": 80,
+        "movement_noise": 84,
+        "prone_control": 80
+      },
+      "team_id": "night_lotus",
+      "teamplay": {
+        "communication": 84,
+        "composure": 88,
+        "discipline": 88,
+        "leadership": 85,
+        "revive_judgement": 80,
+        "teamwork": 88,
+        "trade_timing": 92,
+        "trust": 84
+      },
+      "tier": "S"
+    },
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 74,
+        "game_sense": 82,
+        "hearing": 83,
+        "information_memory": 78,
+        "reaction": 83,
+        "vision": 78
+      },
+      "career": {
+        "assists": 24,
+        "damage": 53600,
+        "earnings": 127520,
+        "kills": 143,
+        "knocks": 186,
+        "matches": 102,
+        "revives": 33,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 74,
+        "close_range": 79,
+        "clutch": 74,
+        "long_range": 75,
+        "mid_range": 83,
+        "recoil_control": 79,
+        "survival": 83,
+        "throwable_accuracy": 75,
+        "utility_timing": 79,
+        "weapon_swap": 79
+      },
+      "contract": {
+        "market_value": 808640,
+        "monthly_salary": 16140,
+        "months_remaining": 32,
+        "release_clause": 1270720
+      },
+      "display_name": "Vertex Smith",
+      "handle": "Vertex",
+      "id": "player_045",
+      "macro": {
+        "driving": 83,
+        "loot_efficiency": 74,
+        "pathfinding": 78,
+        "risk_assessment": 82,
+        "rotation": 82,
+        "scouting": 82,
+        "zone_reading": 77
+      },
+      "nationality": "United Kingdom",
+      "physical": {
+        "fatigue_resistance": 83,
+        "stamina": 79,
+        "stress_recovery": 74
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 89,
+        "morale": 90,
+        "overall": 76,
+        "potential": 83
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 74,
+        "concealment": 79,
+        "movement_noise": 83,
+        "prone_control": 79
+      },
+      "team_id": "vertex_guard",
+      "teamplay": {
+        "communication": 86,
+        "composure": 74,
+        "discipline": 74,
+        "leadership": 81,
+        "revive_judgement": 79,
+        "teamwork": 74,
+        "trade_timing": 79,
+        "trust": 83
+      },
+      "tier": "A"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 80,
+        "game_sense": 72,
+        "hearing": 76,
+        "information_memory": 72,
+        "reaction": 75,
+        "vision": 72
+      },
+      "career": {
+        "assists": 35,
+        "damage": 56500,
+        "earnings": 124500,
+        "kills": 160,
+        "knocks": 205,
+        "matches": 115,
+        "revives": 38,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 80,
+        "close_range": 84,
+        "clutch": 80,
+        "long_range": 68,
+        "mid_range": 76,
+        "recoil_control": 72,
+        "survival": 76,
+        "throwable_accuracy": 68,
+        "utility_timing": 72,
+        "weapon_swap": 72
+      },
+      "contract": {
+        "market_value": 787500,
+        "monthly_salary": 16000,
+        "months_remaining": 12,
+        "release_clause": 1237500
+      },
+      "display_name": "Crow Silva",
+      "handle": "Crow",
+      "id": "player_046",
+      "macro": {
+        "driving": 76,
+        "loot_efficiency": 80,
+        "pathfinding": 84,
+        "risk_assessment": 72,
+        "rotation": 76,
+        "scouting": 72,
+        "zone_reading": 72
+      },
+      "nationality": "United Kingdom",
+      "physical": {
+        "fatigue_resistance": 76,
+        "stamina": 72,
+        "stress_recovery": 80
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 65,
+        "morale": 64,
+        "overall": 75,
+        "potential": 83
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 80,
+        "concealment": 72,
+        "movement_noise": 76,
+        "prone_control": 72
+      },
+      "team_id": "vertex_guard",
+      "teamplay": {
+        "communication": 76,
+        "composure": 80,
+        "discipline": 80,
+        "leadership": 77,
+        "revive_judgement": 72,
+        "teamwork": 80,
+        "trade_timing": 84,
+        "trust": 76
+      },
+      "tier": "A"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 72,
+        "game_sense": 77,
+        "hearing": 68,
+        "information_memory": 77,
+        "reaction": 68,
+        "vision": 77
+      },
+      "career": {
+        "assists": 46,
+        "damage": 59400,
+        "earnings": 118580,
+        "kills": 177,
+        "knocks": 224,
+        "matches": 128,
+        "revives": 43,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 72,
+        "close_range": 77,
+        "clutch": 72,
+        "long_range": 73,
+        "mid_range": 68,
+        "recoil_control": 77,
+        "survival": 68,
+        "throwable_accuracy": 72,
+        "utility_timing": 80,
+        "weapon_swap": 77
+      },
+      "contract": {
+        "market_value": 746060,
+        "monthly_salary": 15720,
+        "months_remaining": 17,
+        "release_clause": 1172380
+      },
+      "display_name": "Mistral Chen",
+      "handle": "Mistral",
+      "id": "player_047",
+      "macro": {
+        "driving": 68,
+        "loot_efficiency": 72,
+        "pathfinding": 76,
+        "risk_assessment": 77,
+        "rotation": 68,
+        "scouting": 77,
+        "zone_reading": 77
+      },
+      "nationality": "United Kingdom",
+      "physical": {
+        "fatigue_resistance": 68,
+        "stamina": 77,
+        "stress_recovery": 72
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 72,
+        "morale": 68,
+        "overall": 73,
+        "potential": 82
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 72,
+        "concealment": 77,
+        "movement_noise": 68,
+        "prone_control": 77
+      },
+      "team_id": "vertex_guard",
+      "teamplay": {
+        "communication": 68,
+        "composure": 72,
+        "discipline": 72,
+        "leadership": 69,
+        "revive_judgement": 80,
+        "teamwork": 72,
+        "trade_timing": 77,
+        "trust": 68
+      },
+      "tier": "A"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 80,
+        "game_sense": 72,
+        "hearing": 76,
+        "information_memory": 72,
+        "reaction": 76,
+        "vision": 72
+      },
+      "career": {
+        "assists": 57,
+        "damage": 62300,
+        "earnings": 121520,
+        "kills": 194,
+        "knocks": 243,
+        "matches": 141,
+        "revives": 48,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 80,
+        "close_range": 72,
+        "clutch": 80,
+        "long_range": 80,
+        "mid_range": 76,
+        "recoil_control": 72,
+        "survival": 76,
+        "throwable_accuracy": 68,
+        "utility_timing": 72,
+        "weapon_swap": 72
+      },
+      "contract": {
+        "market_value": 766640,
+        "monthly_salary": 15860,
+        "months_remaining": 22,
+        "release_clause": 1204720
+      },
+      "display_name": "Gale Sato",
+      "handle": "Gale",
+      "id": "player_048",
+      "macro": {
+        "driving": 76,
+        "loot_efficiency": 80,
+        "pathfinding": 71,
+        "risk_assessment": 72,
+        "rotation": 76,
+        "scouting": 72,
+        "zone_reading": 72
+      },
+      "nationality": "United Kingdom",
+      "physical": {
+        "fatigue_resistance": 76,
+        "stamina": 72,
+        "stress_recovery": 80
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 79,
+        "morale": 72,
+        "overall": 74,
+        "potential": 84
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 80,
+        "concealment": 72,
+        "movement_noise": 76,
+        "prone_control": 72
+      },
+      "team_id": "vertex_guard",
+      "teamplay": {
+        "communication": 76,
+        "composure": 80,
+        "discipline": 80,
+        "leadership": 77,
+        "revive_judgement": 72,
+        "teamwork": 80,
+        "trade_timing": 71,
+        "trust": 76
+      },
+      "tier": "A"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 67,
+        "game_sense": 75,
+        "hearing": 63,
+        "information_memory": 71,
+        "reaction": 63,
+        "vision": 71
+      },
+      "career": {
+        "assists": 68,
+        "damage": 65200,
+        "earnings": 101780,
+        "kills": 211,
+        "knocks": 262,
+        "matches": 154,
+        "revives": 53,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 67,
+        "close_range": 72,
+        "clutch": 67,
+        "long_range": 68,
+        "mid_range": 63,
+        "recoil_control": 72,
+        "survival": 63,
+        "throwable_accuracy": 68,
+        "utility_timing": 72,
+        "weapon_swap": 72
+      },
+      "contract": {
+        "market_value": 628460,
+        "monthly_salary": 14880,
+        "months_remaining": 27,
+        "release_clause": 987580
+      },
+      "display_name": "Ember Nguyen",
+      "handle": "Ember",
+      "id": "player_049",
+      "macro": {
+        "driving": 63,
+        "loot_efficiency": 67,
+        "pathfinding": 71,
+        "risk_assessment": 75,
+        "rotation": 75,
+        "scouting": 75,
+        "zone_reading": 70
+      },
+      "nationality": "Canada",
+      "physical": {
+        "fatigue_resistance": 63,
+        "stamina": 72,
+        "stress_recovery": 67
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 86,
+        "morale": 76,
+        "overall": 67,
+        "potential": 70
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 67,
+        "concealment": 72,
+        "movement_noise": 63,
+        "prone_control": 72
+      },
+      "team_id": "ember_crown",
+      "teamplay": {
+        "communication": 66,
+        "composure": 67,
+        "discipline": 67,
+        "leadership": 74,
+        "revive_judgement": 72,
+        "teamwork": 67,
+        "trade_timing": 72,
+        "trust": 63
+      },
+      "tier": "B"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 73,
+        "game_sense": 65,
+        "hearing": 69,
+        "information_memory": 65,
+        "reaction": 68,
+        "vision": 65
+      },
+      "career": {
+        "assists": 79,
+        "damage": 68100,
+        "earnings": 99120,
+        "kills": 228,
+        "knocks": 281,
+        "matches": 167,
+        "revives": 58,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 73,
+        "close_range": 64,
+        "clutch": 73,
+        "long_range": 61,
+        "mid_range": 69,
+        "recoil_control": 65,
+        "survival": 69,
+        "throwable_accuracy": 61,
+        "utility_timing": 65,
+        "weapon_swap": 65
+      },
+      "contract": {
+        "market_value": 609840,
+        "monthly_salary": 14740,
+        "months_remaining": 32,
+        "release_clause": 958320
+      },
+      "display_name": "Polar Kim",
+      "handle": "Polar",
+      "id": "player_050",
+      "macro": {
+        "driving": 69,
+        "loot_efficiency": 73,
+        "pathfinding": 64,
+        "risk_assessment": 65,
+        "rotation": 69,
+        "scouting": 65,
+        "zone_reading": 65
+      },
+      "nationality": "Canada",
+      "physical": {
+        "fatigue_resistance": 69,
+        "stamina": 65,
+        "stress_recovery": 73
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 62,
+        "morale": 80,
+        "overall": 66,
+        "potential": 70
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 73,
+        "concealment": 65,
+        "movement_noise": 69,
+        "prone_control": 65
+      },
+      "team_id": "ember_crown",
+      "teamplay": {
+        "communication": 69,
+        "composure": 73,
+        "discipline": 73,
+        "leadership": 70,
+        "revive_judgement": 65,
+        "teamwork": 73,
+        "trade_timing": 64,
+        "trust": 69
+      },
+      "tier": "B"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 65,
+        "game_sense": 70,
+        "hearing": 61,
+        "information_memory": 70,
+        "reaction": 61,
+        "vision": 70
+      },
+      "career": {
+        "assists": 90,
+        "damage": 71000,
+        "earnings": 93920,
+        "kills": 245,
+        "knocks": 300,
+        "matches": 180,
+        "revives": 63,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 65,
+        "close_range": 70,
+        "clutch": 65,
+        "long_range": 66,
+        "mid_range": 61,
+        "recoil_control": 70,
+        "survival": 61,
+        "throwable_accuracy": 65,
+        "utility_timing": 73,
+        "weapon_swap": 70
+      },
+      "contract": {
+        "market_value": 573440,
+        "monthly_salary": 14460,
+        "months_remaining": 12,
+        "release_clause": 901120
+      },
+      "display_name": "Argo Tan",
+      "handle": "Argo",
+      "id": "player_051",
+      "macro": {
+        "driving": 61,
+        "loot_efficiency": 65,
+        "pathfinding": 69,
+        "risk_assessment": 70,
+        "rotation": 61,
+        "scouting": 70,
+        "zone_reading": 70
+      },
+      "nationality": "Canada",
+      "physical": {
+        "fatigue_resistance": 61,
+        "stamina": 70,
+        "stress_recovery": 65
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 69,
+        "morale": 84,
+        "overall": 64,
+        "potential": 69
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 65,
+        "concealment": 70,
+        "movement_noise": 61,
+        "prone_control": 70
+      },
+      "team_id": "ember_crown",
+      "teamplay": {
+        "communication": 61,
+        "composure": 65,
+        "discipline": 65,
+        "leadership": 62,
+        "revive_judgement": 73,
+        "teamwork": 65,
+        "trade_timing": 70,
+        "trust": 61
+      },
+      "tier": "B"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 73,
+        "game_sense": 65,
+        "hearing": 69,
+        "information_memory": 65,
+        "reaction": 69,
+        "vision": 65
+      },
+      "career": {
+        "assists": 101,
+        "damage": 73900,
+        "earnings": 96500,
+        "kills": 262,
+        "knocks": 319,
+        "matches": 193,
+        "revives": 68,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 73,
+        "close_range": 65,
+        "clutch": 73,
+        "long_range": 73,
+        "mid_range": 69,
+        "recoil_control": 65,
+        "survival": 69,
+        "throwable_accuracy": 61,
+        "utility_timing": 65,
+        "weapon_swap": 65
+      },
+      "contract": {
+        "market_value": 591500,
+        "monthly_salary": 14600,
+        "months_remaining": 17,
+        "release_clause": 929500
+      },
+      "display_name": "Vega Park",
+      "handle": "Vega",
+      "id": "player_052",
+      "macro": {
+        "driving": 69,
+        "loot_efficiency": 73,
+        "pathfinding": 64,
+        "risk_assessment": 65,
+        "rotation": 69,
+        "scouting": 65,
+        "zone_reading": 65
+      },
+      "nationality": "Canada",
+      "physical": {
+        "fatigue_resistance": 69,
+        "stamina": 65,
+        "stress_recovery": 73
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 76,
+        "morale": 88,
+        "overall": 65,
+        "potential": 71
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 73,
+        "concealment": 65,
+        "movement_noise": 69,
+        "prone_control": 65
+      },
+      "team_id": "ember_crown",
+      "teamplay": {
+        "communication": 69,
+        "composure": 73,
+        "discipline": 73,
+        "leadership": 57,
+        "revive_judgement": 65,
+        "teamwork": 73,
+        "trade_timing": 64,
+        "trust": 69
+      },
+      "tier": "B"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 76,
+        "game_sense": 84,
+        "hearing": 72,
+        "information_memory": 80,
+        "reaction": 72,
+        "vision": 80
+      },
+      "career": {
+        "assists": 112,
+        "damage": 76800,
+        "earnings": 121520,
+        "kills": 279,
+        "knocks": 338,
+        "matches": 206,
+        "revives": 8,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 76,
+        "close_range": 68,
+        "clutch": 76,
+        "long_range": 77,
+        "mid_range": 72,
+        "recoil_control": 68,
+        "survival": 72,
+        "throwable_accuracy": 77,
+        "utility_timing": 68,
+        "weapon_swap": 68
+      },
+      "contract": {
+        "market_value": 766640,
+        "monthly_salary": 15860,
+        "months_remaining": 22,
+        "release_clause": 1204720
+      },
+      "display_name": "Orbit Smith",
+      "handle": "Orbit",
+      "id": "player_053",
+      "macro": {
+        "driving": 72,
+        "loot_efficiency": 76,
+        "pathfinding": 80,
+        "risk_assessment": 84,
+        "rotation": 84,
+        "scouting": 84,
+        "zone_reading": 79
+      },
+      "nationality": "Norway",
+      "physical": {
+        "fatigue_resistance": 72,
+        "stamina": 68,
+        "stress_recovery": 76
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 83,
+        "morale": 92,
+        "overall": 74,
+        "potential": 81
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 76,
+        "concealment": 68,
+        "movement_noise": 72,
+        "prone_control": 68
+      },
+      "team_id": "polar_ace",
+      "teamplay": {
+        "communication": 75,
+        "composure": 76,
+        "discipline": 76,
+        "leadership": 83,
+        "revive_judgement": 68,
+        "teamwork": 76,
+        "trade_timing": 68,
+        "trust": 72
+      },
+      "tier": "A"
+    },
+    {
+      "age": 23,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 74,
+        "hearing": 78,
+        "information_memory": 74,
+        "reaction": 77,
+        "vision": 74
+      },
+      "career": {
+        "assists": 123,
+        "damage": 79700,
+        "earnings": 118580,
+        "kills": 296,
+        "knocks": 357,
+        "matches": 49,
+        "revives": 13,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 73,
+        "clutch": 69,
+        "long_range": 70,
+        "mid_range": 78,
+        "recoil_control": 74,
+        "survival": 78,
+        "throwable_accuracy": 70,
+        "utility_timing": 74,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 746060,
+        "monthly_salary": 15720,
+        "months_remaining": 27,
+        "release_clause": 1172380
+      },
+      "display_name": "Comet Silva",
+      "handle": "Comet",
+      "id": "player_054",
+      "macro": {
+        "driving": 78,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 74,
+        "rotation": 78,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Norway",
+      "physical": {
+        "fatigue_resistance": 78,
+        "stamina": 74,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 90,
+        "morale": 66,
+        "overall": 73,
+        "potential": 81
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 74,
+        "movement_noise": 78,
+        "prone_control": 74
+      },
+      "team_id": "polar_ace",
+      "teamplay": {
+        "communication": 78,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 74,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 78
+      },
+      "tier": "A"
+    },
+    {
+      "age": 26,
+      "awareness": {
+        "enemy_tracking": 74,
+        "game_sense": 66,
+        "hearing": 70,
+        "information_memory": 66,
+        "reaction": 70,
+        "vision": 66
+      },
+      "career": {
+        "assists": 134,
+        "damage": 82600,
+        "earnings": 112820,
+        "kills": 313,
+        "knocks": 376,
+        "matches": 62,
+        "revives": 18,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 74,
+        "close_range": 66,
+        "clutch": 74,
+        "long_range": 75,
+        "mid_range": 70,
+        "recoil_control": 66,
+        "survival": 70,
+        "throwable_accuracy": 74,
+        "utility_timing": 69,
+        "weapon_swap": 66
+      },
+      "contract": {
+        "market_value": 705740,
+        "monthly_salary": 15440,
+        "months_remaining": 32,
+        "release_clause": 1109020
+      },
+      "display_name": "Talon Chen",
+      "handle": "Talon",
+      "id": "player_055",
+      "macro": {
+        "driving": 70,
+        "loot_efficiency": 74,
+        "pathfinding": 78,
+        "risk_assessment": 66,
+        "rotation": 70,
+        "scouting": 66,
+        "zone_reading": 66
+      },
+      "nationality": "Norway",
+      "physical": {
+        "fatigue_resistance": 70,
+        "stamina": 66,
+        "stress_recovery": 74
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 66,
+        "morale": 70,
+        "overall": 71,
+        "potential": 80
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 74,
+        "concealment": 66,
+        "movement_noise": 70,
+        "prone_control": 66
+      },
+      "team_id": "polar_ace",
+      "teamplay": {
+        "communication": 70,
+        "composure": 74,
+        "discipline": 74,
+        "leadership": 71,
+        "revive_judgement": 69,
+        "teamwork": 74,
+        "trade_timing": 66,
+        "trust": 70
+      },
+      "tier": "A"
+    },
+    {
+      "age": 18,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 74,
+        "hearing": 78,
+        "information_memory": 74,
+        "reaction": 78,
+        "vision": 74
+      },
+      "career": {
+        "assists": 25,
+        "damage": 85500,
+        "earnings": 115680,
+        "kills": 330,
+        "knocks": 395,
+        "matches": 75,
+        "revives": 23,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 74,
+        "clutch": 69,
+        "long_range": 69,
+        "mid_range": 78,
+        "recoil_control": 74,
+        "survival": 78,
+        "throwable_accuracy": 70,
+        "utility_timing": 74,
+        "weapon_swap": 74
+      },
+      "contract": {
+        "market_value": 725760,
+        "monthly_salary": 15580,
+        "months_remaining": 12,
+        "release_clause": 1140480
+      },
+      "display_name": "Warden Sato",
+      "handle": "Warden",
+      "id": "player_056",
+      "macro": {
+        "driving": 78,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 74,
+        "rotation": 78,
+        "scouting": 74,
+        "zone_reading": 74
+      },
+      "nationality": "Norway",
+      "physical": {
+        "fatigue_resistance": 78,
+        "stamina": 74,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 73,
+        "morale": 74,
+        "overall": 72,
+        "potential": 82
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 74,
+        "movement_noise": 78,
+        "prone_control": 74
+      },
+      "team_id": "polar_ace",
+      "teamplay": {
+        "communication": 78,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 66,
+        "revive_judgement": 74,
+        "teamwork": 69,
+        "trade_timing": 73,
+        "trust": 78
+      },
+      "tier": "A"
+    },
+    {
+      "age": 21,
+      "awareness": {
+        "enemy_tracking": 69,
+        "game_sense": 64,
+        "hearing": 65,
+        "information_memory": 73,
+        "reaction": 65,
+        "vision": 73
+      },
+      "career": {
+        "assists": 36,
+        "damage": 88400,
+        "earnings": 96500,
+        "kills": 347,
+        "knocks": 414,
+        "matches": 88,
+        "revives": 28,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 69,
+        "close_range": 61,
+        "clutch": 69,
+        "long_range": 70,
+        "mid_range": 65,
+        "recoil_control": 61,
+        "survival": 65,
+        "throwable_accuracy": 70,
+        "utility_timing": 61,
+        "weapon_swap": 61
+      },
+      "contract": {
+        "market_value": 591500,
+        "monthly_salary": 14600,
+        "months_remaining": 17,
+        "release_clause": 929500
+      },
+      "display_name": "Rex Nguyen",
+      "handle": "Rex",
+      "id": "player_057",
+      "macro": {
+        "driving": 65,
+        "loot_efficiency": 69,
+        "pathfinding": 73,
+        "risk_assessment": 64,
+        "rotation": 64,
+        "scouting": 64,
+        "zone_reading": 72
+      },
+      "nationality": "Australia",
+      "physical": {
+        "fatigue_resistance": 65,
+        "stamina": 61,
+        "stress_recovery": 69
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 80,
+        "morale": 78,
+        "overall": 65,
+        "potential": 68
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 69,
+        "concealment": 61,
+        "movement_noise": 65,
+        "prone_control": 61
+      },
+      "team_id": "orbit_seven",
+      "teamplay": {
+        "communication": 68,
+        "composure": 69,
+        "discipline": 69,
+        "leadership": 76,
+        "revive_judgement": 61,
+        "teamwork": 69,
+        "trade_timing": 61,
+        "trust": 65
+      },
+      "tier": "B"
+    },
+    {
+      "age": 24,
+      "awareness": {
+        "enemy_tracking": 62,
+        "game_sense": 67,
+        "hearing": 71,
+        "information_memory": 67,
+        "reaction": 70,
+        "vision": 67
+      },
+      "career": {
+        "assists": 47,
+        "damage": 91300,
+        "earnings": 93920,
+        "kills": 364,
+        "knocks": 73,
+        "matches": 101,
+        "revives": 33,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 62,
+        "close_range": 66,
+        "clutch": 62,
+        "long_range": 63,
+        "mid_range": 71,
+        "recoil_control": 67,
+        "survival": 71,
+        "throwable_accuracy": 63,
+        "utility_timing": 67,
+        "weapon_swap": 67
+      },
+      "contract": {
+        "market_value": 573440,
+        "monthly_salary": 14460,
+        "months_remaining": 22,
+        "release_clause": 901120
+      },
+      "display_name": "Cipher Kim",
+      "handle": "Cipher",
+      "id": "player_058",
+      "macro": {
+        "driving": 71,
+        "loot_efficiency": 62,
+        "pathfinding": 66,
+        "risk_assessment": 67,
+        "rotation": 71,
+        "scouting": 67,
+        "zone_reading": 67
+      },
+      "nationality": "Australia",
+      "physical": {
+        "fatigue_resistance": 71,
+        "stamina": 67,
+        "stress_recovery": 62
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 87,
+        "morale": 82,
+        "overall": 64,
+        "potential": 68
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 62,
+        "concealment": 67,
+        "movement_noise": 71,
+        "prone_control": 67
+      },
+      "team_id": "orbit_seven",
+      "teamplay": {
+        "communication": 71,
+        "composure": 62,
+        "discipline": 62,
+        "leadership": 59,
+        "revive_judgement": 67,
+        "teamwork": 62,
+        "trade_timing": 66,
+        "trust": 71
+      },
+      "tier": "B"
+    },
+    {
+      "age": 27,
+      "awareness": {
+        "enemy_tracking": 67,
+        "game_sense": 59,
+        "hearing": 63,
+        "information_memory": 59,
+        "reaction": 63,
+        "vision": 59
+      },
+      "career": {
+        "assists": 58,
+        "damage": 94200,
+        "earnings": 88880,
+        "kills": 381,
+        "knocks": 92,
+        "matches": 114,
+        "revives": 38,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 67,
+        "close_range": 59,
+        "clutch": 67,
+        "long_range": 55,
+        "mid_range": 63,
+        "recoil_control": 59,
+        "survival": 63,
+        "throwable_accuracy": 67,
+        "utility_timing": 62,
+        "weapon_swap": 59
+      },
+      "contract": {
+        "market_value": 538160,
+        "monthly_salary": 14180,
+        "months_remaining": 27,
+        "release_clause": 845680
+      },
+      "display_name": "Khan Tan",
+      "handle": "Khan",
+      "id": "player_059",
+      "macro": {
+        "driving": 63,
+        "loot_efficiency": 67,
+        "pathfinding": 71,
+        "risk_assessment": 59,
+        "rotation": 63,
+        "scouting": 59,
+        "zone_reading": 59
+      },
+      "nationality": "Australia",
+      "physical": {
+        "fatigue_resistance": 63,
+        "stamina": 59,
+        "stress_recovery": 67
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 63,
+        "morale": 86,
+        "overall": 62,
+        "potential": 67
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 67,
+        "concealment": 59,
+        "movement_noise": 63,
+        "prone_control": 59
+      },
+      "team_id": "orbit_seven",
+      "teamplay": {
+        "communication": 63,
+        "composure": 67,
+        "discipline": 67,
+        "leadership": 64,
+        "revive_judgement": 62,
+        "teamwork": 67,
+        "trade_timing": 59,
+        "trust": 63
+      },
+      "tier": "B"
+    },
+    {
+      "age": 19,
+      "awareness": {
+        "enemy_tracking": 62,
+        "game_sense": 67,
+        "hearing": 58,
+        "information_memory": 67,
+        "reaction": 58,
+        "vision": 67
+      },
+      "career": {
+        "assists": 69,
+        "damage": 97100,
+        "earnings": 91380,
+        "kills": 68,
+        "knocks": 111,
+        "matches": 127,
+        "revives": 43,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 62,
+        "close_range": 67,
+        "clutch": 62,
+        "long_range": 62,
+        "mid_range": 58,
+        "recoil_control": 67,
+        "survival": 58,
+        "throwable_accuracy": 63,
+        "utility_timing": 67,
+        "weapon_swap": 67
+      },
+      "contract": {
+        "market_value": 555660,
+        "monthly_salary": 14320,
+        "months_remaining": 32,
+        "release_clause": 873180
+      },
+      "display_name": "Rin Park",
+      "handle": "Rin",
+      "id": "player_060",
+      "macro": {
+        "driving": 58,
+        "loot_efficiency": 62,
+        "pathfinding": 66,
+        "risk_assessment": 67,
+        "rotation": 58,
+        "scouting": 67,
+        "zone_reading": 67
+      },
+      "nationality": "Australia",
+      "physical": {
+        "fatigue_resistance": 58,
+        "stamina": 67,
+        "stress_recovery": 62
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 92,
+        "form": 70,
+        "morale": 90,
+        "overall": 63,
+        "potential": 69
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 62,
+        "concealment": 67,
+        "movement_noise": 58,
+        "prone_control": 67
+      },
+      "team_id": "orbit_seven",
+      "teamplay": {
+        "communication": 58,
+        "composure": 62,
+        "discipline": 62,
+        "leadership": 59,
+        "revive_judgement": 67,
+        "teamwork": 62,
+        "trade_timing": 66,
+        "trust": 58
+      },
+      "tier": "B"
+    },
+    {
+      "age": 22,
+      "awareness": {
+        "enemy_tracking": 85,
+        "game_sense": 80,
+        "hearing": 81,
+        "information_memory": 76,
+        "reaction": 81,
+        "vision": 76
+      },
+      "career": {
+        "assists": 80,
+        "damage": 100000,
+        "earnings": 136820,
+        "kills": 85,
+        "knocks": 130,
+        "matches": 140,
+        "revives": 48,
+        "titles": 0
+      },
+      "combat": {
+        "aim": 85,
+        "close_range": 77,
+        "clutch": 85,
+        "long_range": 73,
+        "mid_range": 81,
+        "recoil_control": 77,
+        "survival": 81,
+        "throwable_accuracy": 73,
+        "utility_timing": 77,
+        "weapon_swap": 77
+      },
+      "contract": {
+        "market_value": 873740,
+        "monthly_salary": 16560,
+        "months_remaining": 12,
+        "release_clause": 1373020
+      },
+      "display_name": "Zero Smith",
+      "handle": "Zero",
+      "id": "player_061",
+      "macro": {
+        "driving": 81,
+        "loot_efficiency": 85,
+        "pathfinding": 76,
+        "risk_assessment": 80,
+        "rotation": 80,
+        "scouting": 80,
+        "zone_reading": 88
+      },
+      "nationality": "Taiwan",
+      "physical": {
+        "fatigue_resistance": 81,
+        "stamina": 77,
+        "stress_recovery": 85
+      },
+      "preferred": {
+        "drop_role": "caller",
+        "primary": "M416",
+        "scope": "4x",
+        "secondary": "SLR"
+      },
+      "ratings": {
+        "energy": 72,
+        "form": 77,
+        "morale": 64,
+        "overall": 79,
+        "potential": 86
+      },
+      "role": "IGL",
+      "secondary_role": "Scout",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 85,
+        "concealment": 77,
+        "movement_noise": 81,
+        "prone_control": 77
+      },
+      "team_id": "rift_kings",
+      "teamplay": {
+        "communication": 84,
+        "composure": 85,
+        "discipline": 85,
+        "leadership": 92,
+        "revive_judgement": 77,
+        "teamwork": 85,
+        "trade_timing": 77,
+        "trust": 81
+      },
+      "tier": "A"
+    },
+    {
+      "age": 25,
+      "awareness": {
+        "enemy_tracking": 78,
+        "game_sense": 83,
+        "hearing": 74,
+        "information_memory": 83,
+        "reaction": 86,
+        "vision": 83
+      },
+      "career": {
+        "assists": 91,
+        "damage": 102900,
+        "earnings": 133680,
+        "kills": 102,
+        "knocks": 149,
+        "matches": 153,
+        "revives": 53,
+        "titles": 1
+      },
+      "combat": {
+        "aim": 78,
+        "close_range": 82,
+        "clutch": 78,
+        "long_range": 79,
+        "mid_range": 74,
+        "recoil_control": 83,
+        "survival": 74,
+        "throwable_accuracy": 79,
+        "utility_timing": 83,
+        "weapon_swap": 83
+      },
+      "contract": {
+        "market_value": 851760,
+        "monthly_salary": 16420,
+        "months_remaining": 17,
+        "release_clause": 1338480
+      },
+      "display_name": "Pulse Silva",
+      "handle": "Pulse",
+      "id": "player_062",
+      "macro": {
+        "driving": 74,
+        "loot_efficiency": 78,
+        "pathfinding": 82,
+        "risk_assessment": 83,
+        "rotation": 74,
+        "scouting": 83,
+        "zone_reading": 83
+      },
+      "nationality": "Taiwan",
+      "physical": {
+        "fatigue_resistance": 74,
+        "stamina": 83,
+        "stress_recovery": 78
+      },
+      "preferred": {
+        "drop_role": "first_land",
+        "primary": "Beryl M762",
+        "scope": "Red Dot",
+        "secondary": "UMP45"
+      },
+      "ratings": {
+        "energy": 77,
+        "form": 84,
+        "morale": 68,
+        "overall": 78,
+        "potential": 86
+      },
+      "role": "Entry",
+      "secondary_role": "Flex",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 78,
+        "concealment": 83,
+        "movement_noise": 74,
+        "prone_control": 83
+      },
+      "team_id": "rift_kings",
+      "teamplay": {
+        "communication": 74,
+        "composure": 78,
+        "discipline": 78,
+        "leadership": 75,
+        "revive_judgement": 83,
+        "teamwork": 78,
+        "trade_timing": 82,
+        "trust": 74
+      },
+      "tier": "A"
+    },
+    {
+      "age": 28,
+      "awareness": {
+        "enemy_tracking": 83,
+        "game_sense": 75,
+        "hearing": 79,
+        "information_memory": 75,
+        "reaction": 79,
+        "vision": 75
+      },
+      "career": {
+        "assists": 102,
+        "damage": 105800,
+        "earnings": 127520,
+        "kills": 119,
+        "knocks": 168,
+        "matches": 166,
+        "revives": 58,
+        "titles": 2
+      },
+      "combat": {
+        "aim": 83,
+        "close_range": 75,
+        "clutch": 83,
+        "long_range": 71,
+        "mid_range": 79,
+        "recoil_control": 75,
+        "survival": 79,
+        "throwable_accuracy": 83,
+        "utility_timing": 78,
+        "weapon_swap": 75
+      },
+      "contract": {
+        "market_value": 808640,
+        "monthly_salary": 16140,
+        "months_remaining": 22,
+        "release_clause": 1270720
+      },
+      "display_name": "Onyx Chen",
+      "handle": "Onyx",
+      "id": "player_063",
+      "macro": {
+        "driving": 79,
+        "loot_efficiency": 83,
+        "pathfinding": 74,
+        "risk_assessment": 75,
+        "rotation": 79,
+        "scouting": 75,
+        "zone_reading": 75
+      },
+      "nationality": "Taiwan",
+      "physical": {
+        "fatigue_resistance": 79,
+        "stamina": 75,
+        "stress_recovery": 83
+      },
+      "preferred": {
+        "drop_role": "loot_support",
+        "primary": "AKM",
+        "scope": "3x",
+        "secondary": "Mini14"
+      },
+      "ratings": {
+        "energy": 82,
+        "form": 60,
+        "morale": 72,
+        "overall": 76,
+        "potential": 85
+      },
+      "role": "Support",
+      "secondary_role": "Anchor",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 83,
+        "concealment": 75,
+        "movement_noise": 79,
+        "prone_control": 75
+      },
+      "team_id": "rift_kings",
+      "teamplay": {
+        "communication": 79,
+        "composure": 83,
+        "discipline": 83,
+        "leadership": 80,
+        "revive_judgement": 78,
+        "teamwork": 83,
+        "trade_timing": 75,
+        "trust": 79
+      },
+      "tier": "A"
+    },
+    {
+      "age": 20,
+      "awareness": {
+        "enemy_tracking": 78,
+        "game_sense": 83,
+        "hearing": 74,
+        "information_memory": 83,
+        "reaction": 74,
+        "vision": 83
+      },
+      "career": {
+        "assists": 113,
+        "damage": 108700,
+        "earnings": 130580,
+        "kills": 136,
+        "knocks": 187,
+        "matches": 179,
+        "revives": 63,
+        "titles": 3
+      },
+      "combat": {
+        "aim": 78,
+        "close_range": 83,
+        "clutch": 78,
+        "long_range": 78,
+        "mid_range": 74,
+        "recoil_control": 83,
+        "survival": 74,
+        "throwable_accuracy": 79,
+        "utility_timing": 83,
+        "weapon_swap": 83
+      },
+      "contract": {
+        "market_value": 830060,
+        "monthly_salary": 16280,
+        "months_remaining": 27,
+        "release_clause": 1304380
+      },
+      "display_name": "Zen Sato",
+      "handle": "Zen",
+      "id": "player_064",
+      "macro": {
+        "driving": 74,
+        "loot_efficiency": 78,
+        "pathfinding": 82,
+        "risk_assessment": 83,
+        "rotation": 74,
+        "scouting": 83,
+        "zone_reading": 83
+      },
+      "nationality": "Taiwan",
+      "physical": {
+        "fatigue_resistance": 74,
+        "stamina": 83,
+        "stress_recovery": 78
+      },
+      "preferred": {
+        "drop_role": "overwatch",
+        "primary": "Mini14",
+        "scope": "6x",
+        "secondary": "M24"
+      },
+      "ratings": {
+        "energy": 87,
+        "form": 67,
+        "morale": 76,
+        "overall": 77,
+        "potential": 87
+      },
+      "role": "Fragger",
+      "secondary_role": "Entry",
+      "status": "active",
+      "stealth": {
+        "ambush_timing": 78,
+        "concealment": 83,
+        "movement_noise": 74,
+        "prone_control": 83
+      },
+      "team_id": "rift_kings",
+      "teamplay": {
+        "communication": 74,
+        "composure": 78,
+        "discipline": 78,
+        "leadership": 75,
+        "revive_judgement": 83,
+        "teamwork": 78,
+        "trade_timing": 82,
+        "trust": 74
+      },
+      "tier": "A"
+    }
+  ],
+  "schema_version": 1
+}

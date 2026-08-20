@@ -1,0 +1,13 @@
+{
+  "sponsors": [
+    {"id":"nova_gear","name":"NOVA GEAR","category":"Peripheral partner","weekly_income":9000,"signing_bonus":30000,"fan_bonus":500,"reputation_required":20,"objective":"Reach Top 8 in Global Survival Invitational"},
+    {"id":"pulse_energy","name":"PULSE ENERGY","category":"Energy partner","weekly_income":15000,"signing_bonus":55000,"fan_bonus":1200,"reputation_required":35,"objective":"Record 3 Top-5 finishes in International Masters"},
+    {"id":"vertex_mobile","name":"VERTEX MOBILE","category":"Title partner","weekly_income":28000,"signing_bonus":110000,"fan_bonus":2500,"reputation_required":55,"objective":"Qualify for a global final"}
+  ],
+  "facilities": {
+    "Training Room":{"display_name":"Training Center","asset_id":"facility.training_center","description":"Development programs and tactical practice","base_upgrade_cost":60000,"max_level":5,"levels":["Aim Drill","Gym Training","Communication Training","Strategy Training","Mental Coaching"]},
+    "Analytics Lab":{"display_name":"Analytics Lab","asset_id":"facility.analytics_lab","description":"Scouting and opponent intelligence","base_upgrade_cost":60000,"max_level":5,"levels":["Basic Scout Reports","Form Analysis","Opponent Analysis","Tactical Prediction","Meta Forecasting"]},
+    "Medical Room":{"display_name":"Recovery Wing","asset_id":"facility.recovery_wing","description":"Energy and burnout management","base_upgrade_cost":60000,"max_level":5,"levels":["Basic Recovery","Burnout Monitoring","Advanced Recovery","Injury Prevention","Peak Conditioning"]},
+    "Streaming Room":{"display_name":"Content Studio","asset_id":"facility.content_studio","description":"Fans, sponsors and player brand","base_upgrade_cost":60000,"max_level":5,"levels":["Basic Media","Player Branding","Sponsor Activation","Global Campaigns","Organization Legacy"]}
+  }
+}

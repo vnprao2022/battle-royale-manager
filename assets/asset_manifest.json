@@ -1,0 +1,2808 @@
+{
+  "animation_profiles": {
+    "marker_ping": {
+      "fps": 0,
+      "frames": 1,
+      "hold_last": false,
+      "loop": false,
+      "runtime_tween": true
+    },
+    "ui_pulse": {
+      "fps": 0,
+      "frames": 1,
+      "loop": false,
+      "runtime_tween": true,
+      "transition": "ease_out"
+    },
+    "zone_shrink": {
+      "fps": 0,
+      "frames": 1,
+      "loop": false,
+      "preserve_phase": true,
+      "runtime_tween": true
+    }
+  },
+  "assets": {
+    "attachment.angled_grip": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/angled_grip.png",
+      "slot": "grip"
+    },
+    "attachment.cheek_pad": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/cheek_pad.png",
+      "slot": "stock"
+    },
+    "attachment.compensator": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/compensator.png",
+      "slot": "muzzle"
+    },
+    "attachment.extended_mag": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/extended_mag.png",
+      "slot": "magazine"
+    },
+    "attachment.flash_hider": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/flash_hider.png",
+      "slot": "muzzle"
+    },
+    "attachment.lightweight_grip": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/lightweight_grip.png",
+      "slot": "grip"
+    },
+    "attachment.quickdraw_mag": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/quickdraw_mag.png",
+      "slot": "magazine"
+    },
+    "attachment.scope_1x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 1,
+      "path": "res://assets/inventory/attachments/scope_1x.png",
+      "slot": "optic"
+    },
+    "attachment.scope_2x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 2,
+      "path": "res://assets/inventory/attachments/scope_2x.png",
+      "slot": "optic"
+    },
+    "attachment.scope_3x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 3,
+      "path": "res://assets/inventory/attachments/scope_3x.png",
+      "slot": "optic"
+    },
+    "attachment.scope_4x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 4,
+      "path": "res://assets/inventory/attachments/scope_4x.png",
+      "slot": "optic"
+    },
+    "attachment.scope_6x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 6,
+      "path": "res://assets/inventory/attachments/scope_6x.png",
+      "slot": "optic"
+    },
+    "attachment.scope_8x": {
+      "kind": "attachment",
+      "lazy": true,
+      "magnification": 8,
+      "path": "res://assets/inventory/attachments/scope_8x.png",
+      "slot": "optic"
+    },
+    "attachment.suppressor": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/suppressor.png",
+      "slot": "muzzle"
+    },
+    "attachment.tactical_stock": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/tactical_stock.png",
+      "slot": "stock"
+    },
+    "attachment.vertical_grip": {
+      "kind": "attachment",
+      "lazy": true,
+      "path": "res://assets/inventory/attachments/vertical_grip.png",
+      "slot": "grip"
+    },
+    "branding.app_icon": {
+      "kind": "branding",
+      "lazy": true,
+      "path": "res://assets/branding/app_icon.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "branding.command_center": {
+      "kind": "background",
+      "lazy": true,
+      "path": "res://assets/branding/command_center_background.png"
+    },
+    "facility.analytics_lab": {"kind":"facility","lazy":true,"path":"res://assets/generated/facilities/analytics_lab.png"},
+    "facility.content_studio": {"kind":"facility","lazy":true,"path":"res://assets/generated/facilities/content_studio.png"},
+    "facility.recovery_wing": {"kind":"facility","lazy":true,"path":"res://assets/generated/facilities/recovery_wing.png"},
+    "facility.training_center": {"kind":"facility","lazy":true,"path":"res://assets/generated/facilities/training_center.png"},
+    "tournament.global_survival_circuit.logo": {
+      "kind": "tournament_logo",
+      "lazy": true,
+      "path": "res://assets/tournaments/global_survival_circuit/logo.png",
+      "size": [
+        512,
+        512
+      ],
+      "tier": "S",
+      "tournament_id": "global_survival_circuit"
+    },
+    "icons.combat.assist": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/assist.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.combat.damage": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/damage.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.combat.heal": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/heal.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.combat.kill": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/kill.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.combat.knock": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/knock.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.combat.revive": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/combat/revive.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.ammo": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/ammo.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.backpack": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/backpack.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.helmet": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/helmet.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.scope": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/scope.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.vehicle": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/vehicle.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.equipment.vest": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/equipment/vest.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.back": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/back.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.close": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/close.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.facilities": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/facilities.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.home": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/home.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.inbox": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/inbox.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.match": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/match.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.next": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/next.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.roster": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/roster.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.save": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/save.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.scout": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/scout.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.settings": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/settings.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.navigation.tactics": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/navigation/tactics.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.loot": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/loot.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.next": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/next.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.pause": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/pause.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.play": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/play.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.previous": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/previous.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.rotation": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/rotation.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.stop": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/stop.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.utility": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/utility.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.replay.zone": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/replay/zone.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.budget": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/budget.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.chemistry": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/chemistry.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.energy": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/energy.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.fans": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/fans.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.morale": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/morale.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.status.reputation": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/status/reputation.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.utility.flash": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/utility/flash.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.utility.frag": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/utility/frag.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.utility.molotov": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/utility/molotov.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "icons.utility.smoke": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/icons/utility/smoke.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.ammo.12g": {
+      "caliber": "12g",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/12g.png"
+    },
+    "inventory.ammo.300_magnum": {
+      "caliber": "300_magnum",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/300_magnum.png"
+    },
+    "inventory.ammo.45": {
+      "caliber": "45",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/45.png"
+    },
+    "inventory.ammo.556": {
+      "caliber": "556",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/556.png"
+    },
+    "inventory.ammo.762": {
+      "caliber": "762",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/762.png"
+    },
+    "inventory.ammo.9mm": {
+      "caliber": "9mm",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/9mm.png"
+    },
+    "inventory.ammo.9x39": {
+      "caliber": "9x39",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/9x39.png"
+    },
+    "inventory.ammo.bolt": {
+      "caliber": "bolt",
+      "category": "ammo",
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/ammo/bolt.png"
+    },
+    "inventory.items.adrenaline": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/adrenaline.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.bandage": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/bandage.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.energy_drink": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/energy_drink.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.flash_grenade": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/flash_grenade.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.frag_grenade": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/frag_grenade.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.med_kit": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/med_kit.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.molotov": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/molotov.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.painkiller": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/painkiller.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "inventory.items.smoke_grenade": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/inventory/items/smoke_grenade.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "item.first_aid": {
+      "kind": "item",
+      "lazy": true,
+      "path": "res://assets/inventory/items/first_aid.png"
+    },
+    "match.effects.explosion": {
+      "frames": 1,
+      "hold_last": false,
+      "kind": "effect",
+      "lazy": true,
+      "loop": false,
+      "path": "res://assets/match/effects/explosion.png"
+    },
+    "match.effects.molotov": {
+      "frames": 1,
+      "hold_last": false,
+      "kind": "effect",
+      "lazy": true,
+      "loop": false,
+      "path": "res://assets/match/effects/molotov.png"
+    },
+    "match.effects.smoke": {
+      "frames": 1,
+      "hold_last": false,
+      "kind": "effect",
+      "lazy": true,
+      "loop": false,
+      "path": "res://assets/match/effects/smoke.png"
+    },
+    "match.events.airdrop": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/match/events/airdrop.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "match.events.ping": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/match/events/ping.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "match.events.vehicle": {
+      "kind": "icon",
+      "lazy": true,
+      "path": "res://assets/match/events/vehicle.png",
+      "size": [
+        64,
+        64
+      ]
+    },
+    "match.hud.bottom.filters.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/filters_default.png",
+      "role": "control",
+      "size": [
+        90,
+        40
+      ]
+    },
+    "match.hud.bottom.live.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/live_default.png",
+      "role": "control",
+      "size": [
+        90,
+        40
+      ]
+    },
+    "match.hud.bottom.next.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/next_default.png",
+      "role": "control",
+      "size": [
+        52,
+        44
+      ]
+    },
+    "match.hud.bottom.pause.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/pause_default.png",
+      "role": "control",
+      "size": [
+        52,
+        44
+      ]
+    },
+    "match.hud.bottom.play.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/play_default.png",
+      "role": "control",
+      "size": [
+        52,
+        44
+      ]
+    },
+    "match.hud.bottom.previous.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/previous_default.png",
+      "role": "control",
+      "size": [
+        52,
+        44
+      ]
+    },
+    "match.hud.bottom.speed_025.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_025_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.speed_05.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_05_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.speed_1.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_1_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.speed_2.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_2_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.speed_4.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_4_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.speed_8.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/speed_8_default.png",
+      "role": "speed",
+      "size": [
+        64,
+        40
+      ]
+    },
+    "match.hud.bottom.stop.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/stop_default.png",
+      "role": "control",
+      "size": [
+        52,
+        44
+      ]
+    },
+    "match.hud.bottom.timeline.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/bottom/timeline_default.png",
+      "role": "timeline",
+      "size": [
+        920,
+        72
+      ]
+    },
+    "match.hud.left.combat_feed.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/left/combat_feed_default.png",
+      "role": "feed",
+      "size": [
+        320,
+        44
+      ]
+    },
+    "match.hud.left.damage_feed.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/left/damage_feed_default.png",
+      "role": "feed",
+      "size": [
+        320,
+        44
+      ]
+    },
+    "match.hud.left.event_feed.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/left/event_feed_default.png",
+      "role": "feed",
+      "size": [
+        320,
+        44
+      ]
+    },
+    "match.hud.left.feed_container.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/left/feed_container_default.png",
+      "role": "container",
+      "size": [
+        336,
+        360
+      ]
+    },
+    "match.hud.left.kill_feed.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/left/kill_feed_default.png",
+      "role": "feed",
+      "size": [
+        320,
+        44
+      ]
+    },
+    "match.hud.right.ammo_bar.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/ammo_bar_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        24
+      ]
+    },
+    "match.hud.right.boost_bar.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/boost_bar_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        24
+      ]
+    },
+    "match.hud.right.equipment.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/equipment_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        150
+      ]
+    },
+    "match.hud.right.health_bar.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/health_bar_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        24
+      ]
+    },
+    "match.hud.right.inventory.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/inventory_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        220
+      ]
+    },
+    "match.hud.right.player_stats.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/player_stats_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        180
+      ]
+    },
+    "match.hud.right.selected_player.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/selected_player_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        96
+      ]
+    },
+    "match.hud.right.selected_team.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/selected_team_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        72
+      ]
+    },
+    "match.hud.right.utility_bar.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/utility_bar_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        24
+      ]
+    },
+    "match.hud.right.vehicle.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/right/vehicle_default.png",
+      "role": "inspector",
+      "size": [
+        320,
+        100
+      ]
+    },
+    "match.hud.top.alive.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/alive_default.png",
+      "role": "metric",
+      "size": [
+        120,
+        64
+      ]
+    },
+    "match.hud.top.current_phase.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/current_phase_default.png",
+      "role": "metric",
+      "size": [
+        180,
+        64
+      ]
+    },
+    "match.hud.top.current_time.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/current_time_default.png",
+      "role": "metric",
+      "size": [
+        140,
+        64
+      ]
+    },
+    "match.hud.top.day_week.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/day_week_default.png",
+      "role": "metric",
+      "size": [
+        150,
+        64
+      ]
+    },
+    "match.hud.top.map_name.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/map_name_default.png",
+      "role": "metric",
+      "size": [
+        180,
+        64
+      ]
+    },
+    "match.hud.top.match_number.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/match_number_default.png",
+      "role": "metric",
+      "size": [
+        150,
+        64
+      ]
+    },
+    "match.hud.top.replay_speed.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/replay_speed_default.png",
+      "role": "metric",
+      "size": [
+        96,
+        64
+      ]
+    },
+    "match.hud.top.teams_alive.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/teams_alive_default.png",
+      "role": "metric",
+      "size": [
+        140,
+        64
+      ]
+    },
+    "match.hud.top.zone_timer.default": {
+      "kind": "match_hud",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/match/hud/top/zone_timer_default.png",
+      "role": "metric",
+      "size": [
+        140,
+        64
+      ]
+    },
+    "match.map.astra": {
+      "kind": "map",
+      "lazy": true,
+      "path": "res://assets/match/maps/tactical_island.png"
+    },
+    "match.map.sunscorch_basin": {
+      "kind": "map",
+      "lazy": true,
+      "path": "res://assets/match/maps/sunscorch_basin.png"
+    },
+    "match.map.verdant_reach": {
+      "kind": "map",
+      "lazy": true,
+      "path": "res://assets/match/maps/verdant_reach.png"
+    },
+    "match.markers.death": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "marker",
+      "lazy": true,
+      "path": "res://assets/match/markers/death.png"
+    },
+    "match.markers.knocked": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "marker",
+      "lazy": true,
+      "path": "res://assets/match/markers/knocked.png"
+    },
+    "match.markers.player": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "marker",
+      "lazy": true,
+      "path": "res://assets/match/markers/player.png"
+    },
+    "match.markers.team": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "marker",
+      "lazy": true,
+      "path": "res://assets/match/markers/team.png"
+    },
+    "match.overlays.blue_zone_ring": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "overlay",
+      "lazy": true,
+      "path": "res://assets/match/overlays/blue_zone_ring.png"
+    },
+    "match.overlays.red_zone_ring": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "overlay",
+      "lazy": true,
+      "path": "res://assets/match/overlays/red_zone_ring.png"
+    },
+    "match.overlays.safe_zone_ring": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "overlay",
+      "lazy": true,
+      "path": "res://assets/match/overlays/safe_zone_ring.png"
+    },
+    "ui.buttons.danger": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/buttons/danger.png",
+      "state": "danger"
+    },
+    "ui.buttons.disabled": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/buttons/disabled.png",
+      "state": "disabled"
+    },
+    "ui.buttons.primary": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/buttons/primary.png",
+      "state": "primary"
+    },
+    "ui.buttons.secondary": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/buttons/secondary.png",
+      "state": "secondary"
+    },
+    "ui.buttons.success": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/buttons/success.png",
+      "state": "success"
+    },
+    "ui.controls.input": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/ui/controls/input.png"
+    },
+    "ui.controls.input_focus": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "path": "res://assets/ui/controls/input_focus.png"
+    },
+    "ui.controls.progress_fill": {
+      "kind": "stretch",
+      "lazy": true,
+      "margins": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "path": "res://assets/ui/controls/progress_fill.png"
+    },
+    "ui.controls.progress_track": {
+      "kind": "stretch",
+      "lazy": true,
+      "margins": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "path": "res://assets/ui/controls/progress_track.png"
+    },
+    "ui.loading.tournament_fallback": {
+      "fallback_for": [
+        "map_background",
+        "tournament_hero",
+        "loading_screen"
+      ],
+      "kind": "loading_fallback",
+      "lazy": false,
+      "path": "res://assets/ui/loading/tournament_fallback.png",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "ui.panels.match_hud": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "path": "res://assets/ui/panels/match_hud.png"
+    },
+    "ui.panels.modal": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "path": "res://assets/ui/panels/modal.png"
+    },
+    "ui.panels.panel": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "path": "res://assets/ui/panels/panel.png"
+    },
+    "ui.panels.panel_elevated": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "path": "res://assets/ui/panels/panel_elevated.png"
+    },
+    "ui.panels.stat_card": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        14,
+        14,
+        14,
+        14
+      ],
+      "path": "res://assets/ui/panels/stat_card.png"
+    },
+    "ui.panels.table_row": {
+      "kind": "stretch",
+      "lazy": true,
+      "margins": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "path": "res://assets/ui/panels/table_row.png"
+    },
+    "ui.panels.table_row_selected": {
+      "kind": "stretch",
+      "lazy": true,
+      "margins": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "path": "res://assets/ui/panels/table_row_selected.png"
+    },
+    "ui.panels.toast": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "path": "res://assets/ui/panels/toast.png"
+    },
+    "ui.panels.tooltip": {
+      "kind": "nine_patch",
+      "lazy": true,
+      "margins": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "path": "res://assets/ui/panels/tooltip.png"
+    },
+    "weapon.ar_556": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/ar_556.png"
+    },
+    "weapon.ar_556.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_556.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_556/ar_556_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "ar_556"
+    },
+    "weapon.ar_762": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/ar_762.png"
+    },
+    "weapon.ar_762.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "ar_762"
+    },
+    "weapon.ar_762.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/ar_762/ar_762_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "ar_762"
+    },
+    "weapon.dmr_762": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/dmr_762.png"
+    },
+    "weapon.dmr_762.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "dmr_762"
+    },
+    "weapon.dmr_762.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/dmr_762/dmr_762_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "dmr_762"
+    },
+    "weapon.lmg_556": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/lmg_556.png"
+    },
+    "weapon.lmg_556.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "lmg_556"
+    },
+    "weapon.lmg_556.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/lmg_556/lmg_556_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "lmg_556"
+    },
+    "weapon.pistol_9mm": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/pistol_9mm.png"
+    },
+    "weapon.pistol_9mm.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.pistol_9mm.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/pistol_9mm/pistol_9mm_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "pistol_9mm"
+    },
+    "weapon.shotgun_12g": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/shotgun_12g.png"
+    },
+    "weapon.shotgun_12g.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.shotgun_12g.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/shotgun_12g/shotgun_12g_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "shotgun_12g"
+    },
+    "weapon.smg_9mm": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/smg_9mm.png"
+    },
+    "weapon.smg_9mm.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "smg_9mm"
+    },
+    "weapon.smg_9mm.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/smg_9mm/smg_9mm_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "smg_9mm"
+    },
+    "weapon.sniper_bolt": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/sniper_bolt.png"
+    },
+    "weapon.sniper_bolt.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.sniper_bolt.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/sniper_bolt/sniper_bolt_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "sniper_bolt"
+    },
+    "weapon.vss_9x39": {
+      "kind": "weapon",
+      "lazy": true,
+      "path": "res://assets/inventory/weapons/vss_9x39.png"
+    },
+    "weapon.vss_9x39.comparison": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_comparison.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "comparison",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.ground": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_ground.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "ground",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.inventory": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_inventory.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "inventory",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.kill_feed": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_kill_feed.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "kill_feed",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.market": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_market.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "market",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.statistics": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_statistics.png",
+      "size": [
+        96,
+        48
+      ],
+      "surface": "statistics",
+      "weapon": "vss_9x39"
+    },
+    "weapon.vss_9x39.training": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_training.png",
+      "size": [
+        256,
+        128
+      ],
+      "surface": "training",
+      "weapon": "vss_9x39"
+    },
+    "campus.mekong.overview": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "campus_background",
+      "lazy": true,
+      "path": "res://assets/campus/mekong_campus_overview_v1.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    "legacy.achievement.badges": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "achievement_atlas",
+      "lazy": true,
+      "path": "res://assets/legacy/achievement_badges_v1.png",
+      "size": [
+        1536,
+        1024
+      ]
+    },
+    "weapon.vss_9x39.weapon_card": {
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "kind": "weapon_surface",
+      "lazy": true,
+      "path": "res://assets/weapons/vss_9x39/vss_9x39_weapon_card.png",
+      "size": [
+        512,
+        256
+      ],
+      "surface": "weapon_card",
+      "weapon": "vss_9x39"
+    }
+  },
+  "excluded": [
+    "player avatars",
+    "team logos",
+    "character body animation",
+    "cosmetics"
+  ],
+  "format": "png_only",
+  "palette": {
+    "amber": "#f5b82e",
+    "bg": "#0b1117",
+    "danger": "#f05252",
+    "panel": "#121b24",
+    "teal": "#20d6aa"
+  },
+  "renderer": "godot_4_gl_compatibility",
+  "schema_version": 2
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "drop_policy": [
+    {"id":"FIXED_SAFE","name":"Fixed Safe Drop","description":"Ưu tiên drop spot quen thuộc, tránh contest","hotness_bias":-0.35,"loot_bias":0.15},
+    {"id":"ADAPTIVE","name":"Adaptive Drop","description":"IGL đổi điểm theo đường bay và mật độ đội","hotness_bias":0.0,"loot_bias":0.10},
+    {"id":"HOT_CONTEST","name":"Hot Contest","description":"Tranh khu loot mạnh, chấp nhận combat sớm","hotness_bias":0.45,"loot_bias":0.30},
+    {"id":"SPLIT_LOOT","name":"Split Loot & Regroup","description":"Chia người loot dạo rồi tập hợp","hotness_bias":-0.20,"loot_bias":0.25}
+  ],
+  "zone_macro": [
+    {"id":"EDGE","name":"Edge Play","description":"Quét rìa bo, gatekeep và giảm góc bị kẹp","rotation_delay":0.20,"center_bias":-0.25},
+    {"id":"CENTER","name":"Center Control","description":"Rotate sớm chiếm compound trung tâm","rotation_delay":-0.25,"center_bias":0.40},
+    {"id":"FAST","name":"Fast Rotation","description":"Lên xe ngay khi bo reveal","rotation_delay":-0.40,"center_bias":0.20},
+    {"id":"LATE","name":"Late Rotation","description":"Loot và thu thập thông tin lâu hơn","rotation_delay":0.40,"center_bias":-0.10}
+  ],
+  "formation": [
+    {"id":"STACK","name":"4 Stack","vision_bonus":-0.08,"trade_bonus":0.18,"split_risk":0.0},
+    {"id":"TWO_TWO","name":"2-2 Split","vision_bonus":0.12,"trade_bonus":0.08,"split_risk":0.08},
+    {"id":"ONE_THREE","name":"1-3 Scout","vision_bonus":0.18,"trade_bonus":0.04,"split_risk":0.12},
+    {"id":"FOUR_WAY","name":"4-way Split","vision_bonus":0.28,"trade_bonus":-0.12,"split_risk":0.25},
+    {"id":"ANCHOR_THREE","name":"Anchor + 3","vision_bonus":0.14,"trade_bonus":0.10,"split_risk":0.07}
+  ],
+  "engagement": [
+    {"id":"AVOID","name":"Avoid Unnecessary Fights","push_threshold":0.78,"third_party_bonus":0.0},
+    {"id":"SELECTIVE","name":"Selective Engagement","push_threshold":0.62,"third_party_bonus":0.08},
+    {"id":"AGGRESSIVE","name":"Aggressive Push","push_threshold":0.48,"third_party_bonus":0.04},
+    {"id":"THIRD_PARTY","name":"Third-party Hunting","push_threshold":0.58,"third_party_bonus":0.22}
+  ],
+  "positioning": [
+    {"id":"CENTER_HOLD","name":"Center Hold","description":"Ưu tiên vị trí gần tâm bo."},
+    {"id":"EDGE_HOLD","name":"Edge Hold","description":"Giữ rìa bo để giảm góc bị kẹp."},
+    {"id":"FORWARD","name":"Forward Position","description":"Đặt đội về phía trước hướng xoay."},
+    {"id":"REAR","name":"Rear Position","description":"Giữ phía sau đội hình để tránh flank."}
+  ],
+  "spacing": [
+    {"id":"TIGHT","name":"Tight","description":"Dễ trade và revive, dễ dính utility cùng lúc."},
+    {"id":"NORMAL","name":"Normal","description":"Cân bằng hỗ trợ và an toàn."},
+    {"id":"WIDE","name":"Wide","description":"Khó bị đánh cùng lúc, hỗ trợ chậm hơn."},
+    {"id":"EXTREME","name":"Extreme Split","description":"Thông tin cao, nguy cơ cô lập cao."}
+  ],
+  "flank": [
+    {"id":"NONE","name":"No Flank","description":"Cả đội giữ cùng một hướng."},
+    {"id":"SINGLE","name":"Single Flank","description":"Một người tạo góc bắn phụ."},
+    {"id":"DOUBLE","name":"Double Flank","description":"Hai người ép từ hướng phụ."},
+    {"id":"PINCER","name":"Pincer","description":"Hai nhóm ép đối thủ từ hai phía."}
+  ],
+  "focus_fire": [
+    {"id":"FOCUS","name":"Focus Fire","description":"Cùng ưu tiên một mục tiêu."},
+    {"id":"SPREAD","name":"Spread Fire","description":"Chia mục tiêu để gây áp lực rộng."}
+  ],
+  "target_priority": [
+    {"id":"LOWEST_HP","name":"Lowest HP","description":"Kết liễu mục tiêu yếu máu."},
+    {"id":"ISOLATED","name":"Isolated Player","description":"Ưu tiên người tách khỏi đội."},
+    {"id":"FRAGGER","name":"Highest Threat","description":"Ưu tiên player có aim/kill cao."},
+    {"id":"CLOSEST","name":"Closest","description":"Giảm threat gần nhất."}
+  ],
+  "combat_range": [
+    {"id":"CLOSE","name":"Close Range","description":"Chủ động áp sát."},
+    {"id":"MID","name":"Mid Range","description":"Giữ khoảng cách vừa phải."},
+    {"id":"LONG","name":"Long Range","description":"Ưu tiên bắn xa, tránh all-in."},
+    {"id":"ADAPTIVE","name":"Adaptive Range","description":"Theo lợi thế vũ khí."}
+  ],
+  "information": [
+    {"id":"INFO_FIRST","name":"Information First","description":"Ưu tiên xác nhận trước combat."},
+    {"id":"SCOUT_FIRST","name":"Scout First","description":"Scout mở thông tin cho đội."},
+    {"id":"CONFIRM_PUSH","name":"Confirm Before Push","description":"Chỉ push khi đủ dữ kiện."},
+    {"id":"IMMEDIATE","name":"Immediate Contact","description":"Phát hiện là gây áp lực ngay."}
+  ],
+  "resource": [
+    {"id":"MINIMAL","name":"Minimal Loot","description":"Loot nhanh để xoay sớm."},
+    {"id":"HEAL","name":"Heal Priority","description":"Ưu tiên thuốc và hồi phục."},
+    {"id":"UTILITY","name":"Utility Priority","description":"Ưu tiên smoke và grenade."},
+    {"id":"FULL","name":"Full Loot","description":"Loot tối đa trước khi di chuyển."}
+  ]
+}

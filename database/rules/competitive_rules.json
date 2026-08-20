@@ -1,0 +1,52 @@
+{
+  "id": "pubg_pc_esports_v1",
+  "match": {
+    "friendly_fire": true,
+    "maps": [
+      "verdant_reach",
+      "sunscorch_basin"
+    ],
+    "players": 64,
+    "players_per_team": 4,
+    "safe_zone_phases": 5,
+    "teams": 16
+  },
+  "name": "Battle Royale PC Esports Rules",
+  "roster": {
+    "active": 4,
+    "coach_required": true,
+    "substitutes_max": 2
+  },
+  "schema_version": 1,
+  "stat_range": {
+    "development_cap": 99,
+    "maximum": 99,
+    "minimum": 1
+  },
+  "tiers": {
+    "A": {
+      "label": "International / Top Regional",
+      "rating_min": 74
+    },
+    "B": {
+      "label": "Regional Series",
+      "rating_min": 64
+    },
+    "C": {
+      "label": "Regional Qualifier",
+      "rating_min": 54
+    },
+    "D": {
+      "label": "Scrim / Community",
+      "rating_min": 0
+    },
+    "S": {
+      "label": "Global Series",
+      "rating_min": 84
+    },
+    "S+": {
+      "label": "World Championship",
+      "rating_min": 92
+    }
+  }
+}

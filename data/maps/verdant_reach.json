@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "verdant_reach",
+  "display_name": "Verdant Reach",
+  "asset_id": "match.map.verdant_reach",
+  "world_size_m": 8000,
+  "default_ground_speed": 1.0,
+  "regions": [
+    {"id":"west_harbor","name":"West Harbor","position":[0.14,0.38],"radius":0.10,"loot_multiplier":1.35,"hotness":0.80,"terrain":"urban","walkable":true,"vehicle":true},
+    {"id":"rivergate","name":"Rivergate","position":[0.53,0.45],"radius":0.09,"loot_multiplier":1.45,"hotness":0.90,"terrain":"bridge","walkable":true,"vehicle":true},
+    {"id":"sunfield","name":"Sunfield","position":[0.27,0.72],"radius":0.11,"loot_multiplier":0.85,"hotness":0.35,"terrain":"field","walkable":true,"vehicle":true},
+    {"id":"central_depot","name":"Central Depot","position":[0.55,0.76],"radius":0.12,"loot_multiplier":1.65,"hotness":1.00,"terrain":"urban","walkable":true,"vehicle":true},
+    {"id":"east_quarry","name":"East Quarry","position":[0.84,0.50],"radius":0.11,"loot_multiplier":1.20,"hotness":0.65,"terrain":"rock","walkable":true,"vehicle":true},
+    {"id":"moss_temple","name":"Moss Temple","position":[0.83,0.85],"radius":0.09,"loot_multiplier":1.10,"hotness":0.55,"terrain":"forest","walkable":true,"vehicle":false}
+  ],
+  "points": [
+    {"id":"farmhouse_01","name":"Farmhouse 01","position":[0.37,0.61],"type":"house","loot_multiplier":0.65,"capacity":12,"enabled":true},
+    {"id":"river_bridge","name":"River Bridge","position":[0.49,0.69],"type":"bridge","loot_multiplier":0.45,"capacity":6,"enabled":true},
+    {"id":"hill_shack","name":"Hill Shack","position":[0.67,0.30],"type":"house","loot_multiplier":0.35,"capacity":5,"enabled":true},
+    {"id":"north_compound","name":"North Compound","position":[0.46,0.16],"type":"compound","loot_multiplier":1.10,"capacity":22,"enabled":true}
+  ],
+  "terrain_rules": {
+    "urban":{"walk_speed":1.0,"vehicle_speed":0.72,"walkable":true,"vehicle":true},
+    "field":{"walk_speed":1.0,"vehicle_speed":1.0,"walkable":true,"vehicle":true},
+    "forest":{"walk_speed":0.82,"vehicle_speed":0.55,"walkable":true,"vehicle":false},
+    "rock":{"walk_speed":0.72,"vehicle_speed":0.45,"walkable":true,"vehicle":true},
+    "bridge":{"walk_speed":1.0,"vehicle_speed":0.9,"walkable":true,"vehicle":true},
+    "water":{"walk_speed":0.5,"vehicle_speed":0.0,"walkable":true,"vehicle":false}
+  },
+  "water_zones": [
+    {"id":"central_river","name":"Central River","rect":[0.46,0.0,0.10,1.0],"terrain":"water"}
+  ]
+}

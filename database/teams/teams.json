@@ -1,0 +1,935 @@
+{
+  "count": 16,
+  "entity": "teams",
+  "schema_version": 1,
+  "teams": [
+    {
+      "achievements": [],
+      "coach": {
+        "development": 58,
+        "id": "coach_01",
+        "leadership": 86,
+        "name": "Coach MR",
+        "tactical": 84,
+        "tier": "A"
+      },
+      "country": "Vietnam",
+      "economy": {
+        "monthly_payroll": 62500,
+        "sponsor_value": 110700,
+        "total_earnings": 627500
+      },
+      "founded_year": 2016,
+      "id": "mekong_reapers",
+      "logo_asset_id": "team.mekong_reapers.logo",
+      "map_mastery": {
+        "sunscorch_basin": 58,
+        "verdant_reach": 55
+      },
+      "name": "Mekong Reapers",
+      "performance": {
+        "average_placement": 5.2,
+        "consistency": 79,
+        "kills_per_match": 6.0,
+        "matches": 60,
+        "wins": 2
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "SELECTIVE",
+        "formation": "TWO_TWO",
+        "home_drop": "Rivergate",
+        "vehicle_policy": "preserve",
+        "zone_macro": "CENTER"
+      },
+      "ranking": {
+        "pgs_points": 140,
+        "power": 73,
+        "regional": 1,
+        "world": 22
+      },
+      "region": "Asia Pacific",
+      "roster_ids": [
+        "player_001",
+        "player_002",
+        "player_003",
+        "player_004"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "MR",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 61,
+        "id": "coach_02",
+        "leadership": 91,
+        "name": "Coach CO",
+        "tactical": 89,
+        "tier": "S"
+      },
+      "country": "Germany",
+      "economy": {
+        "monthly_payroll": 70000,
+        "sponsor_value": 124200,
+        "total_earnings": 740000
+      },
+      "founded_year": 2017,
+      "id": "crimson_owls",
+      "logo_asset_id": "team.crimson_owls.logo",
+      "map_mastery": {
+        "sunscorch_basin": 65,
+        "verdant_reach": 60
+      },
+      "name": "Crimson Owls",
+      "performance": {
+        "average_placement": 5.5,
+        "consistency": 84,
+        "kills_per_match": 6.6,
+        "matches": 67,
+        "wins": 3
+      },
+      "playbook": {
+        "airdrop_policy": "ignore",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "THIRD_PARTY",
+        "formation": "ONE_THREE",
+        "home_drop": "Central Depot",
+        "vehicle_policy": "vehicle_first",
+        "zone_macro": "FAST"
+      },
+      "ranking": {
+        "pgs_points": 133,
+        "power": 88,
+        "regional": 2,
+        "world": 4
+      },
+      "region": "Europe",
+      "roster_ids": [
+        "player_005",
+        "player_006",
+        "player_007",
+        "player_008"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "CO",
+      "tier": "S"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 64,
+        "id": "coach_03",
+        "leadership": 90,
+        "name": "Coach NT",
+        "tactical": 88,
+        "tier": "S"
+      },
+      "country": "Korea",
+      "economy": {
+        "monthly_payroll": 69000,
+        "sponsor_value": 122400,
+        "total_earnings": 725000
+      },
+      "founded_year": 2018,
+      "id": "neon_tigers",
+      "logo_asset_id": "team.neon_tigers.logo",
+      "map_mastery": {
+        "sunscorch_basin": 72,
+        "verdant_reach": 65
+      },
+      "name": "Neon Tigers",
+      "performance": {
+        "average_placement": 5.8,
+        "consistency": 83,
+        "kills_per_match": 6.5,
+        "matches": 74,
+        "wins": 4
+      },
+      "playbook": {
+        "airdrop_policy": "contest",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "AGGRESSIVE",
+        "formation": "STACK",
+        "home_drop": "Ironworks",
+        "vehicle_policy": "disposable",
+        "zone_macro": "CENTER"
+      },
+      "ranking": {
+        "pgs_points": 126,
+        "power": 86,
+        "regional": 3,
+        "world": 7
+      },
+      "region": "East Asia",
+      "roster_ids": [
+        "player_009",
+        "player_010",
+        "player_011",
+        "player_012"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "NT",
+      "tier": "S"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 67,
+        "id": "coach_04",
+        "leadership": 89,
+        "name": "Coach AN",
+        "tactical": 87,
+        "tier": "A"
+      },
+      "country": "Finland",
+      "economy": {
+        "monthly_payroll": 66500,
+        "sponsor_value": 117900,
+        "total_earnings": 687500
+      },
+      "founded_year": 2019,
+      "id": "astra_nine",
+      "logo_asset_id": "team.astra_nine.logo",
+      "map_mastery": {
+        "sunscorch_basin": 79,
+        "verdant_reach": 70
+      },
+      "name": "Astra Nine",
+      "performance": {
+        "average_placement": 6.0,
+        "consistency": 82,
+        "kills_per_match": 6.3,
+        "matches": 81,
+        "wins": 5
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "AVOID",
+        "formation": "ANCHOR_THREE",
+        "home_drop": "West Harbor",
+        "vehicle_policy": "preserve",
+        "zone_macro": "EDGE"
+      },
+      "ranking": {
+        "pgs_points": 119,
+        "power": 81,
+        "regional": 4,
+        "world": 13
+      },
+      "region": "Europe",
+      "roster_ids": [
+        "player_013",
+        "player_014",
+        "player_015",
+        "player_016"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "AN",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 70,
+        "id": "coach_05",
+        "leadership": 88,
+        "name": "Coach IP",
+        "tactical": 86,
+        "tier": "A"
+      },
+      "country": "USA",
+      "economy": {
+        "monthly_payroll": 65000,
+        "sponsor_value": 115200,
+        "total_earnings": 665000
+      },
+      "founded_year": 2020,
+      "id": "iron_pulse",
+      "logo_asset_id": "team.iron_pulse.logo",
+      "map_mastery": {
+        "sunscorch_basin": 86,
+        "verdant_reach": 75
+      },
+      "name": "Iron Pulse",
+      "performance": {
+        "average_placement": 6.3,
+        "consistency": 81,
+        "kills_per_match": 6.2,
+        "matches": 88,
+        "wins": 6
+      },
+      "playbook": {
+        "airdrop_policy": "ignore",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "SELECTIVE",
+        "formation": "TWO_TWO",
+        "home_drop": "East Quarry",
+        "vehicle_policy": "vehicle_first",
+        "zone_macro": "LATE"
+      },
+      "ranking": {
+        "pgs_points": 112,
+        "power": 78,
+        "regional": 5,
+        "world": 18
+      },
+      "region": "Americas",
+      "roster_ids": [
+        "player_017",
+        "player_018",
+        "player_019",
+        "player_020"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "IP",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 73,
+        "id": "coach_06",
+        "leadership": 87,
+        "name": "Coach SW",
+        "tactical": 85,
+        "tier": "A"
+      },
+      "country": "Thailand",
+      "economy": {
+        "monthly_payroll": 64000,
+        "sponsor_value": 113400,
+        "total_earnings": 650000
+      },
+      "founded_year": 2021,
+      "id": "silent_wave",
+      "logo_asset_id": "team.silent_wave.logo",
+      "map_mastery": {
+        "sunscorch_basin": 93,
+        "verdant_reach": 80
+      },
+      "name": "Silent Wave",
+      "performance": {
+        "average_placement": 6.6,
+        "consistency": 80,
+        "kills_per_match": 6.1,
+        "matches": 95,
+        "wins": 7
+      },
+      "playbook": {
+        "airdrop_policy": "contest",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "THIRD_PARTY",
+        "formation": "ONE_THREE",
+        "home_drop": "Sunfield",
+        "vehicle_policy": "disposable",
+        "zone_macro": "EDGE"
+      },
+      "ranking": {
+        "pgs_points": 105,
+        "power": 76,
+        "regional": 6,
+        "world": 20
+      },
+      "region": "Asia Pacific",
+      "roster_ids": [
+        "player_021",
+        "player_022",
+        "player_023",
+        "player_024"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "SW",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 76,
+        "id": "coach_07",
+        "leadership": 85,
+        "name": "Coach TF",
+        "tactical": 83,
+        "tier": "B"
+      },
+      "country": "Turkey",
+      "economy": {
+        "monthly_payroll": 61000,
+        "sponsor_value": 108000,
+        "total_earnings": 605000
+      },
+      "founded_year": 2022,
+      "id": "titan_forge",
+      "logo_asset_id": "team.titan_forge.logo",
+      "map_mastery": {
+        "sunscorch_basin": 62,
+        "verdant_reach": 85
+      },
+      "name": "Titan Forge",
+      "performance": {
+        "average_placement": 6.9,
+        "consistency": 78,
+        "kills_per_match": 5.9,
+        "matches": 102,
+        "wins": 8
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "AGGRESSIVE",
+        "formation": "STACK",
+        "home_drop": "Moss Temple",
+        "vehicle_policy": "preserve",
+        "zone_macro": "CENTER"
+      },
+      "ranking": {
+        "pgs_points": 98,
+        "power": 70,
+        "regional": 7,
+        "world": 29
+      },
+      "region": "Europe",
+      "roster_ids": [
+        "player_025",
+        "player_026",
+        "player_027",
+        "player_028"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "TF",
+      "tier": "B"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 79,
+        "id": "coach_08",
+        "leadership": 88,
+        "name": "Coach AF",
+        "tactical": 86,
+        "tier": "A"
+      },
+      "country": "Japan",
+      "economy": {
+        "monthly_payroll": 65500,
+        "sponsor_value": 116100,
+        "total_earnings": 672500
+      },
+      "founded_year": 2023,
+      "id": "azure_foxes",
+      "logo_asset_id": "team.azure_foxes.logo",
+      "map_mastery": {
+        "sunscorch_basin": 69,
+        "verdant_reach": 90
+      },
+      "name": "Azure Foxes",
+      "performance": {
+        "average_placement": 7.2,
+        "consistency": 81,
+        "kills_per_match": 6.3,
+        "matches": 109,
+        "wins": 9
+      },
+      "playbook": {
+        "airdrop_policy": "ignore",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "AVOID",
+        "formation": "ANCHOR_THREE",
+        "home_drop": "Cedar Camp",
+        "vehicle_policy": "vehicle_first",
+        "zone_macro": "FAST"
+      },
+      "ranking": {
+        "pgs_points": 91,
+        "power": 79,
+        "regional": 8,
+        "world": 16
+      },
+      "region": "East Asia",
+      "roster_ids": [
+        "player_029",
+        "player_030",
+        "player_031",
+        "player_032"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "AF",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 82,
+        "id": "coach_09",
+        "leadership": 85,
+        "name": "Coach QR",
+        "tactical": 83,
+        "tier": "B"
+      },
+      "country": "Brazil",
+      "economy": {
+        "monthly_payroll": 60500,
+        "sponsor_value": 107100,
+        "total_earnings": 597500
+      },
+      "founded_year": 2024,
+      "id": "quantum_raid",
+      "logo_asset_id": "team.quantum_raid.logo",
+      "map_mastery": {
+        "sunscorch_basin": 76,
+        "verdant_reach": 55
+      },
+      "name": "Quantum Raid",
+      "performance": {
+        "average_placement": 7.4,
+        "consistency": 78,
+        "kills_per_match": 5.9,
+        "matches": 116,
+        "wins": 2
+      },
+      "playbook": {
+        "airdrop_policy": "contest",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "SELECTIVE",
+        "formation": "TWO_TWO",
+        "home_drop": "Northwatch",
+        "vehicle_policy": "disposable",
+        "zone_macro": "LATE"
+      },
+      "ranking": {
+        "pgs_points": 84,
+        "power": 69,
+        "regional": 9,
+        "world": 31
+      },
+      "region": "Americas",
+      "roster_ids": [
+        "player_033",
+        "player_034",
+        "player_035",
+        "player_036"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "QR",
+      "tier": "B"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 85,
+        "id": "coach_10",
+        "leadership": 84,
+        "name": "Coach SV",
+        "tactical": 82,
+        "tier": "B"
+      },
+      "country": "Indonesia",
+      "economy": {
+        "monthly_payroll": 59500,
+        "sponsor_value": 105300,
+        "total_earnings": 582500
+      },
+      "founded_year": 2016,
+      "id": "solar_vipers",
+      "logo_asset_id": "team.solar_vipers.logo",
+      "map_mastery": {
+        "sunscorch_basin": 83,
+        "verdant_reach": 60
+      },
+      "name": "Solar Vipers",
+      "performance": {
+        "average_placement": 7.7,
+        "consistency": 77,
+        "kills_per_match": 5.8,
+        "matches": 123,
+        "wins": 3
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "THIRD_PARTY",
+        "formation": "ONE_THREE",
+        "home_drop": "Coastal Village",
+        "vehicle_policy": "preserve",
+        "zone_macro": "EDGE"
+      },
+      "ranking": {
+        "pgs_points": 77,
+        "power": 67,
+        "regional": 10,
+        "world": 35
+      },
+      "region": "Asia Pacific",
+      "roster_ids": [
+        "player_037",
+        "player_038",
+        "player_039",
+        "player_040"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "SV",
+      "tier": "B"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 88,
+        "id": "coach_11",
+        "leadership": 90,
+        "name": "Coach NL",
+        "tactical": 88,
+        "tier": "S"
+      },
+      "country": "China",
+      "economy": {
+        "monthly_payroll": 68000,
+        "sponsor_value": 120600,
+        "total_earnings": 710000
+      },
+      "founded_year": 2017,
+      "id": "night_lotus",
+      "logo_asset_id": "team.night_lotus.logo",
+      "map_mastery": {
+        "sunscorch_basin": 90,
+        "verdant_reach": 65
+      },
+      "name": "Night Lotus",
+      "performance": {
+        "average_placement": 8.0,
+        "consistency": 83,
+        "kills_per_match": 6.5,
+        "matches": 130,
+        "wins": 4
+      },
+      "playbook": {
+        "airdrop_policy": "ignore",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "AGGRESSIVE",
+        "formation": "STACK",
+        "home_drop": "Old Citadel",
+        "vehicle_policy": "vehicle_first",
+        "zone_macro": "CENTER"
+      },
+      "ranking": {
+        "pgs_points": 70,
+        "power": 84,
+        "regional": 11,
+        "world": 9
+      },
+      "region": "East Asia",
+      "roster_ids": [
+        "player_041",
+        "player_042",
+        "player_043",
+        "player_044"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "NL",
+      "tier": "S"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 60,
+        "id": "coach_12",
+        "leadership": 86,
+        "name": "Coach VG",
+        "tactical": 84,
+        "tier": "A"
+      },
+      "country": "United Kingdom",
+      "economy": {
+        "monthly_payroll": 63000,
+        "sponsor_value": 111600,
+        "total_earnings": 635000
+      },
+      "founded_year": 2018,
+      "id": "vertex_guard",
+      "logo_asset_id": "team.vertex_guard.logo",
+      "map_mastery": {
+        "sunscorch_basin": 59,
+        "verdant_reach": 70
+      },
+      "name": "Vertex Guard",
+      "performance": {
+        "average_placement": 8.3,
+        "consistency": 79,
+        "kills_per_match": 6.1,
+        "matches": 137,
+        "wins": 5
+      },
+      "playbook": {
+        "airdrop_policy": "contest",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "AVOID",
+        "formation": "ANCHOR_THREE",
+        "home_drop": "South Docks",
+        "vehicle_policy": "disposable",
+        "zone_macro": "FAST"
+      },
+      "ranking": {
+        "pgs_points": 63,
+        "power": 74,
+        "regional": 12,
+        "world": 24
+      },
+      "region": "Europe",
+      "roster_ids": [
+        "player_045",
+        "player_046",
+        "player_047",
+        "player_048"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "VG",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 63,
+        "id": "coach_13",
+        "leadership": 83,
+        "name": "Coach EC",
+        "tactical": 81,
+        "tier": "B"
+      },
+      "country": "Canada",
+      "economy": {
+        "monthly_payroll": 58500,
+        "sponsor_value": 103500,
+        "total_earnings": 567500
+      },
+      "founded_year": 2019,
+      "id": "ember_crown",
+      "logo_asset_id": "team.ember_crown.logo",
+      "map_mastery": {
+        "sunscorch_basin": 66,
+        "verdant_reach": 75
+      },
+      "name": "Ember Crown",
+      "performance": {
+        "average_placement": 8.6,
+        "consistency": 76,
+        "kills_per_match": 5.7,
+        "matches": 144,
+        "wins": 6
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "SELECTIVE",
+        "formation": "TWO_TWO",
+        "home_drop": "West Harbor",
+        "vehicle_policy": "preserve",
+        "zone_macro": "LATE"
+      },
+      "ranking": {
+        "pgs_points": 56,
+        "power": 65,
+        "regional": 1,
+        "world": 38
+      },
+      "region": "Americas",
+      "roster_ids": [
+        "player_049",
+        "player_050",
+        "player_051",
+        "player_052"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "EC",
+      "tier": "B"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 66,
+        "id": "coach_14",
+        "leadership": 86,
+        "name": "Coach PA",
+        "tactical": 84,
+        "tier": "A"
+      },
+      "country": "Norway",
+      "economy": {
+        "monthly_payroll": 62000,
+        "sponsor_value": 109800,
+        "total_earnings": 620000
+      },
+      "founded_year": 2020,
+      "id": "polar_ace",
+      "logo_asset_id": "team.polar_ace.logo",
+      "map_mastery": {
+        "sunscorch_basin": 73,
+        "verdant_reach": 80
+      },
+      "name": "Polar Ace",
+      "performance": {
+        "average_placement": 8.8,
+        "consistency": 79,
+        "kills_per_match": 6.0,
+        "matches": 151,
+        "wins": 7
+      },
+      "playbook": {
+        "airdrop_policy": "ignore",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "THIRD_PARTY",
+        "formation": "ONE_THREE",
+        "home_drop": "Rivergate",
+        "vehicle_policy": "vehicle_first",
+        "zone_macro": "EDGE"
+      },
+      "ranking": {
+        "pgs_points": 49,
+        "power": 72,
+        "regional": 2,
+        "world": 27
+      },
+      "region": "Europe",
+      "roster_ids": [
+        "player_053",
+        "player_054",
+        "player_055",
+        "player_056"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "PA",
+      "tier": "A"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 69,
+        "id": "coach_15",
+        "leadership": 83,
+        "name": "Coach O7",
+        "tactical": 81,
+        "tier": "B"
+      },
+      "country": "Australia",
+      "economy": {
+        "monthly_payroll": 57500,
+        "sponsor_value": 101700,
+        "total_earnings": 552500
+      },
+      "founded_year": 2021,
+      "id": "orbit_seven",
+      "logo_asset_id": "team.orbit_seven.logo",
+      "map_mastery": {
+        "sunscorch_basin": 80,
+        "verdant_reach": 85
+      },
+      "name": "Orbit Seven",
+      "performance": {
+        "average_placement": 9.1,
+        "consistency": 76,
+        "kills_per_match": 5.6,
+        "matches": 158,
+        "wins": 8
+      },
+      "playbook": {
+        "airdrop_policy": "contest",
+        "drop_policy": "ADAPTIVE",
+        "engagement": "AGGRESSIVE",
+        "formation": "STACK",
+        "home_drop": "Sunfield",
+        "vehicle_policy": "disposable",
+        "zone_macro": "CENTER"
+      },
+      "ranking": {
+        "pgs_points": 42,
+        "power": 63,
+        "regional": 3,
+        "world": 41
+      },
+      "region": "Asia Pacific",
+      "roster_ids": [
+        "player_057",
+        "player_058",
+        "player_059",
+        "player_060"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "O7",
+      "tier": "B"
+    },
+    {
+      "achievements": [],
+      "coach": {
+        "development": 72,
+        "id": "coach_16",
+        "leadership": 87,
+        "name": "Coach RIX",
+        "tactical": 85,
+        "tier": "A"
+      },
+      "country": "Taiwan",
+      "economy": {
+        "monthly_payroll": 64500,
+        "sponsor_value": 114300,
+        "total_earnings": 657500
+      },
+      "founded_year": 2022,
+      "id": "rift_kings",
+      "logo_asset_id": "team.rift_kings.logo",
+      "map_mastery": {
+        "sunscorch_basin": 87,
+        "verdant_reach": 90
+      },
+      "name": "RIX",
+      "performance": {
+        "average_placement": 9.4,
+        "consistency": 80,
+        "kills_per_match": 6.2,
+        "matches": 165,
+        "wins": 9
+      },
+      "playbook": {
+        "airdrop_policy": "opportunistic",
+        "drop_policy": "FIXED_SAFE",
+        "engagement": "AVOID",
+        "formation": "ANCHOR_THREE",
+        "home_drop": "Central Depot",
+        "vehicle_policy": "preserve",
+        "zone_macro": "FAST"
+      },
+      "ranking": {
+        "pgs_points": 35,
+        "power": 77,
+        "regional": 4,
+        "world": 19
+      },
+      "region": "East Asia",
+      "roster_ids": [
+        "player_061",
+        "player_062",
+        "player_063",
+        "player_064"
+      ],
+      "status": "active",
+      "substitute_ids": [],
+      "tag": "RIX",
+      "tier": "A"
+    }
+  ]
+}
