@@ -58,9 +58,10 @@ func _run_system_journey() -> void:
 
 	# Outbound recruitment: offer -> pending event -> accepted -> roster/finance.
 	game.data.reputation = 100
-	var market_player: Dictionary = game.data.market[0]; market_player.confidence = 100; var fee := int(market_player.value); var roster_before_signing: int = game.data.roster.size(); var budget_before_signing := int(game.data.budget)
+	var market_player: Dictionary = game.data.market[0]; market_player.confidence = 100; var roster_before_signing: int = game.data.roster.size(); var budget_before_signing := int(game.data.budget)
 	var outbound := game.create_transfer_offer(str(market_player.id), {"salary":int(market_player.salary)+2000,"months":24,"starter_guarantee":true})
 	_check(bool(outbound.get("ok", false)), "Outbound offer was not created")
+	var fee := int(outbound.get("offer", {}).get("fee", -1))
 	var outbound_event: Dictionary = game.data.pending_events.filter(func(event): return str(event.get("type", "")) == "transfer_offer")[0]
 	var accepted_choice := "accept" if str(outbound.offer.response) == "ACCEPT" else "counter"
 	_check(bool(game.resolve_event(str(outbound_event.id), accepted_choice).get("ok", false)), "Outbound negotiation did not resolve")

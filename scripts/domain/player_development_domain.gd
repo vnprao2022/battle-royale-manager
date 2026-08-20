@@ -19,10 +19,16 @@ static func energy_change(player: Dictionary, schedule: String, recovery_level: 
 	return 7 + recovery_level * 2 if schedule == "Nghỉ & hồi phục" else (-8 + fatigue_resistance / 25 if schedule == "Cường độ cao" else 1 + recovery_level)
 
 static func apply_week(player: Dictionary, state: Dictionary, context: Dictionary) -> Dictionary:
-	var before := {"overall":int(player.get("overall", 0)), "energy":int(player.get("energy", 0)), "form":int(player.get("form", 0)), "morale":int(player.get("morale", player.get("happiness", 0)))}
+	var before := {"overall":int(player.get("overall", 0)), "energy":int(player.get("energy", 0)), "form":int(player.get("form", 0)), "morale":int(player.get("morale", player.get("happiness", 0))), "aim":int(player.get("aim",0)), "game_sense":int(player.get("game_sense",0)), "teamwork":int(player.get("teamwork",0)), "clutch":int(player.get("clutch",0))}
 	var schedule := str(state.get("schedule", "Cân bằng")); var recovery_level := int(context.get("recovery_level", 1)); var mental_bonus := int(context.get("mental_bonus", 0))
-	player.energy = clampi(int(player.get("energy", 0)) + energy_change(player, schedule, recovery_level) + randi_range(-1, 1), 15, 100)
-	var profile := growth_chance(player, state, 0.34 if schedule == "Cường độ cao" else 0.16, int(context.get("training_level", 1)), float(context.get("head_coach_bonus", 0.0)), float(context.get("difficulty_bonus", 0.0)))
+	var calendar: Array = state.get("training_schedule", [])
+	var intensive_days := calendar.filter(func(day): return str(day.get("intensity", "")) == "Intensive").size()
+	var competitive_days := calendar.filter(func(day): return str(day.get("intensity", "")) == "Competitive").size()
+	var recovery_days := calendar.filter(func(day): return str(day.get("activity", "")) in ["Recovery","Rest"]).size()
+	var calendar_energy := recovery_days * (3 + recovery_level) - intensive_days * 7 - competitive_days * 4
+	player.energy = clampi(int(player.get("energy", 0)) + energy_change(player, schedule, recovery_level) + calendar_energy + randi_range(-1, 1), 15, 100)
+	var base_growth := (0.34 if schedule == "Cường độ cao" else 0.16) + intensive_days * 0.025 + competitive_days * 0.01 - recovery_days * 0.008
+	var profile := growth_chance(player, state, base_growth, int(context.get("training_level", 1)), float(context.get("head_coach_bonus", 0.0)), float(context.get("difficulty_bonus", 0.0)))
 	var grew := false; var growth_stat := ""
 	if randf() < float(profile.chance) and int(player.get("overall", 0)) < int(player.get("potential", 0)) and int(player.energy) > 40:
 		growth_stat = str(context.get("focus_stat", "game_sense")); player[growth_stat] = clampi(int(player.get(growth_stat, player.overall)) + 1, 1, int(player.potential))
@@ -33,6 +39,9 @@ static func apply_week(player: Dictionary, state: Dictionary, context: Dictionar
 	if not individual_focus.is_empty():
 		var focus_stat: String = str({"Aim":"aim","Strategy":"game_sense","Mental":"clutch","Recovery":"energy","Teamwork":"teamwork"}.get(individual_focus,"aim"))
 		player[focus_stat] = clampi(int(player.get(focus_stat, 50)) + 1, 1, 99); player.energy = clampi(int(player.energy) - (2 if individual_focus != "Recovery" else -mental_bonus), 15, 100)
+	var team_focus_stat := str({"Combat":"aim","Strategy":"game_sense","Teamwork":"teamwork","Mental":"clutch"}.get(str(state.get("team_training_focus","")),""))
+	if not team_focus_stat.is_empty() and calendar.any(func(day): return str(day.get("activity","")) == str(state.get("team_training_focus",""))):
+		player[team_focus_stat] = clampi(int(player.get(team_focus_stat,50)) + 1, 1, 99)
 	player.happiness = clampi(int(player.get("happiness", 60)) + roundi(float(mental_bonus) / 3.0), 0, 100)
 	player.morale = clampi(roundi((int(player.get("morale", player.happiness)) * 2 + int(player.happiness)) / 3.0), 0, 100)
-	return {"player_id":str(player.get("id", "")), "before":before, "after":{"overall":int(player.overall), "energy":int(player.energy), "form":int(player.form), "morale":int(player.morale)}, "grew":grew, "growth_stat":growth_stat, "growth_profile":profile}
+	return {"player_id":str(player.get("id", "")), "before":before, "after":{"overall":int(player.overall), "energy":int(player.energy), "form":int(player.form), "morale":int(player.morale), "aim":int(player.get("aim",0)), "game_sense":int(player.get("game_sense",0)), "teamwork":int(player.get("teamwork",0)), "clutch":int(player.get("clutch",0))}, "grew":grew, "growth_stat":growth_stat, "growth_profile":profile, "calendar_load":{"intensive_days":intensive_days,"competitive_days":competitive_days,"recovery_days":recovery_days}}

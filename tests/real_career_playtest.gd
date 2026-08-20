@@ -108,8 +108,9 @@ func _run_playthrough() -> void:
 			_check(action != "reject", "Affordable high-value recruitment terms were still rejected")
 			_check(bool(game.resolve_event(str(event.id), action).get("ok", false)), "Outbound Inbox negotiation failed")
 			_check(game.data.roster.size() == roster_before_signing + 1, "Signed player did not become owned roster data")
-			_check(int(game.data.budget) == budget_before_signing - int(candidate.value), "Transfer spending was not applied exactly once")
-			balance_report.outbound_transfer_fee = int(candidate.value)
+			var applied_fee:=int(offer.get("offer",{}).get("fee",-1))
+			_check(int(game.data.budget) == budget_before_signing - applied_fee, "Transfer spending was not applied exactly once")
+			balance_report.outbound_transfer_fee = applied_fee
 			_check(not bool(game.resolve_event(str(event.id), action).get("ok", false)), "Resolved transfer event could be accepted twice")
 	_validate_roster("after outbound transfer")
 	if game.data.roster.size() >= 5:

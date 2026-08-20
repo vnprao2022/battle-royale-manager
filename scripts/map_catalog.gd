@@ -3,7 +3,11 @@ extends RefCounted
 
 const MAP_PATHS := {
 	"verdant_reach": "res://data/maps/verdant_reach.json",
-	"sunscorch_basin": "res://data/maps/sunscorch_basin.json"
+	"sunscorch_basin": "res://data/maps/sunscorch_basin.json",
+	"tactical_island": "res://data/maps/tactical_island.json",
+	"frostline_valley": "res://data/maps/frostline_valley.json",
+	"coastal_breakwater": "res://data/maps/coastal_breakwater.json",
+	"highland_reserve": "res://data/maps/highland_reserve.json"
 }
 const OVERRIDE_DIR := "user://map_overrides"
 

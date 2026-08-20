@@ -65,8 +65,10 @@ func set_active_match_event(event_id: String) -> Dictionary:
 func difficulty_rules() -> Dictionary:
 	var difficulty := str(data.get("difficulty", "Normal")).to_upper()
 	return {
+		"CASUAL":{"economy":1.15,"training_chance":0.07,"scouting":3,"inbound_interest":5},
 		"EASY":{"economy":1.10,"training_chance":0.05,"scouting":2,"inbound_interest":4},
-		"HARD":{"economy":0.90,"training_chance":-0.05,"scouting":-2,"inbound_interest":-4}
+		"HARD":{"economy":0.90,"training_chance":-0.05,"scouting":-2,"inbound_interest":-4},
+		"DIRECTOR":{"economy":0.82,"training_chance":-0.08,"scouting":-3,"inbound_interest":-6}
 	}.get(difficulty, {"economy":1.0,"training_chance":0.0,"scouting":0,"inbound_interest":0})
 
 func organization_player_count() -> int:
@@ -130,14 +132,8 @@ func featured_match_opponent() -> Dictionary:
 	return data.get("teams", [])[0] if not data.get("teams", []).is_empty() else {}
 
 func career_world_rank() -> int:
-	var database = career_database()
-	if not _database_errors.is_empty(): return 0
-	var power_rows: Array = []
-	for team in database.teams:
-		power_rows.append({"id":str(team.get("id", "")), "power":roundi(get_team_power()) if str(team.get("id", "")) == str(data.get("organization_id", "")) else int(team.get("ranking", {}).get("power", 0))})
-	power_rows.sort_custom(func(a, b): return int(a.power) > int(b.power))
-	for index in power_rows.size():
-		if str(power_rows[index].id) == str(data.get("organization_id", "")): return index + 1
+	for profile in competitive_rankings("CLUB"):
+		if str(profile.get("id",""))==str(data.get("organization_id","")): return int(profile.get("rank",0))
 	return 0
 
 func _next_record_id(prefix: String) -> String:
@@ -212,6 +208,23 @@ func new_career(org_name: String, background: String, region: String, options: D
 	else:
 		for i in 6: roster.append(_make_player(62 + i * 2, ROLES[i], true))
 		for i in 18: market.append(_make_player(randi_range(55, 84), ROLES[i % ROLES.size()], false))
+	var career_mode := str(options.get("team_mode", "existing"))
+	var academy_pool: Array = []
+	if career_mode == "new":
+		roster.clear()
+		var custom_players: Array = options.get("custom_players", []) if str(options.get("roster_source", "generated")) == "custom" else []
+		for index in 6:
+			var player := _make_player(randi_range(48, 59), ROLES[index], true)
+			player.potential = clampi(randi_range(60, 76), int(player.overall), 76)
+			if index < custom_players.size():
+				var custom: Dictionary = custom_players[index]
+				if not str(custom.get("name", "")).strip_edges().is_empty(): player.name = str(custom.name).strip_edges()
+				if not str(custom.get("handle", "")).strip_edges().is_empty(): player.handle = str(custom.handle).strip_edges()
+				player.role = str(custom.get("role", ROLES[index]))
+			roster.append(player)
+		for index in 10:
+			var prospect := _make_player(randi_range(44, 57), ROLES[index % ROLES.size()], false)
+			prospect.potential = clampi(randi_range(58, 78), int(prospect.overall), 78); prospect.squad_role = "academy"; prospect.academy_candidate = true; academy_pool.append(prospect); market.push_front(prospect)
 	var teams: Array = game_database.career_opponents(selected_team_id) if database_errors.is_empty() else []
 	var initial_scrims: Array = _initial_scrim_requests(game_database, selected_team_id) if database_errors.is_empty() else []
 	if not database_errors.is_empty():
@@ -221,21 +234,20 @@ func new_career(org_name: String, background: String, region: String, options: D
 	var starting_tier := str(options.get("starting_tier", selected_team.get("tier", "D"))).to_upper()
 	var tier_profile: Dictionary = {"D":{"budget":250000,"fans":2500,"reputation":18,"expectation":"Develop talent"},"C":{"budget":450000,"fans":6000,"reputation":32,"expectation":"Regional contender"},"B":{"budget":700000,"fans":11000,"reputation":50,"expectation":"Qualify for finals"},"A":{"budget":1000000,"fans":20000,"reputation":68,"expectation":"Challenge for titles"}}.get(starting_tier, {"budget":250000,"fans":2500,"reputation":18,"expectation":"Develop talent"})
 	var official_name := str(selected_team.get("name", org_name))
-	var career_mode := str(options.get("team_mode", "existing"))
 	var resolved_name := org_name if career_mode in ["new", "replace"] else official_name
 	var resolved_logo := str(options.get("logo_asset_id", selected_team.get("logo_asset_id", "team.mekong_reapers.logo")))
 	data = {
-		"save_version": SAVE_VERSION, "slot_id":requested_slot, "career_id":"career-%d-%d" % [requested_slot, Time.get_unix_time_from_system()], "organization_id":selected_team_id, "org_name": resolved_name, "org_logo_asset_id": resolved_logo, "background": background, "region": str(selected_team.get("region", region)),
+		"save_version": SAVE_VERSION, "slot_id":requested_slot, "career_id":"career-%d-%d" % [requested_slot, Time.get_unix_time_from_system()], "organization_id":selected_team_id, "org_name": resolved_name, "org_logo_asset_id": resolved_logo, "manager_name":background, "background": background, "region": region if career_mode == "new" else str(selected_team.get("region", region)),
 		"season": 1, "week": 1, "budget": int(tier_profile.budget), "fans": int(tier_profile.fans), "reputation": int(tier_profile.reputation), "difficulty":str(options.get("difficulty", "Normal")), "starting_tier":starting_tier, "board_expectation":str(tier_profile.expectation),
-		"career_type":str(options.get("career_type", "normal")), "team_mode":career_mode, "career_overrides":{}, "content_lock":options.get("content_lock", []).duplicate(true),
+		"career_type":"normal", "journey_mode":str(options.get("journey_mode", "existing")), "roster_source":str(options.get("roster_source", "database")), "team_mode":career_mode, "career_overrides":{}, "content_lock":options.get("content_lock", []).duplicate(true),
 		"created_at":Time.get_datetime_string_from_system(), "last_saved_at":"", "playtime_seconds":0,
 		"current_date": SEASON_START_DATE, "calendar_month_offset": 0,
 		"morale": 72, "chemistry": 61, "training_focus": "Cân bằng", "schedule": "Cân bằng",
-		"weekly_training_plan":["Aim Training","Strategy Review","Scrim Preparation","Recovery","Team Chemistry","VOD Review","Rest"], "individual_training":{},
+		"weekly_training_plan":["Combat • Team","Strategy • Team","Scrim • Competitive","Recovery • Light","Teamwork • Team","Mental • Light","Rest • Rest"], "training_schedule":_default_training_schedule(), "training_program":"BALANCED", "team_training_focus":"Strategy", "individual_training":{}, "training_history":[], "recent_training_impact":{}, "match_readiness":65,
 		"tactics": {"early": "Rotate sớm", "mid": "Kiểm soát trung tâm", "late": "Fight for zone"},
 		"coach_plan": {"drop_policy":"ADAPTIVE", "zone_macro":"CENTER", "formation":"TWO_TWO", "engagement":"SELECTIVE", "positioning":"CENTER_HOLD", "spacing":"NORMAL", "flank":"NONE", "focus_fire":"FOCUS", "target_priority":"LOWEST_HP", "combat_range":"ADAPTIVE", "information":"INFO_FIRST", "resource":"MINIMAL"}, "map_tactics":{}, "match_decisions":{"EARLY":"ROTATE","MID":"HOLD","END":"FIGHT"},
 		"facilities": {"Training Room": 1, "Analytics Lab": 1, "Medical Room": 1, "Streaming Room": 1}, "facility_projects": [],
-		"roster": roster, "market": market, "teams": teams, "inbox": [], "history": [], "last_match": {}, "match_replays": [], "tournament_results": {}, "previous_team_power": 0, "ranking_trend": 0,
+		"roster": roster, "academy_pool":academy_pool, "market": market, "scout_assignments":[], "scout_reports":[], "teams": teams, "inbox": [], "history": [], "last_match": {}, "match_replays": [], "tournament_results": {}, "competitive_world":{}, "background_tournament_results":[], "previous_team_power": 0, "ranking_trend": 0,
 		"days_elapsed":0, "season_start_days_elapsed":0, "progression_log":[], "season_history":[], "season_transition":{}, "season_start_budget":int(tier_profile.budget), "next_record_sequence":1,
 		"loaned_players":[], "loan_records":[], "inbound_offers":[], "transferred_out_players":[], "media_stories":[],
 		"scrim_requests":initial_scrims, "scrim_history":[], "tactical_familiarity":0,
@@ -254,8 +266,13 @@ func new_career(org_name: String, background: String, region: String, options: D
 		"active_tournament_player_count": int(game_database.get_active_tournament().get("player_count", 64)),
 		"tournaments": [], "competitions": [], "facility_definitions": game_database.career_content.get("facilities", {}), "calendar_events": []
 	}
+	if career_mode == "new":
+		data.organization_id = "career_org:%s" % str(data.career_id)
+		for player in data.roster: player.team_id = str(data.organization_id)
+	ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 	data.tournaments = _tournament_catalog()
 	data.competitions = data.tournaments
+	_ensure_competitive_world()
 	data.calendar_events = _build_season_calendar(SEASON_START_DATE)
 	data.calendar_events.append({"id":"training-day-1","date":SEASON_START_DATE,"time":"10:00","priority":50,"requires_player_action":true,"completed":false,"status":"scheduled","type":"training","tournament":"TEAM TRAINING","round":"Training session"})
 	if not initial_scrims.is_empty(): data.calendar_events.append({"id":str(initial_scrims[0].id),"date":str(initial_scrims[0].date),"time":str(initial_scrims[0].time),"priority":60,"requires_player_action":true,"completed":false,"status":"scheduled","type":"scrim","tournament":str(initial_scrims[0].cluster_name),"round":"Cluster session"})
@@ -361,6 +378,76 @@ func scouting_pool(query := "", role := "") -> Array:
 		result.append(player)
 	return result
 
+func start_scout_assignment(criteria: Dictionary) -> Dictionary:
+	if data.get("scout_assignments", []).any(func(assignment): return str(assignment.get("status", "")) == "ACTIVE"):
+		return _command_error("SCOUT_BUSY", "The scouting team already has an active assignment.")
+	var allowed_roles := ["ALL", "IGL", "FRAGGER", "SUPPORT", "ENTRY", "ANCHOR", "FLEX"]
+	var role := str(criteria.get("role", "ALL")).to_upper()
+	if not role in allowed_roles: return _command_error("SCOUT_ROLE_INVALID", "Unsupported scouting role.", {"role":role})
+	var level := int(data.get("facilities", {}).get("Analytics Lab", 1))
+	var duration_days := maxi(2, 5 - mini(3, level - 1))
+	var cost := 2500 + level * 1250
+	if int(data.get("budget", 0)) < cost: return _command_error("SCOUT_BUDGET_LOW", "The scouting budget cannot fund this assignment.", {"cost":cost})
+	var assignment := {"id":_next_record_id("scout"),"status":"ACTIVE","criteria":{"role":role,"age_band":str(criteria.get("age_band","ANY")),"priority":str(criteria.get("priority","POTENTIAL")),"max_value":int(criteria.get("max_value",0))},"started_date":str(data.get("current_date",SEASON_START_DATE)),"completion_date":_add_days(str(data.get("current_date",SEASON_START_DATE)),duration_days),"duration_days":duration_days,"facility_level":level,"cost":cost}
+	data.budget = int(data.budget) - cost
+	data.scout_assignments.push_front(assignment)
+	_add_finance_entry("Scouting assignment", -cost)
+	_record_progression("scouting", "Scouting assignment started", "%s search focused on %s." % [role, str(assignment.criteria.priority).capitalize()], {"completion_date":assignment.completion_date,"cost":cost})
+	save_game()
+	return {"ok":true,"assignment":assignment.duplicate(true)}
+
+func active_scout_assignment() -> Dictionary:
+	for assignment in data.get("scout_assignments", []):
+		if str(assignment.get("status", "")) == "ACTIVE": return assignment
+	return {}
+
+func latest_scout_report() -> Dictionary:
+	return data.get("scout_reports", [])[0] if not data.get("scout_reports", []).is_empty() else {}
+
+func current_scout_results(query := "", role := "ALL") -> Array:
+	var report := latest_scout_report()
+	if report.is_empty(): return []
+	var normalized_query := query.to_lower().strip_edges(); var normalized_role := role.to_upper(); var result: Array = []
+	for player in report.get("players", []):
+		if normalized_role not in ["", "ALL"] and str(player.get("role", "")).to_upper() != normalized_role: continue
+		if not normalized_query.is_empty() and normalized_query not in str(player.get("name", "")).to_lower() and normalized_query not in str(player.get("handle", "")).to_lower(): continue
+		result.append(player)
+	return result
+
+func _process_scout_assignments(current_date: String) -> void:
+	for assignment in data.get("scout_assignments", []):
+		if str(assignment.get("status", "")) != "ACTIVE" or str(assignment.get("completion_date", "")) > current_date: continue
+		var criteria: Dictionary = assignment.get("criteria", {}); var database = career_database(); var candidates: Array = []
+		for source in database.players:
+			var player := _player_from_database(source, false); var player_id := str(player.get("id", ""))
+			if data.get("roster", []).any(func(owned): return str(owned.get("id", "")) == player_id): continue
+			var role := str(criteria.get("role", "ALL")); if role != "ALL" and str(player.get("role", "")).to_upper() != role: continue
+			var age_band := str(criteria.get("age_band", "ANY")); if age_band == "U21" and int(player.age) > 21: continue
+			if age_band == "22-25" and (int(player.age) < 22 or int(player.age) > 25): continue
+			if age_band == "26+" and int(player.age) < 26: continue
+			if int(criteria.get("max_value", 0)) > 0 and int(player.value) > int(criteria.max_value): continue
+			var priority := str(criteria.get("priority", "POTENTIAL")); var primary := int(player.potential) if priority == "POTENTIAL" else int(player.overall) if priority == "CURRENT_ABILITY" else -int(player.value)
+			player.discovery_score = primary * 1000 + absi((str(assignment.id) + player_id).hash()) % 997; candidates.append(player)
+		candidates.sort_custom(func(a,b): return int(a.discovery_score) > int(b.discovery_score))
+		var count := clampi(2 + int(assignment.get("facility_level",1)), 3, 7); var found: Array = candidates.slice(0, mini(count, candidates.size()))
+		var scout_rating := 50
+		for staff in data.get("staff", []):
+			if str(staff.get("id", "")) == "scout": scout_rating = int(staff.get("rating",50)); break
+		for player in found:
+			player.erase("discovery_score"); player.scouted = true; player.confidence = clampi(45 + int(assignment.get("facility_level",1)) * 8 + scout_rating / 10, 50, 95)
+			if not data.get("market", []).any(func(candidate): return str(candidate.get("id", "")) == str(player.get("id", ""))): data.market.append(player.duplicate(true))
+		assignment.status = "COMPLETE"; assignment.completed_date = current_date
+		var report := {"id":_next_record_id("scout_report"),"assignment_id":str(assignment.id),"date":current_date,"criteria":criteria.duplicate(true),"players":found,"count":found.size()}; data.scout_reports.push_front(report); if data.scout_reports.size() > 12: data.scout_reports.resize(12)
+		_add_news("Scout report ready", "%d players matched the assignment. Review the report before approaching a player." % found.size(), "SCOUT", "scouting")
+		_record_progression("scouting", "Scout report completed", "%d candidates discovered." % found.size(), {"report_id":report.id,"count":found.size()})
+
+func transfer_window_status() -> Dictionary:
+	var week := int(data.get("week", 1)); var window_name := "CLOSED"; var open := false
+	if week in [1, 2]: window_name = "PRE-SEASON"; open = true
+	elif week in [6, 7]: window_name = "MID-SEASON"; open = true
+	elif week in [11, 12]: window_name = "POST-SEASON"; open = true
+	return {"open":open,"name":window_name,"week":week,"next":"Week 6" if week < 6 and not open else "Week 11" if week < 11 and not open else "Next season" if not open else "Open now"}
+
 func eligible_national_players(national_team_id: String) -> Array:
 	var database = career_database(); var errors: PackedStringArray = _database_errors
 	if not errors.is_empty(): return []
@@ -411,7 +498,7 @@ func accept_scrim(request_id: String, options: Dictionary = {}) -> Dictionary:
 		if str(candidate.get("id", "")) == request_id: request = candidate; break
 	if request.is_empty() or str(request.get("status", "")) != "pending": return {"ok":false,"error":"Scrim request is unavailable"}
 	var match_count := clampi(int(options.get("matches", 3)), 1, 7); var map_id := str(options.get("map", "verdant_reach")); var objective := str(options.get("objective", "TACTICAL_FAMILIARITY"))
-	if not map_id in ["verdant_reach","sunscorch_basin"]: return {"ok":false,"error":"Unsupported scrim map"}
+	if not map_id in ["verdant_reach","sunscorch_basin","tactical_island","frostline_valley","coastal_breakwater","highland_reserve"]: return {"ok":false,"error":"Unsupported scrim map"}
 	if not objective in ["TACTICAL_FAMILIARITY","CHEMISTRY","PLAYER_FORM","OPPONENT_ANALYSIS"]: return {"ok":false,"error":"Unsupported tactical objective"}
 	var seed_value := absi((request_id + str(data.get("week",1))).hash()); var placement := 1 + seed_value % maxi(2, int(data.get("active_tournament_team_count",16)))
 	var chemistry_gain := 2 if objective == "CHEMISTRY" else 1; var familiarity_gain := mini(5, match_count + (2 if objective == "TACTICAL_FAMILIARITY" else 0))
@@ -490,6 +577,7 @@ func advance_day() -> Dictionary:
 	var weekly_update := int(data.days_elapsed) > 0 and int(data.days_elapsed) % 7 == 0
 	_process_facility_projects(target_date)
 	_process_loan_returns(target_date)
+	_process_scout_assignments(target_date)
 	_expire_inbound_offers()
 	var weekly_result: Dictionary = advance_week(false) if weekly_update else {}
 	if not weekly_update: _record_progression("day", "Day advanced", "Career calendar advanced to %s." % target_date)
@@ -566,6 +654,7 @@ func advance_week(advance_calendar := true) -> Dictionary:
 	if int(data.week) % 4 == 0:
 		_random_event()
 	_review_sponsor_objective()
+	_simulate_background_tournaments()
 	if int(data.week) > 12:
 		_end_season()
 	_ensure_media_story()
@@ -576,6 +665,16 @@ func advance_week(advance_calendar := true) -> Dictionary:
 	var energy_delta := roundi(float(new_energy - old_energy) / maxi(1, data.get("roster", []).size()))
 	var net_change := int(data.get("budget", 0)) - old_budget
 	var developed_players := development_results.filter(func(result): return bool(result.get("grew", false))).map(func(result): return str(result.get("player_id", "")))
+	var impact := {"week":int(data.week),"focus":str(data.get("team_training_focus","Strategy")),"program":str(data.get("training_program","CUSTOM")),"energy_delta":energy_delta,"team_power_delta":roundi(get_team_power())-old_team_power,"developed_players":developed_players,"player_results":development_results.duplicate(true)}
+	data.recent_training_impact = impact
+	data.training_history.push_front(impact.duplicate(true))
+	if data.training_history.size() > 12: data.training_history.resize(12)
+	data.match_readiness = clampi(roundi((_average_roster_stat("energy") + _average_roster_stat("form") + int(data.get("chemistry",60))) / 3.0), 0, 100)
+	var improved_count:=0
+	for result in development_results:
+		var before:Dictionary=result.get("before",{}); var after:Dictionary=result.get("after",{})
+		if int(after.get("aim",0))>int(before.get("aim",0)) or int(after.get("game_sense",0))>int(before.get("game_sense",0)) or int(after.get("teamwork",0))>int(before.get("teamwork",0)) or int(after.get("clutch",0))>int(before.get("clutch",0)): improved_count+=1
+	_add_news("Head Coach: weekly training report","%s program completed. %d players improved a match-relevant attribute; squad energy changed by %+d and match readiness is %d%%."%[str(data.get("training_program","CUSTOM")),improved_count,energy_delta,int(data.match_readiness)],"TRAINING","training")
 	_record_progression("week", "Weekly management processed", "Training, contracts and organization finance were processed.", {"energy_delta":energy_delta,"budget_delta":net_change,"team_power_delta":roundi(get_team_power())-old_team_power,"developed_players":developed_players})
 	save_game()
 	return {"payroll": payroll, "income":int(finance_plan.income), "expenses":int(finance_plan.expenses), "development":development_results, "consequences":progression_summary(3)}
@@ -697,18 +796,25 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 
 func set_developer_mode(enabled: bool) -> void:
 	data.developer_mode = enabled
+	data.career_rules_modified = enabled or not data.get("simulation_overrides", {}).is_empty()
 	if not enabled: data.simulation_overrides = {}
 	save_game()
 
 func set_simulation_override(key: String, value: Variant) -> Dictionary:
-	if not bool(data.get("developer_mode", false)) or str(data.get("career_type", "normal")) != "sandbox": return {"ok":false,"error":"Simulation overrides require a Sandbox career with Developer Mode enabled."}
+	if not bool(data.get("developer_mode", false)): return {"ok":false,"error":"Enable Custom Rules before changing simulation values."}
 	var allowed := ["weapon_damage_scale","loot_density_scale","zone_damage_scale","ai_aggression_scale","vehicle_density_scale"]
 	if not key in allowed: return {"ok":false,"error":"Unsupported simulation override."}
-	data.simulation_overrides[key] = clampf(float(value), 0.25, 4.0)
+	data.simulation_overrides[key] = clampf(float(value), 0.25, 4.0); data.career_rules_modified = true
 	save_game(); return {"ok":true,"key":key,"value":data.simulation_overrides[key]}
 
+func set_difficulty(value: String) -> Dictionary:
+	if not value in ["Casual", "Normal", "Hard", "Director"]: return _command_error("DIFFICULTY_INVALID", "Unsupported career difficulty.", {"value":value})
+	var before := {"difficulty":str(data.get("difficulty", "Normal"))}
+	data.difficulty = value
+	return _command_result(true, "DIFFICULTY_CHANGED", ["difficulty"], {"previous":before.difficulty,"current":value}, true, before)
+
 func reset_simulation_overrides() -> void:
-	data.simulation_overrides = {}; save_game()
+	data.simulation_overrides = {}; data.career_rules_modified = bool(data.get("developer_mode", false)); save_game()
 
 func analyze_meta() -> Dictionary:
 	var weapon_usage: Dictionary = {}; var weapon_performance: Dictionary = {}
@@ -724,7 +830,7 @@ func analyze_meta() -> Dictionary:
 	return data.meta_state.duplicate(true)
 
 func apply_meta_patch(changes: Dictionary, note := "Manual balance patch") -> Dictionary:
-	if not bool(data.get("developer_mode", false)) or str(data.get("career_type", "normal")) != "sandbox": return {"ok":false,"error":"Meta patches require Sandbox Developer Mode."}
+	if not bool(data.get("developer_mode", false)): return {"ok":false,"error":"Meta patches require Custom Rules to be enabled."}
 	var normalized: Dictionary = {}
 	for key in changes:
 		var value := clampf(float(changes[key]), 0.5, 1.5); normalized[str(key)] = value
@@ -835,15 +941,19 @@ func create_transfer_offer(player_id: String, terms: Dictionary = {}) -> Diction
 	for player in data.get("market", []):
 		if str(player.get("id", "")) == player_id: candidate = player; break
 	if candidate.is_empty(): return {"ok":false,"error":"Player is no longer available on the market."}
+	var is_free_agent := str(candidate.get("squad_role", "")) == "free_agent" or str(candidate.get("team_id", "")).is_empty()
+	var window := transfer_window_status()
+	if not is_free_agent and not bool(window.get("open", false)): return _command_error("TRANSFER_WINDOW_CLOSED", "Contracted players can only be approached during a transfer window.", window)
 	if data.get("transfer_offers", []).any(func(offer): return str(offer.get("player_id", "")) == player_id and str(offer.get("status", "")) in ["PENDING","COUNTERED"]): return {"ok":false,"error":"An offer is already active for this player."}
 	var salary := maxi(int(candidate.get("salary", 0)), int(terms.get("salary", candidate.get("salary", 0))))
 	var months := clampi(int(terms.get("months", 24)), 12, 48); var role := str(terms.get("role", "ROTATION")); var starter := bool(terms.get("starter_guarantee", false))
+	var fee := 0 if is_free_agent else int(candidate.get("value",0))
 	var interest := int(data.get("reputation", 0)) + int(candidate.get("confidence", 0)) / 4 + (10 if starter else 0) + clampi((salary - int(candidate.get("salary", 0))) / 450, -8, 16)
 	var response := "ACCEPT" if interest >= 62 else "COUNTER" if interest >= 42 else "REJECT"
 	var offer_id := _next_record_id("transfer_offer")
 	if organization_player_count() >= 7: return {"ok":false,"error":"The organization has reached its seven-player limit, including players on loan."}
-	if int(data.get("budget", 0)) < int(candidate.get("value", 0)): return {"ok":false,"error":"The transfer budget cannot cover the required fee."}
-	var offer := {"id":offer_id,"player_id":player_id,"player_name":str(candidate.get("name","Player")),"fee":int(candidate.get("value",0)),"salary":salary,"months":months,"role":role,"starter_guarantee":starter,"status":"PENDING","response":response,"created_week":int(data.get("week",1)),"counter_salary":salary+1000,"counter_months":mini(48,months+12)}
+	if int(data.get("budget", 0)) < fee: return {"ok":false,"error":"The transfer budget cannot cover the required fee."}
+	var offer := {"id":offer_id,"player_id":player_id,"player_name":str(candidate.get("name","Player")),"fee":fee,"free_agent":is_free_agent,"salary":salary,"months":months,"role":role,"starter_guarantee":starter,"status":"PENDING","response":response,"created_week":int(data.get("week",1)),"counter_salary":salary+1000,"counter_months":mini(48,months+12)}
 	data.transfer_offers.append(offer)
 	var choices: Array = [{"id":"reject","label":"Reject offer","effects":{"transfer_offer":{"id":offer_id,"action":"reject"}}}]
 	if response == "ACCEPT": choices.push_front({"id":"accept","label":"Accept terms","effects":{"transfer_offer":{"id":offer_id,"action":"accept"}}})
@@ -876,6 +986,42 @@ func set_individual_training(player_id: String, focus: String) -> Dictionary:
 func set_team_training_schedule(schedule: String) -> Dictionary:
 	if not schedule in ["Cân bằng", "Cường độ cao", "Nghỉ & hồi phục"]: return {"ok":false,"error":"Unsupported training schedule."}
 	data.schedule = schedule; save_game(); return {"ok":true,"schedule":schedule}
+
+func set_team_training_focus(focus: String) -> Dictionary:
+	if not focus in ["Combat", "Strategy", "Teamwork", "Mental", "Intensive", "Recovery"]: return {"ok":false,"error":"Unsupported team training focus."}
+	data.team_training_focus = focus
+	data.training_focus = focus
+	data.schedule = "Cường độ cao" if focus == "Intensive" else "Nghỉ & hồi phục" if focus == "Recovery" else "Cân bằng"
+	save_game(); return {"ok":true,"focus":focus}
+
+func set_training_day(day_index: int, activity: String, intensity: String) -> Dictionary:
+	if day_index < 0 or day_index > 6: return {"ok":false,"error":"Training day is outside the weekly schedule."}
+	if not activity in ["Combat", "Strategy", "Teamwork", "Mental", "Scrim", "Recovery", "Rest"]: return {"ok":false,"error":"Unsupported training activity."}
+	if not intensity in ["Light", "Team", "Intensive", "Competitive", "Rest"]: return {"ok":false,"error":"Unsupported training intensity."}
+	var schedule: Array = data.get("training_schedule", _default_training_schedule()).duplicate(true)
+	while schedule.size() < 7: schedule.append(_default_training_schedule()[schedule.size()])
+	schedule[day_index] = {"activity":activity,"intensity":intensity}
+	data.training_schedule = schedule
+	data.weekly_training_plan = schedule.map(func(item): return "%s • %s" % [str(item.activity), str(item.intensity)])
+	data.training_program = "CUSTOM"
+	save_game(); return {"ok":true,"day":day_index,"activity":activity,"intensity":intensity}
+
+func apply_training_program(program: String) -> Dictionary:
+	var programs := {
+		"MECHANICAL":[["Combat","Intensive"],["Combat","Team"],["Recovery","Light"],["Combat","Intensive"],["Scrim","Competitive"],["Recovery","Light"],["Rest","Rest"]],
+		"STRATEGIC":[["Strategy","Team"],["Strategy","Intensive"],["Recovery","Light"],["Teamwork","Team"],["Scrim","Competitive"],["Mental","Light"],["Rest","Rest"]],
+		"BALANCED":[["Combat","Team"],["Strategy","Team"],["Scrim","Competitive"],["Recovery","Light"],["Teamwork","Team"],["Mental","Light"],["Rest","Rest"]],
+		"RECOVERY":[["Recovery","Light"],["Mental","Light"],["Recovery","Light"],["Teamwork","Light"],["Recovery","Light"],["Rest","Rest"],["Rest","Rest"]]
+	}
+	if not programs.has(program): return {"ok":false,"error":"Training program does not exist."}
+	var schedule: Array = []
+	for item in programs[program]: schedule.append({"activity":str(item[0]),"intensity":str(item[1])})
+	data.training_program = program; data.training_schedule = schedule
+	data.weekly_training_plan = schedule.map(func(item): return "%s • %s" % [str(item.activity), str(item.intensity)])
+	save_game(); return {"ok":true,"program":program}
+
+func _default_training_schedule() -> Array:
+	return [{"activity":"Combat","intensity":"Team"},{"activity":"Strategy","intensity":"Team"},{"activity":"Scrim","intensity":"Competitive"},{"activity":"Recovery","intensity":"Light"},{"activity":"Teamwork","intensity":"Team"},{"activity":"Mental","intensity":"Light"},{"activity":"Rest","intensity":"Rest"}]
 
 func set_player_role(player_id: String, role: String) -> Dictionary:
 	var normalized := role.to_upper()
@@ -1100,6 +1246,67 @@ func get_team_power() -> float:
 		total += float(p.overall) * 0.55 + float(p.form) * 0.18 + float(p.energy) * 0.12 + float(p.teamwork) * 0.15
 	return total / mini(4, data.roster.size()) + float(data.chemistry) * 0.08
 
+func _average_roster_stat(key: String) -> int:
+	if data.get("roster", []).is_empty(): return 0
+	var total := 0
+	for player in data.roster: total += int(player.get(key, 0))
+	return roundi(float(total) / data.roster.size())
+
+func _ensure_competitive_world() -> void:
+	if not data.has("competitive_world"): data.competitive_world = {}
+	var database = career_database()
+	if not _database_errors.is_empty(): return
+	for team in database.teams:
+		var team_id:=str(team.get("id","")); if team_id.is_empty(): continue
+		if data.competitive_world.has(team_id): continue
+		var power:=int(team.get("ranking",{}).get("power",50)); var consistency:=int(team.get("performance",{}).get("consistency",50)); var seed:=absi(team_id.hash())
+		data.competitive_world[team_id]={"id":team_id,"name":str(team.get("name","Team")),"team_type":str(team.get("team_type","CLUB")),"region":str(team.get("region","Global")),"country":str(team.get("country","")),"logo_asset_id":str(team.get("logo_asset_id","")),"power":power,"form":clampi(consistency+(seed%15)-7,30,95),"momentum":0,"recent_results":[],"tournament_experience":seed%80,"consistency":consistency,"regional_strength":45+(seed%35),"ranking_points":maxi(100,power*18+consistency*5+(seed%180)),"tier":str(team.get("tier","D")),"last_active_week":0}
+	var organization_id:=str(data.get("organization_id",""))
+	if not organization_id.is_empty() and not data.competitive_world.has(organization_id):
+		data.competitive_world[organization_id]={"id":organization_id,"name":str(data.get("org_name","Organization")),"team_type":"CLUB","region":str(data.get("region","Global")),"country":str(data.get("region","")),"logo_asset_id":str(data.get("org_logo_asset_id","")),"power":roundi(get_team_power()),"form":_average_roster_stat("form"),"momentum":0,"recent_results":[],"tournament_experience":0,"consistency":50,"regional_strength":50,"ranking_points":450,"tier":str(data.get("starting_tier","D")),"last_active_week":0}
+
+func competitive_rankings(team_type: String) -> Array:
+	_ensure_competitive_world()
+	var result:Array=[]
+	for profile in data.get("competitive_world",{}).values():
+		if str(profile.get("team_type","CLUB"))==team_type: result.append(profile.duplicate(true))
+	result.sort_custom(func(a,b): return int(a.get("ranking_points",0))>int(b.get("ranking_points",0)) if int(a.get("ranking_points",0))!=int(b.get("ranking_points",0)) else str(a.get("name",""))<str(b.get("name","")))
+	for index in result.size(): result[index].rank=index+1
+	return result
+
+func _simulate_background_tournaments() -> void:
+	_ensure_competitive_world()
+	var completed_ids:Array=data.get("background_tournament_results",[]).map(func(record): return str(record.get("simulation_id","")))
+	for tournament in data.get("tournaments",[]):
+		var start_date:=str(tournament.get("start_date","")); if start_date.is_empty() or start_date>str(data.get("current_date","")): continue
+		var simulation_id:="season:%d:%s"%[int(data.get("season",1)),str(tournament.get("id",""))]; if simulation_id in completed_ids: continue
+		var scored:Array=[]
+		for team_id in tournament.get("participants",[]):
+			var profile:Dictionary=data.competitive_world.get(str(team_id),{}); if profile.is_empty(): continue
+			var variance:=(absi((simulation_id+str(team_id)).hash())%301)-150; var score:=int(profile.get("power",50))*10+int(profile.get("form",50))*4+int(profile.get("consistency",50))*2+int(profile.get("tournament_experience",0))+variance
+			scored.append({"team_id":str(team_id),"score":score})
+		scored.sort_custom(func(a,b): return int(a.score)>int(b.score))
+		var result_rows:Array=[]; var tier_weight:=maxi(1,6-int(tournament.get("tier",4)))
+		for index in scored.size():
+			var team_id:=str(scored[index].team_id); var profile:Dictionary=data.competitive_world[team_id]; var placement:=index+1; var points:=maxi(5,(scored.size()-index)*12*tier_weight); var previous_points:=int(profile.ranking_points)
+			profile.ranking_points=maxi(50,roundi(previous_points*0.985)+points); profile.momentum=clampi(points/12-placement,-10,10); profile.form=clampi(int(profile.form)+signi(int(profile.momentum))*2,25,99); profile.tournament_experience=int(profile.tournament_experience)+tier_weight; profile.last_active_week=int(data.get("week",1)); profile.recent_results.push_front({"tournament_id":str(tournament.get("id","")),"placement":placement,"points":points}); if profile.recent_results.size()>5: profile.recent_results.resize(5)
+			profile.tier=_competitive_tier(int(profile.ranking_points)); result_rows.append({"team_id":team_id,"placement":placement,"ranking_points":points})
+		data.background_tournament_results.push_front({"simulation_id":simulation_id,"tournament_id":str(tournament.get("id","")),"tournament_name":str(tournament.get("name","Tournament")),"date":start_date,"results":result_rows})
+		if data.background_tournament_results.size()>40: data.background_tournament_results.resize(40)
+	for profile in data.get("competitive_world",{}).values():
+		if int(profile.get("last_active_week",0))<int(data.get("week",1))-4: profile.ranking_points=maxi(50,roundi(int(profile.ranking_points)*0.995)); profile.momentum=maxi(-10,int(profile.get("momentum",0))-1)
+
+func _competitive_tier(points: int) -> String:
+	if points>=2500: return "S+"
+	if points>=2100: return "S"
+	if points>=1700: return "A"
+	if points>=1250: return "B"
+	if points>=800: return "C"
+	return "D"
+
+func _tier_index(tier:String)->int:
+	return ["D","C","B","A","S","S+"].find(tier.to_upper())
+
 func _scout_progress() -> void:
 	var staff_bonus := 0
 	for staff in data.get("staff", []):
@@ -1293,6 +1500,12 @@ func load_game() -> bool:
 
 func _normalize_runtime_schema() -> void:
 	if not data.has("domain_audit_log"): data.domain_audit_log = []
+	if not data.has("scout_assignments"): data.scout_assignments = []
+	if not data.has("scout_reports"): data.scout_reports = []
+	if not data.has("academy_pool"): data.academy_pool = []
+	if not data.has("career_rules_modified"): data.career_rules_modified = false
+	if not data.has("journey_mode"): data.journey_mode = "existing"
+	if not data.has("roster_source"): data.roster_source = "database"
 	if not data.has("season_start_days_elapsed"): data.season_start_days_elapsed = maxi(0, int(data.get("days_elapsed", 0)) - maxi(0, int(data.get("week", 1)) - 1) * 7)
 	for event in data.get("pending_events", []):
 		event.lifecycle_status = "PENDING"
@@ -1377,6 +1590,8 @@ func _migrate_save() -> void:
 	if not data.has("active_tournament_team_count"): data.active_tournament_team_count = 16
 	if not data.has("active_tournament_player_count"): data.active_tournament_player_count = 64
 	if not data.has("tournament_results"): data.tournament_results = {}
+	if not data.has("competitive_world"): data.competitive_world = {}
+	if not data.has("background_tournament_results"): data.background_tournament_results = []
 	if not data.has("match_replays"): data.match_replays = []
 	if not data.has("sponsors"): data.sponsors = _career_content().get("sponsors", [])
 	if not data.has("active_sponsor_id"): data.active_sponsor_id = ""
@@ -1389,7 +1604,13 @@ func _migrate_save() -> void:
 			"scout": staff.effect = "+6 scout confidence per scouting update"
 			"mental_coach": staff.effect = "+5 weekly player happiness"
 	if not data.has("transfer_offers"): data.transfer_offers = []
-	if not data.has("weekly_training_plan"): data.weekly_training_plan = ["Aim Training","Strategy Review","Scrim Preparation","Recovery","Team Chemistry","VOD Review","Rest"]
+	if not data.has("training_schedule"): data.training_schedule = _default_training_schedule()
+	if not data.has("weekly_training_plan"): data.weekly_training_plan = data.training_schedule.map(func(item): return "%s • %s" % [str(item.activity), str(item.intensity)])
+	if not data.has("training_program"): data.training_program = "BALANCED"
+	if not data.has("team_training_focus"): data.team_training_focus = "Strategy"
+	if not data.has("training_history"): data.training_history = []
+	if not data.has("recent_training_impact"): data.recent_training_impact = {}
+	if not data.has("match_readiness"): data.match_readiness = 65
 	if not data.has("individual_training"): data.individual_training = {}
 	if not data.has("map_tactics"): data.map_tactics = {}
 	if not data.has("match_decisions"): data.match_decisions = {"EARLY":"ROTATE","MID":"HOLD","END":"FIGHT"}
@@ -1402,6 +1623,7 @@ func _migrate_save() -> void:
 	var obsolete_catalog: bool = not data.has("tournaments") or data.get("tournaments", []).any(func(item): return int(item.get("team_count", 0)) > 25 or str(item.get("id", "")) in ["sea_survival_league_s1","continental_cup","weekly_cup_s1"])
 	if obsolete_catalog: data.tournaments = _tournament_catalog()
 	data.competitions = data.tournaments
+	_ensure_competitive_world()
 	if not data.has("facility_definitions"): data.facility_definitions = _career_content().get("facilities", {})
 	if not data.has("calendar_events"): data.calendar_events = _build_season_calendar(SEASON_START_DATE)
 	if not data.has("coach_plan"): data.coach_plan = {}
@@ -1456,7 +1678,7 @@ func _select_tournament_participants(tournament: Dictionary, database) -> Array:
 	pool.sort_custom(func(a, b): return int(a.get("ranking", {}).get("power", 0)) > int(b.get("ranking", {}).get("power", 0)))
 	var selected: Array = []
 	var organization_id := str(data.get("organization_id", "")); var organization: Dictionary = database.get_team(organization_id)
-	if participant_type == "CLUB" and bool(tournament.get("auto_registered", false)) and not organization.is_empty(): selected.append(organization_id)
+	if participant_type == "CLUB" and bool(tournament.get("auto_registered", false)) and not organization_id.is_empty(): selected.append(organization_id)
 	var tournament_type := str(tournament.get("tournament_type", "INTERNATIONAL")); var country := str(tournament.get("country", ""))
 	if tournament_type in ["NATIONAL", "DOMESTIC"]: pool = pool.filter(func(team): return _nationality_key(str(team.get("country", ""))) == _nationality_key(country))
 	var slots: Dictionary = tournament.get("international_slots", {})
@@ -1486,8 +1708,13 @@ func tournament_registration_status(tournament_id: String) -> Dictionary:
 	if str(tournament.get("participant_type", "CLUB")) != context_type: reasons.append("Tournament participant type does not match management context")
 	var database = career_database()
 	var team_id := str(data.get("national_team_id", "")) if context_type == "NATIONAL_TEAM" else str(data.get("organization_id", "")); var team: Dictionary = database.get_team(team_id)
-	var required_country := str(tournament.get("qualification_rules", {}).get("country", ""))
+	var qualification:Dictionary=tournament.get("qualification_rules",{})
+	var required_country := str(qualification.get("country", ""))
 	if not required_country.is_empty() and _nationality_key(str(team.get("country", ""))) != _nationality_key(required_country): reasons.append("Team country is not eligible")
+	var profile:Dictionary=data.get("competitive_world",{}).get(team_id,{}); var current_tier:=str(profile.get("tier",data.get("starting_tier","D"))); var minimum_tier:=str(qualification.get("minimum_tier","D"))
+	if _tier_index(current_tier)<_tier_index(minimum_tier): reasons.append("Tier %s is required"%minimum_tier)
+	var minimum_points:=int(qualification.get("minimum_ranking_points",0))
+	if int(profile.get("ranking_points",0))<minimum_points: reasons.append("%d Ranking Points are required"%minimum_points)
 	var start_date := str(tournament.get("start_date", "")); var end_date := str(tournament.get("end_date", start_date))
 	for event in data.get("calendar_events", []):
 		if str(event.get("tournament_id", "")) == tournament_id or str(event.get("status", "scheduled")) == "completed": continue

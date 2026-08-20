@@ -134,6 +134,10 @@
         256
       ]
     },
+    "logo.pattern.crown": {"kind":"logo_pattern","lazy":true,"path":"res://assets/branding/logo_patterns/crown.png"},
+    "logo.pattern.monogram": {"kind":"logo_pattern","lazy":true,"path":"res://assets/branding/logo_patterns/monogram.png"},
+    "logo.pattern.shield": {"kind":"logo_pattern","lazy":true,"path":"res://assets/branding/logo_patterns/shield.png"},
+    "logo.pattern.wing": {"kind":"logo_pattern","lazy":true,"path":"res://assets/branding/logo_patterns/wing.png"},
     "branding.command_center": {
       "kind": "background",
       "lazy": true,
@@ -1347,6 +1351,9 @@
       "lazy": true,
       "path": "res://assets/match/maps/tactical_island.png"
     },
+    "match.map.coastal_breakwater": {"kind":"map","lazy":true,"path":"res://assets/match/maps/coastal_breakwater.png"},
+    "match.map.frostline_valley": {"kind":"map","lazy":true,"path":"res://assets/match/maps/frostline_valley.png"},
+    "match.map.highland_reserve": {"kind":"map","lazy":true,"path":"res://assets/match/maps/highland_reserve.png"},
     "match.map.sunscorch_basin": {
       "kind": "map",
       "lazy": true,

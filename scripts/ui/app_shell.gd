@@ -19,7 +19,7 @@ static func build(owner: Control, assets) -> Dictionary:
 	var scroll := ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL; scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; margin.add_child(scroll)
 	var content := VBoxContainer.new(); content.size_flags_horizontal=Control.SIZE_EXPAND_FILL; content.add_theme_constant_override("separation",12 if Responsive.is_compact(owner.get_viewport_rect().size) else 16); scroll.add_child(content)
 	var toast := Label.new(); toast.set_anchors_preset(Control.PRESET_CENTER_BOTTOM); toast.position=Vector2(-220,-72); toast.size=Vector2(440,46); toast.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; toast.vertical_alignment=VERTICAL_ALIGNMENT_CENTER; toast.visible=false; toast.add_theme_stylebox_override("normal",Tokens.style(Color("142837f2"),6,Tokens.color("information"),1,10)); toast.add_theme_color_override("font_color",Tokens.color("text")); owner.add_child(toast)
-	return {"sidebar":sidebar,"topbar":topbar,"content":content,"toast":toast,"scroll":scroll}
+	return {"root":root,"main":main,"sidebar":sidebar,"topbar":topbar,"margin":margin,"content":content,"toast":toast,"scroll":scroll,"sidebar_width":sidebar_width,"topbar_height":topbar_height}
 
 static func _add_tactical_atmosphere(owner: Control) -> void:
 	var layer:=Control.new(); layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.mouse_filter=Control.MOUSE_FILTER_IGNORE; owner.add_child(layer)

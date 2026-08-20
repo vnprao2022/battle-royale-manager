@@ -19,6 +19,7 @@ const ResponsiveScript = preload("res://scripts/ui/utilities/responsive.gd")
 const GamePresenterScript = preload("res://scripts/ui/presenters/game_presenter.gd")
 const CareerPriorityPresenterScript = preload("res://scripts/ui/presenters/career_priority_presenter.gd")
 const PerformanceCampusScreenScript = preload("res://scripts/ui/screens/performance_campus_screen.gd")
+const UserSettingsScript = preload("res://scripts/user_settings.gd")
 
 const BG := Color("05090d")
 const SIDEBAR := Color("081018")
@@ -53,6 +54,11 @@ var content: VBoxContainer
 var sidebar: VBoxContainer
 var topbar: HBoxContainer
 var toast: Label
+var shell_main: Control
+var shell_margin: MarginContainer
+var shell_sidebar_width := 0
+var shell_topbar_height := 0
+var user_settings := UserSettingsScript.new()
 var active_page := "dashboard"
 var selected_competition_id := "gsi_2026_s1"
 var tactical_preview: Label
@@ -95,10 +101,12 @@ var selected_world_team_id := ""
 var selected_profile_player: Dictionary = {}
 var scout_query := ""
 var scout_page := 0
+var scout_age_filter := "ANY"
+var scout_priority := "POTENTIAL"
 var scrim_page := 0
 var replay_speed := 1
 var content_manager := ContentManagerScript.new()
-var career_draft: Dictionary = {"slot_id":1,"difficulty":"Normal","starting_tier":"D","team_mode":"existing","team_id":"","org_name":"","region":"Global","career_type":"normal"}
+var career_draft: Dictionary = {"slot_id":1,"difficulty":"Normal","starting_tier":"D","journey_mode":"story","team_mode":"new","roster_source":"generated","team_id":"","org_name":"","short_name":"","manager_name":"","region":"Global","logo_pattern":"shield","logo_asset_id":"logo.pattern.shield","logo_primary":"ff8a00","logo_secondary":"101b24"}
 var pending_delete_slot := 0
 var career_step := 1
 var calendar_view := "MONTH"
@@ -108,6 +116,8 @@ func _ready() -> void:
 	# Keep OptionButton/PopupMenu inside the game viewport. Native child windows
 	# cause a full-window compositor flash on Windows when a selector opens.
 	get_viewport().set_embedding_subwindows(true)
+	user_settings.load_settings()
+	user_settings.apply_runtime(get_window())
 	assets.initialize()
 	match_runtime.updated.connect(_on_match_runtime_updated)
 	match_runtime.event_emitted.connect(_on_match_event)
@@ -131,14 +141,26 @@ func _unhandled_input(event:InputEvent)->void:
 
 func _build_shell() -> void:
 	var shell: Dictionary = AppShellScript.build(self, assets)
+	shell_main = shell.main
+	shell_margin = shell.margin
+	shell_sidebar_width = int(shell.sidebar_width)
+	shell_topbar_height = int(shell.topbar_height)
 	sidebar = shell.sidebar
 	topbar = shell.topbar
 	content = shell.content
 	toast = shell.toast
 
+func _set_precareer_layout(enabled: bool) -> void:
+	sidebar.visible = not enabled
+	topbar.visible = not enabled
+	shell_main.offset_left = 0 if enabled else shell_sidebar_width
+	shell_margin.offset_top = 0 if enabled else shell_topbar_height
+	shell_margin.add_theme_constant_override("margin_left", 28 if enabled else ResponsiveScript.page_margin(get_viewport_rect().size))
+	shell_margin.add_theme_constant_override("margin_right", 28 if enabled else ResponsiveScript.page_margin(get_viewport_rect().size))
+
 func _show_start_screen(has_save: bool) -> void:
 	_clear(sidebar); _clear(topbar); _clear(content)
-	sidebar.add_child(_brand())
+	_set_precareer_layout(true)
 	var hero := _panel("", PANEL_HIGH)
 	hero.custom_minimum_size.y = 600
 	content.add_child(hero)
@@ -146,6 +168,7 @@ func _show_start_screen(has_save: bool) -> void:
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 14)
 	hero.add_child(box)
+	var brand := _brand(); brand.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; box.add_child(brand)
 	var kicker := _label("ESPORTS ORGANIZATION SIMULATOR", 12, ACCENT)
 	kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(kicker)
@@ -166,8 +189,9 @@ func _show_start_screen(has_save: bool) -> void:
 	var exit_button := _button("EXIT", false); exit_button.pressed.connect(func(): get_tree().quit()); box.add_child(exit_button)
 
 func _show_save_slots() -> void:
-	_clear(sidebar); _clear(topbar); _clear(content); sidebar.add_child(_brand())
+	_clear(sidebar); _clear(topbar); _clear(content); _set_precareer_layout(true)
 	_header("LOAD CAREER", "Three independent, versioned career slots")
+	_precareer_back()
 	for metadata in game.list_save_slots():
 		var card := _panel("", PANEL); content.add_child(card)
 		if bool(metadata.get("empty", true)):
@@ -187,8 +211,9 @@ func _show_save_slots() -> void:
 	var back := _button("BACK", false); back.pressed.connect(_show_start_screen.bind(game.most_recent_slot() > 0)); content.add_child(back)
 
 func _show_new_career() -> void:
-	_clear(sidebar); _clear(topbar); _clear(content); sidebar.add_child(_brand())
+	_clear(sidebar); _clear(topbar); _clear(content); _set_precareer_layout(true)
 	_header("Create your career", "Every choice defines expectations, resources and the road ahead.", "STEP %d OF 5" % career_step)
+	_precareer_back()
 	var steps := HBoxContainer.new(); steps.add_theme_constant_override("separation", 6); content.add_child(steps)
 	for index in range(1,6):
 		var label := _tag("%d  %s" % [index,["SAVE","CAREER","TEAM","IDENTITY","REVIEW"][index-1]], ACCENT if index == career_step else SUCCESS if index < career_step else MUTED); label.size_flags_horizontal=Control.SIZE_EXPAND_FILL; steps.add_child(label)
@@ -211,19 +236,25 @@ func _career_step_settings() -> void:
 	var difficulty_panel:=_panel("DIFFICULTY",PANEL_HIGH); content.add_child(difficulty_panel); var difficulties:=GridContainer.new(); difficulties.columns=4; difficulty_panel.add_child(difficulties)
 	for spec in [["Casual","More guidance","Forgiving board"],["Normal","Recommended","Balanced pressure"],["Hard","Tight margins","Demanding board"],["Director","No safety net","Maximum pressure"]]:
 		var value:=str(spec[0]); var card:=_choice_card(value,str(spec[1]),str(spec[2]),str(career_draft.difficulty)==value,CYAN); card.pressed.connect(func(): career_draft.difficulty=value; _show_new_career()); difficulties.add_child(card)
-	var tier_panel:=_panel("STARTING CAREER LEVEL",PANEL_HIGH); content.add_child(tier_panel); var tiers:=GridContainer.new(); tiers.columns=4; tier_panel.add_child(tiers)
-	for spec in [["D","Build from the bottom","$250K • Development"],["C","Regional contender","$450K • Growth"],["B","Established club","$700K • Finals"],["A","Elite organization","$1M • Title pressure"]]:
-		var value:=str(spec[0]); var card:=_choice_card("%s TIER"%value,str(spec[1]),str(spec[2]),str(career_draft.starting_tier)==value,GOLD); card.pressed.connect(func(): career_draft.starting_tier=value; _show_new_career()); tiers.add_child(card)
-	var career_types:=HBoxContainer.new(); content.add_child(career_types)
-	for spec in [["normal","NORMAL CAREER","Official rules and progression"],["sandbox","SANDBOX CAREER","Developer tools and simulation overrides"]]:
-		var value:=str(spec[0]); var card:=_choice_card(str(spec[1]),str(spec[2]),"Sandbox is clearly separated from normal play.",str(career_draft.career_type)==value,PURPLE if value=="sandbox" else ACCENT); card.pressed.connect(func(): career_draft.career_type=value; _show_new_career()); career_types.add_child(card)
+	var path_panel:=_panel("CAREER PATH",PANEL_HIGH); content.add_child(path_panel); var paths:=HBoxContainer.new(); paths.add_theme_constant_override("separation",12); path_panel.add_child(paths)
+	for spec in [["story","STORY: BUILD FROM TIER D","Create a new club, identity and development roster."],["existing","DEVELOP AN EXISTING TEAM","Take responsibility for a real database organization."]]:
+		var value:=str(spec[0]); var card:=_choice_card(str(spec[1]),str(spec[2]),"Both paths use the same competitive world and progression rules.",str(career_draft.journey_mode)==value,ACCENT if value=="story" else CYAN); card.pressed.connect(func(): career_draft.journey_mode=value; career_draft.team_mode="new" if value=="story" else "existing"; career_draft.starting_tier="D" if value=="story" else career_draft.starting_tier; _show_new_career()); paths.add_child(card)
+	var path_note := _panel("STARTING CONDITIONS", PANEL); content.add_child(path_note)
+	path_note.add_child(_action_row("STORY", "Tier D club", "$250K budget, low reputation and a development board objective.", GOLD))
+	path_note.add_child(_action_row("EXISTING", "Database team", "Tier, roster, identity and expectations follow the selected organization.", CYAN))
 	_wizard_actions(true,"TEAM SETUP")
 
 func _career_step_team() -> void:
-	var modes:=GridContainer.new(); modes.columns=3; modes.add_theme_constant_override("h_separation",12); content.add_child(modes)
-	for spec in [["existing","USE EXISTING TEAM","Take control of a database organization."],["new","CREATE NEW TEAM","Build a new identity and roster."],["replace","REPLACE EXISTING TEAM","Career-only replacement; official data stays intact."]]:
-		var value:=str(spec[0]); var card:=_choice_card(str(spec[1]),str(spec[2]),"Stable-ID career mapping",str(career_draft.team_mode)==value,ACCENT if value=="existing" else GOLD); card.pressed.connect(func(): career_draft.team_mode=value; _show_new_career()); modes.add_child(card)
 	var database = game.career_database()
+	if str(career_draft.journey_mode) == "story":
+		career_draft.team_mode = "new"; career_draft.starting_tier = "D"
+		var roster_panel := _panel("FOUNDING ROSTER", PANEL_HIGH); content.add_child(roster_panel)
+		var roster_modes := HBoxContainer.new(); roster_modes.add_theme_constant_override("separation", 12); roster_panel.add_child(roster_modes)
+		for spec in [["generated","GENERATED ACADEMY","Game creates six Tier D players plus ten development prospects."],["custom","MANAGER-BUILT CORE","Create four named Tier D players; remaining prospects are generated."]]:
+			var value := str(spec[0]); var card := _choice_card(str(spec[1]), str(spec[2]), "All attributes are capped to the Tier D point budget.", str(career_draft.roster_source) == value, GOLD); card.pressed.connect(func(): career_draft.roster_source = value; _show_new_career()); roster_modes.add_child(card)
+		roster_panel.add_child(_label("Tier D roster limits: overall 48–59, potential 60–76, four required roles and no hidden elite player.", 12, MUTED))
+		_wizard_actions(true,"TEAM IDENTITY")
+		return
 	if str(career_draft.team_id).is_empty():
 		for candidate in database.teams:
 			if candidate.get("roster_ids", []).size() >= 4: career_draft.team_id=str(candidate.id); career_draft.org_name=str(candidate.name); career_draft.region=str(candidate.region); break
@@ -237,6 +268,7 @@ func _career_step_team() -> void:
 func _career_step_identity() -> void:
 	var database = game.career_database(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var existing:=str(career_draft.team_mode)=="existing"
 	var split:=HBoxContainer.new(); split.add_theme_constant_override("separation",16); content.add_child(split); var form:=_panel("TEAM IDENTITY",PANEL_HIGH); form.size_flags_horizontal=Control.SIZE_EXPAND_FILL; split.add_child(form)
+	var manager_name := LineEdit.new(); manager_name.placeholder_text = "Manager / head coach name"; manager_name.text = str(career_draft.get("manager_name", "")); manager_name.text_changed.connect(func(value): career_draft.manager_name = value); form.add_child(_field("MANAGER NAME", manager_name))
 	if existing:
 		form.add_child(_tag("OFFICIAL DATABASE • READ ONLY",SUCCESS))
 		form.add_child(_label("You are taking control of %s. Identity, history and database records remain intact."%str(source.get("name","Team")),14,TEXT))
@@ -246,14 +278,24 @@ func _career_step_identity() -> void:
 		var name:=LineEdit.new(); name.placeholder_text="Team name"; name.text=str(career_draft.get("org_name","")); name.text_changed.connect(func(value): career_draft.org_name=value); form.add_child(_field("TEAM NAME",name))
 		var short_name:=LineEdit.new(); short_name.placeholder_text="2–5 character tag"; short_name.max_length=5; short_name.text=str(career_draft.get("short_name","")); short_name.text_changed.connect(func(value): career_draft.short_name=value.to_upper()); form.add_child(_field("SHORT NAME",short_name))
 		var logo_path:=LineEdit.new(); logo_path.placeholder_text="PNG / JPG / WEBP path"; form.add_child(_field("IMPORT TEAM LOGO",logo_path)); var import:=_button("VALIDATE & IMPORT LOGO",false); import.pressed.connect(func(): var asset_id:="custom.%s.logo"%str(career_draft.get("short_name","team")).to_lower(); var result:=assets.import_custom_image(logo_path.text.strip_edges(),asset_id,"teams",Vector2i(512,512),2097152); if bool(result.get("ok",false)): career_draft.logo_asset_id=asset_id; _notify("Logo imported and normalized."); _show_new_career() else: _notify(str(result.get("error","Invalid logo.")))); form.add_child(import)
+		var patterns := GridContainer.new(); patterns.columns = 4; patterns.add_theme_constant_override("h_separation", 8); form.add_child(_field("OR BUILD FROM A LOGO PATTERN", patterns))
+		for spec in [["shield","logo.pattern.shield"],["wing","logo.pattern.wing"],["crown","logo.pattern.crown"],["monogram","logo.pattern.monogram"]]:
+			var pattern := _button(str(spec[0]).to_upper(), str(career_draft.get("logo_pattern", "shield")) == str(spec[0])); pattern.icon = assets.texture(str(spec[1])); pattern.expand_icon = true; pattern.add_theme_constant_override("icon_max_width", 44); pattern.pressed.connect(func(): career_draft.logo_pattern = str(spec[0]); career_draft.logo_asset_id = str(spec[1]); _show_new_career()); patterns.add_child(pattern)
+		if str(career_draft.roster_source) == "custom":
+			var custom_players: Array = career_draft.get("custom_players", [])
+			while custom_players.size() < 4: custom_players.append({"name":"","handle":"","role":["IGL","Entry","Support","Fragger"][custom_players.size()]})
+			career_draft.custom_players = custom_players
+			var founders := _panel("FOUR FOUNDING PLAYERS", PANEL); form.add_child(founders)
+			for index in 4:
+				var row := HBoxContainer.new(); founders.add_child(row); var player_name := LineEdit.new(); player_name.placeholder_text = "Player %d name" % (index + 1); player_name.text = str(custom_players[index].name); player_name.text_changed.connect(func(value): career_draft.custom_players[index].name = value); row.add_child(player_name); var handle := LineEdit.new(); handle.placeholder_text = "Nickname"; handle.text = str(custom_players[index].handle); handle.text_changed.connect(func(value): career_draft.custom_players[index].handle = value); row.add_child(handle); row.add_child(_tag(str(custom_players[index].role), CYAN))
 	var preview:=_panel("LIVE TEAM PREVIEW",Color("10212b")); preview.custom_minimum_size.x=380; split.add_child(preview); preview.add_child(_team_logo(str(career_draft.get("logo_asset_id",source.get("logo_asset_id",""))),str(career_draft.get("short_name",source.get("tag","TEAM"))),Vector2(128,128))); preview.add_child(_label(str(career_draft.get("org_name",source.get("name","Your Team"))),28,TEXT)); preview.add_child(_tag("%s • %s TIER"%[str(career_draft.region),str(career_draft.starting_tier)],GOLD)); preview.add_child(_label("%s organization"%("Career override" if str(career_draft.team_mode)=="replace" else "New" if str(career_draft.team_mode)=="new" else "Official"),12,MUTED))
 	_wizard_actions(true,"REVIEW CAREER")
 
 func _career_step_review() -> void:
 	var database = game.career_database(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var team_name:=str(source.get("name","Team")) if str(career_draft.team_mode)=="existing" else str(career_draft.get("org_name","Custom Team"))
 	var hero:=_panel("TEAM PREVIEW",Color("10212b")); content.add_child(hero); hero.add_child(_team_logo(str(career_draft.get("logo_asset_id",source.get("logo_asset_id",""))),str(career_draft.get("short_name",source.get("tag","TEAM"))),Vector2(120,120))); hero.add_child(_label(team_name,34,TEXT)); hero.add_child(_tag("%s • %s TIER"%[str(career_draft.region),str(career_draft.starting_tier)],GOLD))
-	var details:=GridContainer.new(); details.columns=4; hero.add_child(details); details.add_child(_visual_stat("SAVE SLOT",career_draft.slot_id,CYAN,"Independent career")); details.add_child(_visual_stat("DIFFICULTY",career_draft.difficulty,GOLD,"Board pressure")); details.add_child(_visual_stat("DATABASE MODE",str(career_draft.team_mode).to_upper(),ACCENT,"Official data protected")); details.add_child(_visual_stat("CAREER TYPE",str(career_draft.career_type).to_upper(),PURPLE,"Ruleset"))
-	var start:=_button("CREATE PROFILE",true); start.pressed.connect(func(): var options:=career_draft.duplicate(true); game.new_career(team_name,"Analyst",str(career_draft.region),options); if str(career_draft.team_mode)!="existing": game.set_custom_team_identity(team_name,str(career_draft.get("short_name","TEAM")),str(career_draft.get("logo_asset_id",""))); career_step=1; _notify("SAVE CREATED • Load the career from Profile Select."); _show_save_slots()); content.add_child(start)
+	var details:=GridContainer.new(); details.columns=4; hero.add_child(details); details.add_child(_visual_stat("SAVE",career_draft.slot_id,CYAN,"Independent career")); details.add_child(_visual_stat("MANAGER",str(career_draft.get("manager_name","Not entered")),TEXT,"Head coach identity")); details.add_child(_visual_stat("DIFFICULTY",career_draft.difficulty,GOLD,"Board pressure")); details.add_child(_visual_stat("PATH",str(career_draft.journey_mode).to_upper(),PURPLE,"Career progression"))
+	var start:=_button("START CAREER",true); start.disabled = str(career_draft.get("manager_name", "")).strip_edges().length() < 2 or team_name.strip_edges().length() < 2; start.tooltip_text = "Enter a manager name and valid team identity." if start.disabled else "Create the career and enter Command Center"; start.pressed.connect(func(): var options:=career_draft.duplicate(true); game.new_career(team_name,str(career_draft.manager_name),str(career_draft.region),options); if str(career_draft.team_mode)!="existing": game.set_custom_team_identity(team_name,str(career_draft.get("short_name","TEAM")),str(career_draft.get("logo_asset_id",""))); career_step=1; _enter_game()); content.add_child(start)
 	_wizard_actions(true,"")
 
 func _wizard_actions(show_back:bool,next_label:String)->void:
@@ -264,14 +306,15 @@ func _wizard_actions(show_back:bool,next_label:String)->void:
 		var cancel:=_button("CANCEL",false); cancel.pressed.connect(func(): career_step=1; _show_start_screen(game.most_recent_slot()>0)); actions.add_child(cancel)
 	var fill:=Control.new(); fill.size_flags_horizontal=Control.SIZE_EXPAND_FILL; actions.add_child(fill)
 	if not next_label.is_empty():
-		var next:=_button(next_label+"  →",true); next.pressed.connect(func(): career_step=mini(5,career_step+1); _show_new_career()); actions.add_child(next)
+		var next:=_button(next_label,true); next.pressed.connect(func(): career_step=mini(5,career_step+1); _show_new_career()); actions.add_child(next)
 
 func _choice_card(title:String,subtitle:String,note:String,selected:bool,color:Color)->Button:
-	var card:=_button(("✓  " if selected else "")+title,false); card.alignment=HORIZONTAL_ALIGNMENT_LEFT; card.text+="\n"+subtitle+"\n"+note; card.custom_minimum_size=Vector2(250,112); card.size_flags_horizontal=Control.SIZE_EXPAND_FILL; card.add_theme_font_size_override("font_size",12); card.add_theme_color_override("font_color",TEXT if selected else MUTED); card.add_theme_stylebox_override("normal",_style(Color("122330") if selected else PANEL,RADIUS_MD,Color(color,0.95 if selected else 0.35),2 if selected else 1)); card.add_theme_stylebox_override("hover",_style(Color("172d3b"),RADIUS_MD,color,1)); return card
+	var card:=_button(("SELECTED\n" if selected else "")+title,false); card.alignment=HORIZONTAL_ALIGNMENT_LEFT; card.text+="\n"+subtitle+"\n"+note; card.custom_minimum_size=Vector2(250,112); card.size_flags_horizontal=Control.SIZE_EXPAND_FILL; card.add_theme_font_size_override("font_size",12); card.add_theme_color_override("font_color",TEXT if selected else MUTED); card.add_theme_stylebox_override("normal",_style(Color("122330") if selected else PANEL,RADIUS_MD,Color(color,0.95 if selected else 0.35),2 if selected else 1)); card.add_theme_stylebox_override("hover",_style(Color("172d3b"),RADIUS_MD,color,1)); return card
 
 func _show_custom_content() -> void:
-	_clear(sidebar); _clear(topbar); _clear(content); sidebar.add_child(_brand())
+	_clear(sidebar); _clear(topbar); _clear(content); _set_precareer_layout(true)
 	_header("Community content", "Install secure packages without modifying the official database.", "CONTENT LIBRARY")
+	_precareer_back()
 	var split:=HBoxContainer.new(); split.add_theme_constant_override("separation",16); content.add_child(split)
 	var import_panel:=_panel("IMPORT CONTENT",PANEL_HIGH); import_panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL; split.add_child(import_panel)
 	var drop:=_panel("",Color("0b1720")); drop.custom_minimum_size.y=160; import_panel.add_child(drop)
@@ -292,17 +335,69 @@ func _show_custom_content() -> void:
 	var back:=_button("BACK",false); back.pressed.connect(_show_start_screen.bind(game.most_recent_slot()>0)); content.add_child(back)
 
 func _show_start_settings() -> void:
-	_clear(sidebar); _clear(topbar); _clear(content); sidebar.add_child(_brand()); _header("SETTINGS", "Display and gameplay accessibility settings")
-	var panel := _panel("GENERAL", PANEL); content.add_child(panel)
-	panel.add_child(_action_row("DISPLAY", "Responsive UI", "Validated from 1280×720 through 2560×1080", SUCCESS))
-	panel.add_child(_action_row("SAVE", "Autosave", "Career transactions save after every committed action", SUCCESS))
-	panel.add_child(_action_row("IDENTITY", "Steam profile", "No separate login is required; local fallback remains supported", CYAN))
-	var back := _button("BACK", false); back.pressed.connect(_show_start_screen.bind(game.most_recent_slot() > 0)); content.add_child(back)
+	_clear(sidebar); _clear(topbar); _clear(content); _set_precareer_layout(true); _header("SETTINGS", "Audio, display, accessibility and local game preferences")
+	_precareer_back()
+	_build_settings_controls(false)
+
+func _precareer_back() -> void:
+	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 8); content.add_child(row)
+	var back := _button("BACK TO MAIN MENU", false); back.icon = _small_icon("icons.navigation.back"); back.pressed.connect(_show_start_screen.bind(game.most_recent_slot() > 0)); row.add_child(back)
+
+func _go_back() -> void:
+	var previous := router.go_back()
+	_show_page(str(previous.get("id", "dashboard")))
+
+func _build_settings_controls(in_career: bool) -> void:
+	var layout := GridContainer.new(); layout.columns = ResponsiveScript.columns(get_viewport_rect().size, 2, 2, 1); layout.add_theme_constant_override("h_separation", 16); layout.add_theme_constant_override("v_separation", 16); content.add_child(layout)
+	var audio := _panel("AUDIO", PANEL_HIGH); audio.size_flags_horizontal=Control.SIZE_EXPAND_FILL; audio.custom_minimum_size.x=480; layout.add_child(audio)
+	_settings_slider(audio, "MASTER VOLUME", "master_volume")
+	_settings_slider(audio, "MUSIC VOLUME", "music_volume")
+	_settings_slider(audio, "SFX VOLUME", "sfx_volume")
+	var display := _panel("DISPLAY", PANEL_HIGH); display.size_flags_horizontal=Control.SIZE_EXPAND_FILL; display.custom_minimum_size.x=480; layout.add_child(display)
+	var mode := OptionButton.new(); mode.custom_minimum_size.y = 42
+	for value in ["WINDOWED", "FULLSCREEN", "BORDERLESS"]: mode.add_item(value); mode.set_item_metadata(mode.item_count - 1, value)
+	for index in mode.item_count:
+		if str(mode.get_item_metadata(index)) == str(user_settings.values.get("display_mode", "BORDERLESS")): mode.select(index); break
+	mode.item_selected.connect(func(index): user_settings.set_value("display_mode", str(mode.get_item_metadata(index)), get_window()))
+	display.add_child(_field("WINDOW MODE", mode))
+	var resolution := OptionButton.new(); resolution.custom_minimum_size.y = 42
+	for size in UserSettingsScript.RESOLUTIONS:
+		var value := "%dx%d" % [size.x, size.y]; resolution.add_item(value); resolution.set_item_metadata(resolution.item_count - 1, value)
+	for index in resolution.item_count:
+		if str(resolution.get_item_metadata(index)) == str(user_settings.values.get("resolution", "1920x1080")): resolution.select(index); break
+	resolution.item_selected.connect(func(index): user_settings.set_value("resolution", str(resolution.get_item_metadata(index)), get_window()))
+	display.add_child(_field("WINDOWED RESOLUTION", resolution))
+	var vsync := CheckButton.new(); vsync.text = "VERTICAL SYNC"; vsync.button_pressed = bool(user_settings.values.get("vsync", true)); vsync.toggled.connect(func(value): user_settings.set_value("vsync", value, get_window())); display.add_child(vsync)
+	var accessibility := _panel("INTERFACE & ACCESSIBILITY", PANEL); accessibility.size_flags_horizontal=Control.SIZE_EXPAND_FILL; accessibility.custom_minimum_size.x=480; layout.add_child(accessibility)
+	_settings_slider(accessibility, "UI SCALE", "ui_scale", 80, 130)
+	for spec in [["reduce_motion", "REDUCE MOTION"], ["high_contrast", "HIGH CONTRAST"], ["autosave", "AUTOSAVE"]]:
+		var toggle := CheckButton.new(); toggle.text = str(spec[1]); toggle.button_pressed = bool(user_settings.values.get(spec[0], false)); toggle.toggled.connect(func(value): user_settings.set_value(str(spec[0]), value, get_window())); accessibility.add_child(toggle)
+	var gameplay := _panel("GAMEPLAY", PANEL); gameplay.size_flags_horizontal=Control.SIZE_EXPAND_FILL; gameplay.custom_minimum_size.x=480; layout.add_child(gameplay)
+	if in_career:
+		var difficulty := OptionButton.new(); difficulty.custom_minimum_size.y = 42
+		for value in ["Casual", "Normal", "Hard", "Director"]: difficulty.add_item(value); difficulty.set_item_metadata(difficulty.item_count - 1, value)
+		for index in difficulty.item_count:
+			if str(difficulty.get_item_metadata(index)) == str(game.data.get("difficulty", "Normal")): difficulty.select(index); break
+		difficulty.item_selected.connect(func(index): game.set_difficulty(str(difficulty.get_item_metadata(index))); _notify("Difficulty updated."))
+		gameplay.add_child(_field("CAREER DIFFICULTY", difficulty))
+		var custom_rules := _button("OPEN CUSTOM RULES", false); custom_rules.icon = _small_icon("icons.navigation.settings"); custom_rules.pressed.connect(_show_page.bind("developer")); gameplay.add_child(custom_rules)
+		gameplay.add_child(_label("Custom Rules contains drop/loot density, zone damage, AI aggression, vehicle density and the map drop-zone editor. Enabling it marks the career as modified.", 11, MUTED))
+	else:
+		gameplay.add_child(_label("Career difficulty is selected when a career is created and can be changed later from this page inside the career.", 12, MUTED))
+	var reset := _button("RESET SETTINGS", false); reset.pressed.connect(func(): user_settings.reset(get_window()); _show_page("settings") if in_career else _show_start_settings()); gameplay.add_child(reset)
+
+func _settings_slider(parent: Container, label_text: String, key: String, minimum := 0, maximum := 100) -> void:
+	var row := VBoxContainer.new(); row.size_flags_horizontal=Control.SIZE_EXPAND_FILL; row.add_theme_constant_override("separation", 4); parent.add_child(row)
+	var readout := _label("%s  %d%%" % [label_text, int(user_settings.values.get(key, 100))], 11, TEXT); row.add_child(readout)
+	var slider := HSlider.new(); slider.min_value = minimum; slider.max_value = maximum; slider.step = 1; slider.value = float(user_settings.values.get(key, 100)); slider.custom_minimum_size.y = 30
+	slider.value_changed.connect(func(value): readout.text = "%s  %d%%" % [label_text, roundi(value)]; user_settings.set_value(key, roundi(value), get_window()))
+	row.add_child(slider)
 
 func _field(label_text: String, control: Control) -> VBoxContainer:
 	var wrapper := VBoxContainer.new(); wrapper.add_theme_constant_override("separation", 5); wrapper.add_child(_label(label_text, 10, MUTED)); wrapper.add_child(control); return wrapper
 
 func _enter_game() -> void:
+	_set_precareer_layout(false)
 	_build_sidebar()
 	_show_page("dashboard")
 
@@ -330,7 +425,7 @@ func _build_sidebar() -> void:
 		["GROUP", "ORGANIZATION"], ["facilities", "PERFORMANCE CAMPUS", "icons.navigation.facilities"], ["finance", "FINANCE & PARTNERS", "icons.status.fans"], ["national_team", "NATIONAL TEAM", "icons.status.reputation"],
 		["GROUP", "CAREER"], ["trophies", "CAREER HISTORY", "icons.status.fans"],
 		["GROUP", "SYSTEM"], ["inbox", "INBOX", "icons.navigation.inbox"], ["media", "WORLD FEED", "icons.status.fans"], ["settings", "SETTINGS & PROFILE", "icons.navigation.settings"]]
-	if str(game.data.get("career_type", "normal")) == "sandbox": pages.append(["GROUP", "SANDBOX"]); pages.append(["developer", "DEVELOPER MODE", "icons.navigation.settings"])
+	pages.append(["developer", "CUSTOM RULES", "icons.navigation.settings"])
 	for item in pages:
 		if item[0] == "GROUP":
 			var group := _label(str(item[1]), 9, MUTED); group.custom_minimum_size.y = 20; group.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM; nav_list.add_child(group); continue
@@ -347,6 +442,8 @@ func _refresh_topbar() -> void:
 	_clear(topbar)
 	var compact: bool = ResponsiveScript.is_compact(get_viewport_rect().size)
 	var pad := Control.new(); pad.custom_minimum_size.x = 10 if compact else 20; topbar.add_child(pad)
+	if active_page != "dashboard" and not router.history.is_empty():
+		var back := _button("BACK", false); back.icon = _small_icon("icons.navigation.back"); back.tooltip_text = "Return to the previous screen"; back.pressed.connect(_go_back); topbar.add_child(back)
 	if not compact:
 		var club_mark := _team_logo(str(game.data.get("org_logo_asset_id", "")), str(game.data.get("org_name", "MR")).left(2).to_upper(), Vector2(32, 32)); club_mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER; topbar.add_child(club_mark)
 	var page_name: String = str(router.descriptor(active_page).get("title", active_page.to_upper()))
@@ -811,29 +908,32 @@ func _show_confirm_action(title: String, message: String, confirm_text: String, 
 	var actions := HBoxContainer.new(); actions.add_theme_constant_override("separation", 8); box.add_child(actions); var cancel := _button("CANCEL", false); cancel.pressed.connect(popup.queue_free); actions.add_child(cancel); var confirm := _button_variant(confirm_text, "danger" if dangerous else "primary"); confirm.pressed.connect(func(): popup.queue_free(); callback.call()); actions.add_child(confirm); popup.popup()
 
 func _scouting() -> void:
-	_header("PLAYER DISCOVERY", "Search verified player data, review scout confidence and prepare contact.", "SCOUTING NETWORK  •  LEVEL %d" % game.data.facilities["Analytics Lab"])
-	var filters := HBoxContainer.new(); filters.add_theme_constant_override("separation", 8); content.add_child(filters)
-	for f in ["ALL", "IGL", "FRAGGER", "SUPPORT", "U23", "HIGH POTENTIAL"]:
-		var filter_button := _button(f, scout_filter == f); filter_button.pressed.connect(func(): scout_filter = f; _show_page("transfer")); filters.add_child(filter_button)
-	var sort := OptionButton.new(); sort.custom_minimum_size.x = 180; filters.add_child(sort)
-	for option in ["VALUE", "POTENTIAL", "CONFIDENCE", "SALARY"]: sort.add_item(option)
-	var sort_options := ["VALUE", "POTENTIAL", "CONFIDENCE", "SALARY"]
-	sort.select(sort_options.find(scout_sort)); sort.item_selected.connect(_on_scout_sort_selected.bind(sort_options))
-	var search := LineEdit.new(); search.placeholder_text = "Search all 637 players"; search.text = scout_query; search.size_flags_horizontal = Control.SIZE_EXPAND_FILL; search.text_submitted.connect(func(value): scout_query = value.strip_edges(); scout_page = 0; _show_page("transfer")); filters.add_child(search)
-	var compact_layout := ResponsiveScript.is_compact(get_viewport_rect().size)
-	var split: BoxContainer = VBoxContainer.new() if compact_layout else HBoxContainer.new(); split.add_theme_constant_override("separation", 16); content.add_child(split)
-	var candidates := GridContainer.new(); candidates.columns = ResponsiveScript.columns(get_viewport_rect().size, 3, 2, 1); candidates.size_flags_horizontal = Control.SIZE_EXPAND_FILL; candidates.add_theme_constant_override("h_separation", 10); candidates.add_theme_constant_override("v_separation", 10); split.add_child(candidates)
-	var visible: Array = game.scouting_pool(scout_query, scout_filter)
-	if scout_sort == "POTENTIAL": visible.sort_custom(func(a,b): return int(a.potential) > int(b.potential))
-	elif scout_sort == "SALARY": visible.sort_custom(func(a,b): return int(a.salary) < int(b.salary))
-	else: visible.sort_custom(func(a,b): return int(a.value) < int(b.value))
-	var page_size := 8; var page_count := maxi(1, ceili(float(visible.size()) / page_size)); scout_page = clampi(scout_page, 0, page_count - 1)
-	for p in visible.slice(scout_page * page_size, mini((scout_page + 1) * page_size, visible.size())):
-		var card := _candidate_card(p, -1); candidates.add_child(card)
-	var pager := HBoxContainer.new(); candidates.add_child(pager); var previous := _button("PREVIOUS", false); previous.disabled = scout_page <= 0; previous.pressed.connect(func(): scout_page -= 1; _show_page("transfer")); pager.add_child(previous); pager.add_child(_tag("PAGE %d / %d • %d PLAYERS" % [scout_page + 1, page_count, visible.size()], CYAN)); var next := _button("NEXT", false); next.disabled = scout_page >= page_count - 1; next.pressed.connect(func(): scout_page += 1; _show_page("transfer")); pager.add_child(next)
-	var report := UIComponentsScript.hero_panel("LEAD SCOUT DOSSIER", "The highest-ranked player in the current search window.", CYAN); report.custom_minimum_size.x = 0 if compact_layout else 370; split.add_child(report)
-	if not visible.is_empty(): _fill_scout_report(report, visible[scout_page * page_size], -1)
-	else: report.add_child(_empty_state("NO PLAYERS", "No world-database player matches these filters."))
+	var level := int(game.data.facilities.get("Analytics Lab", 1)); var active := game.active_scout_assignment(); var latest := game.latest_scout_report()
+	_header("PLAYER SCOUTING", "Assign the scouting team, wait for research and review only the players they actually discover.", "ANALYTICS LEVEL %d  •  %d-%d RESULTS" % [level, 3, mini(7, 2 + level)])
+	var brief := _panel("NEW SCOUTING ASSIGNMENT", PANEL_HIGH); content.add_child(brief)
+	var role_row := HBoxContainer.new(); role_row.add_theme_constant_override("separation", 7); brief.add_child(role_row)
+	for role in ["ALL", "IGL", "FRAGGER", "SUPPORT", "ENTRY", "ANCHOR"]:
+		var role_button := _button(role, scout_filter == role); role_button.disabled = not active.is_empty(); role_button.pressed.connect(func(): scout_filter = role; _show_page("scouting")); role_row.add_child(role_button)
+	var criteria := HBoxContainer.new(); criteria.add_theme_constant_override("separation", 10); brief.add_child(criteria)
+	var age := OptionButton.new(); age.custom_minimum_size.x = 180
+	for value in ["ANY", "U21", "22-25", "26+"]: age.add_item(value); age.set_item_metadata(age.item_count - 1, value)
+	age.select(["ANY", "U21", "22-25", "26+"].find(scout_age_filter)); age.disabled = not active.is_empty(); age.item_selected.connect(func(index): scout_age_filter = str(age.get_item_metadata(index))); criteria.add_child(_field("AGE", age))
+	var priority := OptionButton.new(); priority.custom_minimum_size.x = 220
+	for value in ["POTENTIAL", "CURRENT_ABILITY", "AFFORDABILITY"]: priority.add_item(value.replace("_", " ")); priority.set_item_metadata(priority.item_count - 1, value)
+	priority.select(["POTENTIAL", "CURRENT_ABILITY", "AFFORDABILITY"].find(scout_priority)); priority.disabled = not active.is_empty(); priority.item_selected.connect(func(index): scout_priority = str(priority.get_item_metadata(index))); criteria.add_child(_field("PRIORITY", priority))
+	var assignment_button := _button("SCOUTING IN PROGRESS" if not active.is_empty() else "START SCOUTING ASSIGNMENT", active.is_empty()); assignment_button.disabled = not active.is_empty(); assignment_button.pressed.connect(func(): var result := game.start_scout_assignment({"role":scout_filter,"age_band":scout_age_filter,"priority":scout_priority}); _notify("Scout dispatched." if bool(result.get("ok",false)) else str(result.get("error","Assignment failed."))); _show_page("scouting")); criteria.add_child(assignment_button)
+	if not active.is_empty():
+		brief.add_child(_action_row("ACTIVE", "%s / %s / %s" % [str(active.criteria.role), str(active.criteria.age_band), str(active.criteria.priority).replace("_"," ")], "Report due %s • Cost $%s" % [str(active.completion_date), GameStateScript.money(int(active.cost))], GOLD))
+	elif latest.is_empty():
+		brief.add_child(_empty_state("NO SCOUT REPORT", "Choose criteria and start an assignment. The player database is not revealed until the report completes."))
+	var report_title := "LATEST REPORT" if not latest.is_empty() else "SCOUTING RESULTS"
+	var result_panel := _panel(report_title, PANEL); content.add_child(result_panel)
+	if not latest.is_empty(): result_panel.add_child(_label("%s • %d players • %s priority" % [str(latest.get("date","")), int(latest.get("count",0)), str(latest.get("criteria",{}).get("priority","POTENTIAL")).replace("_"," ")], 12, MUTED))
+	var search := LineEdit.new(); search.placeholder_text = "Filter this report"; search.text = scout_query; search.text_submitted.connect(func(value): scout_query = value.strip_edges(); _show_page("scouting")); result_panel.add_child(search)
+	var candidates := GridContainer.new(); candidates.columns = ResponsiveScript.columns(get_viewport_rect().size, 3, 2, 1); candidates.add_theme_constant_override("h_separation", 10); candidates.add_theme_constant_override("v_separation", 10); result_panel.add_child(candidates)
+	var visible := game.current_scout_results(scout_query, "ALL")
+	for player in visible: candidates.add_child(_candidate_card(player, -1))
+	if visible.is_empty() and active.is_empty(): candidates.add_child(_empty_state("NO DISCOVERED PLAYERS", "A completed assignment will reveal between three and seven candidates depending on Analytics Lab level."))
 
 func _filtered_market() -> Array:
 	var filtered: Array = []
@@ -1007,7 +1107,7 @@ func _match_gameplay_lab() -> void:
 	last_match_panel_second=-1
 	if not match_runtime.running and match_runtime.elapsed <= 0.0:
 		match_runtime.start_match(game.data)
-	var lab_available := str(game.data.get("career_type", "normal")) == "sandbox" and bool(game.data.get("developer_mode", false))
+	var lab_available := bool(game.data.get("developer_mode", false))
 	var compact_match := ResponsiveScript.is_compact(get_viewport_rect().size)
 	if match_ui_mode == "lab" and not lab_available:
 		match_ui_mode = "observer"
@@ -1153,7 +1253,7 @@ func _map_manager_page() -> void:
 	if map_editor_data.is_empty(): map_editor_data = map_catalog.load_map("verdant_reach")
 	_header("MAP MANAGER", "Tune loot, heat and traversal through descriptors; changes apply to new matches", "DATA-DRIVEN TOOL")
 	var toolbar := HBoxContainer.new(); toolbar.add_theme_constant_override("separation", 8); content.add_child(toolbar)
-	for id in ["verdant_reach", "sunscorch_basin"]:
+	for id in ["verdant_reach", "sunscorch_basin", "tactical_island", "frostline_valley", "coastal_breakwater", "highland_reserve"]:
 		var choose := _button(id.to_upper(), str(map_editor_data.get("id", "")) == id); choose.pressed.connect(func(): map_editor_data = map_catalog.load_map(id); _show_page("map_manager")); toolbar.add_child(choose)
 	var save := _button("SAVE OVERRIDE", true); save.pressed.connect(func(): _notify("Map override saved." if map_catalog.save_override(map_editor_data) else "The map descriptor is invalid.")); toolbar.add_child(save)
 	save.icon=assets.texture("icons.navigation.save"); save.expand_icon=true
@@ -1524,6 +1624,8 @@ func _transfers_page() -> void:
 	_header("TRANSFER CENTER", "Move from discovery to a signed contract through verified scouting and negotiation.", "$%s AVAILABLE" % GameStateScript.money(int(game.data.budget)))
 	var market_players: Array = game.data.get("market", [])
 	var offers: Array = game.data.get("transfer_offers", [])
+	var window:Dictionary=game.transfer_window_status(); var window_panel:=UIComponentsScript.hero_panel("%s TRANSFER WINDOW" % str(window.get("name","CLOSED")),"Contracted-player approaches are available only during registered windows. Free agents may negotiate at any time.",SUCCESS if bool(window.get("open",false)) else DANGER); content.add_child(window_panel)
+	window_panel.add_child(_label("CAREER WEEK %d  •  %s" % [int(window.get("week",1)),"OPEN NOW" if bool(window.get("open",false)) else "NEXT WINDOW: %s" % str(window.get("next","Next season"))],15,GOLD))
 	var compact_layout := ResponsiveScript.is_compact(get_viewport_rect().size)
 	var stage: BoxContainer = VBoxContainer.new() if compact_layout else HBoxContainer.new(); stage.add_theme_constant_override("separation", 20); content.add_child(stage)
 	var lead := UIComponentsScript.hero_panel("NEXT RECRUIT", "Scout → evaluate → negotiate → sign", GOLD); lead.size_flags_horizontal = Control.SIZE_EXPAND_FILL; lead.custom_minimum_size.y = 285; stage.add_child(lead)
@@ -1544,8 +1646,14 @@ func _transfers_page() -> void:
 	var negotiation_actions := HBoxContainer.new(); negotiation_actions.add_theme_constant_override("separation",8); offer_zone.add_child(negotiation_actions)
 	var discover := _button("DISCOVER PLAYERS", true); discover.pressed.connect(_show_page.bind("scouting")); negotiation_actions.add_child(discover)
 	var review_inbox := _button("OPEN INBOX", false); review_inbox.pressed.connect(_show_page.bind("inbox")); negotiation_actions.add_child(review_inbox)
-	var shortlist := VBoxContainer.new(); shortlist.add_theme_constant_override("separation", 8); content.add_child(shortlist); shortlist.add_child(_label("Scouted shortlist", 20, TEXT))
-	for market_player in market_players.slice(0, 6): shortlist.add_child(_market_player_row(market_player))
+	var free_agents:Array=market_players.filter(func(player): return str(player.get("squad_role",""))=="free_agent" or str(player.get("team_id","")).is_empty())
+	var contracted:Array=market_players.filter(func(player): return not player in free_agents)
+	var free_panel:=_panel("FREE AGENTS • NEGOTIATION ALWAYS AVAILABLE",PANEL_HIGH); content.add_child(free_panel)
+	for market_player in free_agents.slice(0,6): free_panel.add_child(_market_player_row(market_player))
+	if free_agents.is_empty(): free_panel.add_child(_empty_state("NO FREE AGENTS DISCOVERED","Complete scouting assignments to find unattached players."))
+	var contracted_panel:=_panel("CONTRACTED PLAYERS • WINDOW REQUIRED",PANEL); content.add_child(contracted_panel)
+	for market_player in contracted.slice(0,6): contracted_panel.add_child(_market_player_row(market_player))
+	if contracted.is_empty(): contracted_panel.add_child(_empty_state("NO CONTRACTED TARGETS","Scout a club player before approaching their organization."))
 
 func _contracts_page() -> void:
 	_header("PLAYER CONTRACTS", "Protect the core roster, resolve expiring deals and control payroll.", "SQUAD COMMITMENTS")
@@ -1583,36 +1691,46 @@ func _contracts_page() -> void:
 	var open_roster := _button("OPEN SQUAD & LINEUP  →", false); open_roster.pressed.connect(_show_page.bind("roster")); guidance.add_child(open_roster)
 
 func _training_page() -> void:
-	_header("TRAINING CENTER", "Set the team workload, manage fatigue and assign individual development focus.", "TODAY • TEAM TRAINING")
-	var training_definition: Dictionary=game.data.get("facility_definitions",{}).get("Training Room",{})
-	if not training_definition.is_empty():
-		var training_stage:=UIComponentsScript.hero_panel("DAILY PREPARATION","Every training decision trades development against match readiness.",SUCCESS); content.add_child(training_stage); var training_art:=_asset_preview(str(training_definition.get("asset_id","")),Vector2(1200,150)); training_art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED; training_stage.add_child(training_art)
-	var readiness := HBoxContainer.new(); readiness.add_theme_constant_override("separation", 10); content.add_child(readiness); readiness.add_child(_visual_stat("ENERGY", _average("energy"), _metric_color(_average("energy")), "Squad average")); readiness.add_child(_visual_stat("MORALE", _average("happiness"), _metric_color(_average("happiness")), "Squad mood")); readiness.add_child(_visual_stat("FORM", _average("form"), GOLD, "Competition rhythm")); readiness.add_child(_visual_stat("NEXT MATCH", str(game.get_next_match(true).get("date", "—")), CYAN, "Workload window"))
-	var training_split := HBoxContainer.new(); training_split.add_theme_constant_override("separation", 14); content.add_child(training_split)
-	var plan := _panel("TEAM TRAINING PLAN", PANEL_HIGH); plan.size_flags_horizontal = Control.SIZE_EXPAND_FILL; training_split.add_child(plan)
-	var presets := GridContainer.new(); presets.columns = 3; presets.add_theme_constant_override("h_separation", 8); presets.add_theme_constant_override("v_separation", 8); plan.add_child(presets)
-	for spec in [["Cân bằng", "BALANCED", ACCENT], ["Cường độ cao", "AGGRESSIVE", ORANGE], ["Nghỉ & hồi phục", "RECOVERY", SUCCESS]]:
-		var preview: Dictionary=game.training_plan_preview(str(spec[0])); var consequence := "Energy %+d • %d%% base growth chance" % [int(preview.get("energy_change",0)),roundi(float(preview.get("growth_chance",0.0))*100.0)]; var choice := _choice_card(str(spec[1]), consequence, "Player age, potential, morale, role and form modify this baseline", str(game.data.schedule) == str(spec[0]), spec[2]); choice.pressed.connect(func(): game.set_team_training_schedule(str(spec[0])); _show_page("training")); presets.add_child(choice)
-	plan.add_child(_label("CURRENT PLAN  •  %s" % _training_schedule_display(str(game.data.schedule)), 12, CYAN))
-	var workload := _panel("NEXT MATCH READINESS", PANEL); workload.custom_minimum_size.x = 330; training_split.add_child(workload)
-	workload.add_child(_decision_signal("INTENSITY", _training_schedule_display(str(game.data.schedule)), GOLD))
-	workload.add_child(_decision_signal("FATIGUE RISK", "HIGH" if str(game.data.schedule) == "Cường độ cao" else "LOW" if str(game.data.schedule) == "Nghỉ & hồi phục" else "MEDIUM", DANGER if str(game.data.schedule) == "Cường độ cao" else SUCCESS if str(game.data.schedule) == "Nghỉ & hồi phục" else GOLD))
-	workload.add_child(_decision_signal("MATCH READINESS", "%d%%" % _average("energy"), _metric_color(_average("energy"))))
-	var weekly := _panel("WEEKLY CALENDAR", PANEL); content.add_child(weekly)
-	var days := HBoxContainer.new(); days.add_theme_constant_override("separation",6); weekly.add_child(days)
-	for index in game.data.get("weekly_training_plan", []).size():
-		var day_names := ["MON","TUE","WED","THU","FRI","SAT","SUN"]; var item := _action_row(day_names[index], str(game.data.weekly_training_plan[index]), "Scheduled team activity", ACCENT if index<5 else SUCCESS); item.size_flags_horizontal=Control.SIZE_EXPAND_FILL; days.add_child(item)
-	var individual := _panel("INDIVIDUAL TRAINING", PANEL_HIGH); content.add_child(individual)
-	for player in game.data.get("roster", []).slice(0,4):
-		var row := HBoxContainer.new(); row.custom_minimum_size.y=48; row.add_theme_constant_override("separation",8); row.add_child(_player_avatar(str(player.get("avatar_asset_id","")),Vector2(40,44))); var player_name := _label("@%s\n%s" % [str(player.get("handle",player.get("name","Player"))),str(player.get("role","FLEX")).to_upper()],12,TEXT); player_name.custom_minimum_size.x = 170; row.add_child(player_name); var current := str(game.data.get("individual_training",{}).get(str(player.get("id","")),"Aim"));
-		for focus in ["Aim","Strategy","Mental","Recovery","Teamwork"]:
-			var focus_button := _button(focus, current==focus); focus_button.tooltip_text = "+1 %s each week • energy tradeoff" % focus; focus_button.pressed.connect(func(): game.set_individual_training(str(player.get("id", "")),focus); _show_page("training")); row.add_child(focus_button)
-		individual.add_child(row)
-	var staff_panel := _panel("STAFF CONTRACTS & IMPACT", PANEL); content.add_child(staff_panel)
-	for staff in game.data.get("staff", []): staff_panel.add_child(_action_row("%d" % int(staff.get("rating",0)), str(staff.get("role","Staff")), "%s • $%s/week • %d months" % [str(staff.get("effect","")),GameStateScript.money(int(staff.get("salary",0))),int(staff.get("contract",0))], PURPLE))
-	for event in game.actionable_events():
-		if str(event.get("type", "")) == "training":
-			var start := _button("START TRAINING • COMPLETE SESSION", true); start.pressed.connect(func(): game.acknowledge_calendar_event(str(event.id)); _notify("Training completed • daily progression unlocked."); _show_page("training")); content.add_child(start)
+	_header("TRAINING CENTER", "Diagnose weaknesses, build the week and accept the trade-off between growth and readiness.", "ACTIVE PROGRAM: %s" % str(game.data.get("training_program","CUSTOM")))
+	var readiness := HBoxContainer.new(); readiness.add_theme_constant_override("separation",10); content.add_child(readiness)
+	readiness.add_child(_visual_stat("ENERGY",_average("energy"),_metric_color(_average("energy")),"Squad average")); readiness.add_child(_visual_stat("FORM",_average("form"),GOLD,"Competition rhythm")); readiness.add_child(_visual_stat("CHEMISTRY",int(game.data.get("chemistry",0)),CYAN,"Team coordination")); readiness.add_child(_visual_stat("MATCH READINESS",int(game.data.get("match_readiness",65)),SUCCESS,"Energy, form and chemistry"))
+	var focus_panel := _panel("TEAM TRAINING FOCUS",PANEL_HIGH); content.add_child(focus_panel)
+	var focus_grid := GridContainer.new(); focus_grid.columns=3; focus_panel.add_child(focus_grid)
+	var current_focus := str(game.data.get("team_training_focus","Strategy"))
+	var focus_notes := {"Combat":"Aim and mechanical development","Strategy":"Rotation and decision making","Teamwork":"Chemistry and coordination","Mental":"Composure and consistency","Intensive":"Fast growth with high fatigue","Recovery":"Energy and form recovery"}
+	for focus in ["Combat","Strategy","Teamwork","Mental","Intensive","Recovery"]:
+		var choice:=_choice_card(focus.to_upper(),str(focus_notes[focus]),"Selected focus changes weekly attribute development.",focus==current_focus,ORANGE if focus=="Intensive" else SUCCESS if focus=="Recovery" else ACCENT); choice.pressed.connect(func(): game.set_team_training_focus(focus); _show_page("training")); focus_grid.add_child(choice)
+	var programs := _panel("TRAINING PROGRAMS",PANEL); content.add_child(programs)
+	var program_actions:=HBoxContainer.new(); program_actions.add_theme_constant_override("separation",8); programs.add_child(program_actions)
+	for program in ["MECHANICAL","STRATEGIC","BALANCED","RECOVERY"]:
+		var program_button:=_button(program,str(game.data.get("training_program",""))==program); program_button.pressed.connect(func(): game.apply_training_program(program); _show_page("training")); program_actions.add_child(program_button)
+	programs.add_child(_label("Programs populate all seven days. Any manual day change becomes a custom program.",12,MUTED))
+	var weekly := _panel("WEEKLY SCHEDULE",PANEL_HIGH); content.add_child(weekly)
+	var day_names := ["MON","TUE","WED","THU","FRI","SAT","SUN"]
+	var activities := ["Combat","Strategy","Teamwork","Mental","Scrim","Recovery","Rest"]
+	var intensities := ["Light","Team","Intensive","Competitive","Rest"]
+	var schedule:Array=game.data.get("training_schedule",[])
+	for index in 7:
+		var entry:Dictionary=schedule[index] if index<schedule.size() else {"activity":"Rest","intensity":"Rest"}; var row:=HBoxContainer.new(); row.add_theme_constant_override("separation",10); weekly.add_child(row)
+		var day_label:=_label(day_names[index],13,GOLD); day_label.custom_minimum_size.x=55; row.add_child(day_label)
+		var activity:=OptionButton.new(); activity.custom_minimum_size.x=190
+		for item in activities: activity.add_item(item)
+		activity.select(maxi(0,activities.find(str(entry.activity)))); row.add_child(activity)
+		var intensity:=OptionButton.new(); intensity.custom_minimum_size.x=160
+		for item in intensities: intensity.add_item(item)
+		intensity.select(maxi(0,intensities.find(str(entry.intensity)))); row.add_child(intensity)
+		var apply_day:=_button("APPLY",false); apply_day.pressed.connect(func(): game.set_training_day(index,activity.get_item_text(activity.selected),intensity.get_item_text(intensity.selected)); _show_page("training")); row.add_child(apply_day)
+		row.add_child(_label(_training_tradeoff(str(entry.activity),str(entry.intensity)),12,MUTED))
+	var individual := _panel("INDIVIDUAL DEVELOPMENT",PANEL_HIGH); content.add_child(individual)
+	for player in game.data.get("roster",[]):
+		var recommendation:=_training_recommendation(player); var card:=_panel("",PANEL); individual.add_child(card); var row:=HBoxContainer.new(); row.add_theme_constant_override("separation",10); card.add_child(row); row.add_child(_player_avatar(str(player.get("avatar_asset_id","")),Vector2(54,62)))
+		var identity:=_label("@%s  %s\nAIM %d   STRATEGY %d   MENTAL %d   TEAMWORK %d   FORM %d\nRECOMMENDED: %s" % [str(player.get("handle",player.get("name","Player"))),str(player.get("role","Flex")).to_upper(),int(player.get("aim",0)),int(player.get("game_sense",0)),int(player.get("clutch",0)),int(player.get("teamwork",0)),int(player.get("form",0)),recommendation],12,TEXT); identity.custom_minimum_size.x=550; row.add_child(identity)
+		var current:=str(game.data.get("individual_training",{}).get(str(player.get("id","")),recommendation)); for focus in ["Aim","Strategy","Mental","Recovery","Teamwork"]: var focus_button:=_button(focus,current==focus); focus_button.pressed.connect(func(): game.set_individual_training(str(player.get("id","")),focus); _show_page("training")); row.add_child(focus_button)
+	var impact:Dictionary=game.data.get("recent_training_impact",{})
+	var report:=_panel("RECENT TRAINING IMPACT",PANEL); content.add_child(report)
+	if impact.is_empty(): report.add_child(_empty_state("NO COMPLETED WEEK","Complete a career week to produce verified training changes."))
+	else: report.add_child(_label("Week %d  •  %s  •  Energy %+d  •  Team power %+d\nAttribute changes are consumed by MatchRuntime through the updated player attributes, form, energy and teamwork." % [int(impact.get("week",0)),str(impact.get("focus","")),int(impact.get("energy_delta",0)),int(impact.get("team_power_delta",0))],13,TEXT))
+	var staff_panel:=_panel("STAFF IMPACT",PANEL); content.add_child(staff_panel); for staff in game.data.get("staff",[]): staff_panel.add_child(_action_row(str(staff.get("rating",0)),str(staff.get("role","Staff")),str(staff.get("effect","")),PURPLE))
 
 func _player_stats_page() -> void:
 	_header("PLAYER PERFORMANCE", "Read the squad through its players: current form, energy, role and competitive ceiling.", "ACTIVE ROSTER")
@@ -1673,20 +1791,10 @@ func _settings_page() -> void:
 	controls.add_child(_label("Autosave runs after committed management actions.", 12, MUTED))
 	var save_now := _button("SAVE CAREER NOW", true); save_now.pressed.connect(func(): game.save_game(); _notify("Career saved.")); controls.add_child(save_now)
 	var back_home := _button("RETURN TO COMMAND CENTER", false); back_home.pressed.connect(_show_page.bind("dashboard")); controls.add_child(back_home)
-	var interface_panel := _panel("INTERFACE & ACCESSIBILITY", PANEL_HIGH); content.add_child(interface_panel)
-	var options := HBoxContainer.new(); options.add_theme_constant_override("separation", 12); interface_panel.add_child(options)
-	options.add_child(_visual_stat("DISPLAY", "%dx%d" % [int(get_viewport_rect().size.x), int(get_viewport_rect().size.y)], CYAN, "Responsive container layout"))
-	options.add_child(_visual_stat("INPUT", "KEYBOARD", SUCCESS, "Buttons retain focus states"))
-	options.add_child(_visual_stat("STATUS", "TEXT + COLOR", GOLD, "States are never color-only"))
-	options.add_child(_visual_stat("SAVE SLOT", game.data.get("save_slot", "AUTO"), PURPLE, "Versioned career data"))
-	var guidance := _panel("MANAGER HELP", PANEL); content.add_child(guidance)
-	guidance.add_child(_action_row("HOME", "Command Center", "Review decisions and today's priorities.", CYAN))
-	guidance.add_child(_action_row("TEAM", "Squad & Lineup", "Manage starters, roles, recovery and contracts.", ACCENT))
-	guidance.add_child(_action_row("MATCH", "Match Center", "Prepare the tactical plan or follow the live observer.", GOLD))
+	_build_settings_controls(true)
 
 func _developer_page() -> void:
-	if str(game.data.get("career_type", "normal")) != "sandbox": _header("DEVELOPER MODE UNAVAILABLE", "Create a Sandbox career to access internal simulation overrides", "SEPARATE PLAYER/DEV SCOPE"); return
-	_header("DEVELOPER MODE", "Overrides connect directly to MatchRuntime and are removed when disabled", "SANDBOX ONLY")
+	_header("CUSTOM RULES", "Optional rules connect to new matches and mark this career as modified", "PLAYER-CONTROLLED RULESET")
 	var enabled := bool(game.data.get("developer_mode", false)); var toggle := _button("DISABLE DEVELOPER MODE" if enabled else "ENABLE DEVELOPER MODE", enabled); toggle.pressed.connect(func(): game.set_developer_mode(not enabled); _show_page("developer")); content.add_child(toggle)
 	var status := _panel("RUNTIME OVERRIDES", PANEL); content.add_child(status)
 	for spec in [["weapon_damage_scale","WEAPON DAMAGE"],["zone_damage_scale","ZONE DAMAGE"],["loot_density_scale","LOOT DENSITY"],["ai_aggression_scale","AI AGGRESSION"],["vehicle_density_scale","VEHICLE DENSITY"]]:
@@ -1695,7 +1803,7 @@ func _developer_page() -> void:
 	var tools := _panel("INTERNAL TOOLS", PANEL); content.add_child(tools)
 	var lab := _button("OPEN EXISTING MATCH LAB", true); lab.disabled=not enabled; lab.pressed.connect(_show_page.bind("match_lab")); tools.add_child(lab)
 	var map_tool := _button("OPEN EXISTING MAP MANAGER", false); map_tool.disabled=not enabled; map_tool.pressed.connect(_show_page.bind("map_manager")); tools.add_child(map_tool)
-	tools.add_child(_label("AI debugger, zone simulation and entity controls remain owned by the existing Match Lab. Production Normal careers never expose this page.", 11, MUTED))
+	tools.add_child(_label("AI debugger, zone simulation and entity controls remain owned by the existing Match Lab. They unlock only while Custom Rules is enabled and mark the career as modified.", 11, MUTED))
 
 func _inbox() -> void:
 	var unread:int = game.data.inbox.filter(func(message): return not bool(message.get("read", false))).size()
@@ -1716,8 +1824,7 @@ func _inbox() -> void:
 		matches.select(1)
 		setup.add_child(matches)
 		var map_choice := OptionButton.new()
-		map_choice.add_item("VERDANT REACH"); map_choice.set_item_metadata(0, "verdant_reach")
-		map_choice.add_item("SUNSCORCH BASIN"); map_choice.set_item_metadata(1, "sunscorch_basin")
+		for map_entry in [["VERDANT REACH","verdant_reach"],["SUNSCORCH BASIN","sunscorch_basin"],["TACTICAL ISLAND","tactical_island"],["FROSTLINE VALLEY","frostline_valley"],["COASTAL BREAKWATER","coastal_breakwater"],["HIGHLAND RESERVE","highland_reserve"]]: map_choice.add_item(str(map_entry[0])); map_choice.set_item_metadata(map_choice.item_count-1,str(map_entry[1]))
 		setup.add_child(map_choice)
 		var objective := OptionButton.new()
 		for spec in [["TACTICAL FAMILIARITY","TACTICAL_FAMILIARITY"],["CHEMISTRY","CHEMISTRY"],["PLAYER FORM","PLAYER_FORM"],["OPPONENT ANALYSIS","OPPONENT_ANALYSIS"]]:
@@ -1802,7 +1909,7 @@ func _competition_center() -> void:
 		competition.next_in_days = 0 if next_events.is_empty() else maxi(0, int((Time.get_unix_time_from_datetime_string(str(next_events[0].date) + "T00:00:00") - Time.get_unix_time_from_datetime_string(str(game.data.current_date) + "T00:00:00")) / 86400.0))
 		var card := _panel(str(competition.get("short_name", "COMP")), Color("0a141c")); card.custom_minimum_size = Vector2(300, 330); grid.add_child(card)
 		var identity:=HBoxContainer.new(); identity.add_theme_constant_override("separation",12); card.add_child(identity); identity.add_child(_team_logo(str(competition.get("logo_asset_id","")),str(competition.get("short_name","CP")),Vector2(58,58))); var identity_copy:=VBoxContainer.new(); identity_copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL; identity.add_child(identity_copy); identity_copy.add_child(_label(str(competition.get("name", "Competition")), 18, TEXT)); identity_copy.add_child(_label("%s · TIER %s" % [competition.get("tournament_type","INTERNATIONAL"),competition.get("tier",1)], 11, MUTED))
-		card.add_child(_label("%d TEAMS  ·  %d PLAYERS  ·  %d MATCHES" % [int(competition.get("team_count",16)),int(competition.get("max_players",64)),int(competition.get("total_matches",1))], 11, CYAN)); card.add_child(_label("#%d" % int(competition.get("standing", 0)), 38, ACCENT)); card.add_child(_label("CURRENT STANDING  ·  %s" % str(competition.get("stage", "")), 11, MUTED)); card.add_child(_label("$%s PRIZE POOL" % GameStateScript.money(int(competition.get("prize_pool",0))), 20, GOLD))
+		card.add_child(_label("%d TEAMS  •  %d PLAYERS  •  %d MATCHES" % [int(competition.get("team_count",16)),int(competition.get("max_players",64)),int(competition.get("total_matches",1))], 11, CYAN)); card.add_child(_label("#%d" % int(competition.get("standing", 0)), 38, ACCENT)); card.add_child(_label("CURRENT STANDING  •  %s" % str(competition.get("stage", "")), 11, MUTED)); card.add_child(_label("$%s PRIZE POOL" % GameStateScript.money(int(competition.get("prize_pool",0))), 20, GOLD)); var qualification:Dictionary=competition.get("qualification_rules",{}); card.add_child(_label("ENTRY: TIER %s  •  %s"%[str(qualification.get("minimum_tier","D")),"%d RP"%int(qualification.get("minimum_ranking_points",0)) if int(qualification.get("minimum_ranking_points",0))>0 else "NO RP FLOOR"],11,MUTED))
 		var reasons: Array = competition.get("priority_reasons", []); if not reasons.is_empty(): card.add_child(_label("WHY  •  %s" % str(reasons[0]), 11, MUTED))
 		var registration := game.tournament_registration_status(competition_id); var registration_status := str(registration.get("status","NOT_ELIGIBLE")); card.add_child(_tag(registration_status.replace("_"," "), ACCENT if registration_status=="REGISTERED" else DANGER if registration_status in ["NOT_ELIGIBLE","SCHEDULE_CONFLICT"] else GOLD))
 		if registration_status == "AVAILABLE":
@@ -1853,34 +1960,28 @@ func _competition_detail() -> void:
 	rule.add_child(_label("SUPER RULE: placement points + 1 point per kill. The top eight advance; ties are resolved by kills, WWCDs, then the most recent result.", 13, TEXT))
 
 func _rankings() -> void:
-	_header("WORLD RANKING", "Team power, form and movement update through the career cycle.", "WORLD • REGION • TOURNAMENT")
+	_header("WORLD RANKING", "Competitive results determine rank; power remains an internal strength estimate.", "CLUB AND NATIONAL TABLES")
 	var controls := HBoxContainer.new(); controls.add_theme_constant_override("separation", 8); content.add_child(controls)
-	for tab in ["WORLD", str(game.data.region), "COMPETITION", "PRIZE MONEY"]:
+	for tab in ["CLUB", "NATIONAL", "COMPETITION"]:
 		var tab_button := _button(tab, tab == ranking_mode)
 		tab_button.pressed.connect(func(): ranking_mode = tab; _show_page("rankings"))
 		controls.add_child(tab_button)
 	var search := LineEdit.new(); search.placeholder_text = "Search teams"; search.custom_minimum_size.x = 220; search.size_flags_horizontal = Control.SIZE_EXPAND_FILL; controls.add_child(search)
-	var table := _panel("GLOBAL POWER RANKING", PANEL_HIGH); content.add_child(table)
+	if ranking_mode == "WORLD": ranking_mode = "CLUB"
+	var table := _panel("%s COMPETITIVE RANKING" % ranking_mode, PANEL_HIGH); content.add_child(table)
 	var header := HBoxContainer.new(); header.custom_minimum_size.y = 30; header.add_theme_constant_override("separation", 8); table.add_child(header)
 	var compact := ResponsiveScript.is_compact(get_viewport_rect().size)
-	for spec in [["#",42],["TEAM",280 if compact else 500],["REGION",110 if compact else 250],["POWER",90 if compact else 150],["FORM",90 if compact else 150],["TREND",100 if compact else 160]]:
+	for spec in [["#",42],["TEAM",280 if compact else 430],["REGION",110 if compact else 180],["RP",90 if compact else 120],["FORM",90 if compact else 120],["MOMENTUM",100 if compact else 140],["TIER",70]]:
 		var column := _label(str(spec[0]), 11, MUTED); column.custom_minimum_size.x = int(spec[1]); header.add_child(column)
 	search.text = ranking_query
 	search.text_submitted.connect(func(value): ranking_query = value.strip_edges(); _show_page("rankings"))
-	var rows := _ranking_rows()
-	if ranking_mode == str(game.data.region):
-		rows = rows.filter(func(row): return str(row.region) == str(game.data.region))
-	elif ranking_mode == "COMPETITION":
+	var rows := game.competitive_rankings("NATIONAL" if ranking_mode=="NATIONAL" else "CLUB").map(func(profile): return {"rank":profile.rank,"id":profile.id,"name":profile.name,"region":profile.region,"power":profile.ranking_points,"form":profile.form,"trend":profile.momentum,"tier":profile.tier,"recent_results":profile.recent_results,"logo_asset_id":profile.logo_asset_id,"is_player":str(profile.id)==str(game.data.get("organization_id",""))})
+	if ranking_mode == "COMPETITION":
 		var tournament_id := str(game.data.get("active_tournament_id", "gsi_2026_s1"))
-		rows = game.get_tournament_standings(tournament_id).map(func(row): return {"rank":row.rank,"name":row.name,"power":row.points,"form":row.kills,"trend":row.wins,"region":"PTS / KILLS / WINS","logo_asset_id":row.get("logo_asset_id", ""),"is_player":row.get("is_player", false)})
-	elif ranking_mode == "PRIZE MONEY":
-		rows.sort_custom(func(a, b): return int(a.get("prize_money", 0)) > int(b.get("prize_money", 0)))
-		for i in rows.size():
-			rows[i].rank = i + 1
-			rows[i].power = int(rows[i].get("prize_money", 0))
+		rows = game.get_tournament_standings(tournament_id).map(func(row): return {"rank":row.rank,"id":row.get("team_id",""),"name":row.name,"power":row.points,"form":row.kills,"trend":row.wins,"tier":"EVENT","recent_results":[],"region":"POINTS / KILLS / WINS","logo_asset_id":row.get("logo_asset_id", ""),"is_player":row.get("is_player", false)})
 	if not ranking_query.is_empty(): rows = rows.filter(func(row): return ranking_query.to_lower() in str(row.name).to_lower())
 	if not rows.is_empty():
-		var elite:=UIComponentsScript.hero_panel("WORLD ELITE","The leading organizations set the competitive benchmark.",GOLD); content.add_child(elite); content.move_child(elite,table.get_index())
+		var elite:=UIComponentsScript.hero_panel("WORLD ELITE","Ranking Points come from tournament finishes, event tier, consistency and activity decay.",GOLD); content.add_child(elite); content.move_child(elite,table.get_index())
 		var podium:=HBoxContainer.new(); podium.add_theme_constant_override("separation",12); elite.add_child(podium)
 		for row in rows.slice(0,mini(3,rows.size())): podium.add_child(_ranking_podium_card(row))
 	for row in rows.slice(mini(3,rows.size())): table.add_child(_ranking_row(row))
@@ -2494,13 +2595,31 @@ func _player_avatar(asset_id: String, minimum: Vector2) -> TextureRect:
 	return image
 
 func _brand() -> VBoxContainer:
-	var box := VBoxContainer.new(); box.add_theme_constant_override("separation", 0); box.add_child(_label("BR//", 24, ACCENT)); box.add_child(_label("MANAGER COMMAND", 10, MUTED)); return box
+	var box := VBoxContainer.new(); box.add_theme_constant_override("separation", 6)
+	var icon := TextureRect.new(); icon.texture = assets.texture("branding.app_icon"); icon.custom_minimum_size = Vector2(56, 56); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; box.add_child(icon)
+	var title := _label("BATTLE ROYALE MANAGER", 13, TEXT); title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; box.add_child(title)
+	return box
 
 func _style(color: Color, radius: int, border: Color, width: int) -> StyleBoxFlat:
 	return DesignTokensScript.style(color, radius, border, width, 14)
 
 func _training_schedule_display(value: String) -> String:
 	return str({"Cân bằng":"BALANCED", "Cường độ cao":"HIGH INTENSITY", "Nghỉ & hồi phục":"RECOVERY"}.get(value, value.to_upper()))
+
+func _training_tradeoff(activity: String, intensity: String) -> String:
+	if activity == "Rest": return "Energy recovery; no skill growth"
+	if activity == "Recovery": return "Energy and form recovery; minimal growth"
+	if activity == "Scrim": return "Match readiness and fatigue"
+	if intensity == "Intensive": return "High growth; high energy cost"
+	if intensity == "Light": return "Low growth; low energy cost"
+	return "Moderate growth and workload"
+
+func _training_recommendation(player: Dictionary) -> String:
+	var values := {"Aim":int(player.get("aim",50)),"Strategy":int(player.get("game_sense",50)),"Mental":int(player.get("clutch",50)),"Teamwork":int(player.get("teamwork",50)),"Recovery":mini(int(player.get("energy",50)),int(player.get("form",50)))}
+	var result := "Aim"
+	for focus in values:
+		if int(values[focus]) < int(values[result]): result = str(focus)
+	return result
 
 func _compact_player_name(value: String) -> String:
 	if value.length() <= 22: return value
@@ -2542,7 +2661,8 @@ func _refresh_tactical_preview() -> void:
 	var fight_text := "ENGAGEMENT  •  %s" % fight.replace("_"," ")
 	tactical_preview.text = "%s\n%s\n%s" % [drop_text, zone_text, fight_text]
 func _trend_text(value: int) -> String: return "↑ strong form" if value >= 75 else "→ stable" if value >= 55 else "↓ needs attention"
-func _map_asset(map_name: String) -> String: return "match.map.sunscorch_basin" if map_name == "Sunscorch Basin" else "match.map.verdant_reach" if map_name == "Verdant Reach" else "match.map.astra"
+func _map_asset(map_name: String) -> String:
+	return str({"Sunscorch Basin":"match.map.sunscorch_basin","sunscorch_basin":"match.map.sunscorch_basin","Verdant Reach":"match.map.verdant_reach","verdant_reach":"match.map.verdant_reach","Tactical Island":"match.map.astra","tactical_island":"match.map.astra","Frostline Valley":"match.map.frostline_valley","frostline_valley":"match.map.frostline_valley","Coastal Breakwater":"match.map.coastal_breakwater","coastal_breakwater":"match.map.coastal_breakwater","Highland Reserve":"match.map.highland_reserve","highland_reserve":"match.map.highland_reserve"}.get(map_name,"match.map.verdant_reach"))
 func _favorite_weapon(p: Dictionary) -> String: return game.player_weapon_preference(str(p.get("id", "")))
 func _featured_opponent() -> Dictionary: return game.featured_match_opponent()
 func _opponent_rank(opponent: Dictionary) -> int: return clampi(30 - int(opponent.power) / 4, 1, 40)
@@ -2582,26 +2702,17 @@ func _pulse_row(label: String, title: String, note: String, color: Color, page: 
 	return row
 
 func _ranking_rows() -> Array:
-	var rows: Array = []
-	var career_prize := 0
-	for entry in game.data.get("finance_ledger", []):
-		if str(entry.get("type", "")) == "prize": career_prize += int(entry.get("amount", 0))
-	var database = game.career_database()
-	for team in database.teams:
-		var is_player := str(team.get("id", "")) == str(game.data.get("organization_id", ""))
-		rows.append({"id":str(team.get("id", "")), "name":str(game.data.org_name) if is_player else str(team.name), "power":roundi(game.get_team_power()) if is_player else int(team.get("ranking", {}).get("power", 50)), "form":_average("form") if is_player else int(team.get("performance", {}).get("consistency", 50)), "trend":int(game.data.get("ranking_trend", 0)) if is_player else 0, "prize_money":career_prize if is_player else 0, "region":str(team.region), "logo_asset_id":str(game.data.get("org_logo_asset_id", "")) if is_player else str(team.get("logo_asset_id", "")), "is_player":is_player})
-	rows.sort_custom(func(a, b): return int(a.power) > int(b.power))
-	for i in rows.size(): rows[i].rank = i + 1
-	return rows
+	return game.competitive_rankings("CLUB").map(func(profile): return {"rank":profile.rank,"id":profile.id,"name":profile.name,"power":profile.ranking_points,"form":profile.form,"trend":profile.momentum,"tier":profile.tier,"region":profile.region,"logo_asset_id":profile.logo_asset_id,"is_player":str(profile.id)==str(game.data.get("organization_id",""))})
 func _ranking_row(row: Dictionary) -> HBoxContainer:
 	var line := HBoxContainer.new(); line.custom_minimum_size.y = 42; line.add_theme_constant_override("separation", 8)
 	var compact := ResponsiveScript.is_compact(get_viewport_rect().size)
 	var rank := _label("%02d" % row.rank, 14, GOLD if row.is_player else MUTED); rank.custom_minimum_size.x = 42; line.add_child(rank)
-	var name := _button(str(row.name), false); name.alignment = HORIZONTAL_ALIGNMENT_LEFT; name.custom_minimum_size = Vector2(280 if compact else 500, 38); name.flat = true; name.tooltip_text = "Open Team Profile"; name.pressed.connect(func(): selected_world_team_id = str(row.get("id", "")); _show_page("team_profile")); line.add_child(name)
-	var region := _label(str(row.region), 12, CYAN); region.custom_minimum_size.x = 110 if compact else 250; line.add_child(region)
-	var power := _label(str(row.power), 14, GOLD); power.custom_minimum_size.x = 90 if compact else 150; line.add_child(power)
-	var form_value := int(row.get("form", 0)); var form := _label(str(form_value), 14, SUCCESS if form_value >= 72 else GOLD); form.custom_minimum_size.x = 90 if compact else 150; line.add_child(form)
-	var trend_value := int(row.get("trend", 0)); var trend := _label("—" if trend_value == 0 else ("▲ +%d" % trend_value if trend_value > 0 else "▼ -%d" % -trend_value), 12, SUCCESS if trend_value > 0 else DANGER if trend_value < 0 else MUTED); trend.custom_minimum_size.x = 100 if compact else 160; line.add_child(trend)
+	var name := _button(str(row.name), false); name.alignment = HORIZONTAL_ALIGNMENT_LEFT; name.custom_minimum_size = Vector2(280 if compact else 430, 38); name.flat = true; name.tooltip_text = "Open Team Profile"; name.pressed.connect(func(): selected_world_team_id = str(row.get("id", "")); _show_page("team_profile")); line.add_child(name)
+	var region := _label(str(row.region), 12, CYAN); region.custom_minimum_size.x = 110 if compact else 180; line.add_child(region)
+	var power := _label(str(row.power), 14, GOLD); power.custom_minimum_size.x = 90 if compact else 120; line.add_child(power)
+	var form_value := int(row.get("form", 0)); var form := _label(str(form_value), 14, SUCCESS if form_value >= 72 else GOLD); form.custom_minimum_size.x = 90 if compact else 120; line.add_child(form)
+	var trend_value := int(row.get("trend", 0)); var trend := _label("STABLE" if trend_value == 0 else "+%d" % trend_value if trend_value > 0 else str(trend_value), 12, SUCCESS if trend_value > 0 else DANGER if trend_value < 0 else MUTED); trend.custom_minimum_size.x = 100 if compact else 140; line.add_child(trend)
+	var tier:=_tag(str(row.get("tier","D")),ACCENT); tier.custom_minimum_size.x=70; line.add_child(tier)
 	return line
 
 func _ranking_podium_card(row: Dictionary) -> Button:
@@ -2609,7 +2720,7 @@ func _ranking_podium_card(row: Dictionary) -> Button:
 	var card:=_button("",false); card.custom_minimum_size=Vector2(300,150); card.size_flags_horizontal=Control.SIZE_EXPAND_FILL; card.add_theme_stylebox_override("normal",_style(Color(tone,0.07),3,Color.TRANSPARENT,0)); card.add_theme_stylebox_override("hover",_style(Color(tone,0.14),3,tone,1)); card.pressed.connect(func(): selected_world_team_id=str(row.get("id","")); _show_page("team_profile"))
 	var body:=HBoxContainer.new(); body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); body.mouse_filter=Control.MOUSE_FILTER_IGNORE; body.add_theme_constant_override("separation",14); card.add_child(body)
 	body.add_child(_team_logo(str(row.get("logo_asset_id","")),str(row.name).left(2).to_upper(),Vector2(78,78)))
-	var copy:=VBoxContainer.new(); copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL; body.add_child(copy); copy.add_child(_label("#%02d" % int(row.rank),28,tone)); copy.add_child(_label(str(row.name),18,TEXT)); copy.add_child(_label("POWER %s  ·  FORM %s" % [str(row.power),str(row.form)],11,MUTED))
+	var copy:=VBoxContainer.new(); copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL; body.add_child(copy); copy.add_child(_label("#%02d" % int(row.rank),28,tone)); copy.add_child(_label(str(row.name),18,TEXT)); copy.add_child(_label("RP %s  •  FORM %s  •  TIER %s" % [str(row.power),str(row.form),str(row.get("tier","D"))],11,MUTED))
 	return card
 func _best_placement() -> int:
 	var best := game.career_best_placement()
