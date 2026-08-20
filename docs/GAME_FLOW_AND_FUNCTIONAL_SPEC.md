@@ -22,6 +22,12 @@ main.tscn
    ├─ scripts/ui/presenters/career_priority_presenter.gd deterministic real-state priorities
    ├─ scripts/ui/screens/performance_campus_screen.gd extracted Campus screen
    ├─ scripts/game_state.gd                 career state, rules, save/load
+   ├─ scripts/domain/state_validator.gd      centralized career invariants
+   ├─ scripts/domain/finance_domain.gd       authoritative weekly finance projection
+   ├─ scripts/domain/roster_domain.gd        roster lookup and squad-role normalization
+   ├─ scripts/domain/player_development_domain.gd player progression policy
+   ├─ scripts/domain/match_career_feedback.gd career consequences from match results
+   ├─ scripts/persistence/save_migrations.gd explicit versioned migrations
    ├─ scripts/game_database.gd              immutable world-data loader/normalizer
    └─ scripts/match_runtime.gd              live match simulation
 ```
@@ -73,7 +79,7 @@ Status meanings:
 | `rankings` — World Ranking | `main.gd::_rankings` | World/region/Competition/Prize Money modes and search | `GameState.world_rankings`, tournament standings and DB teams | Premium/current |
 | `team_profile` — Team Profile | `main.gd::_team_profile` | selected team identity and player dossier links | `GameDatabase` team/player records | Premium/current; tactics/results explicitly unavailable due insufficient source data |
 | `facilities` — Performance Campus | `main.gd::_performance_campus`, `performance_campus_screen.gd` | facility levels, affordable/disabled upgrade, active project, max level | facility definitions/projects, budget, calendar; `GameState.upgrade_facility` | Premium/current/extracted |
-| `finance` — Finance & Partners | `main.gd::_finance_hub`, `game_presenter.gd` | cash-flow summary, one active sponsor, locked/unlocked offers, risk summary | finance ledger, payroll, sponsors, weekly finance simulation | Premium/current |
+| `finance` — Finance & Partners | `main.gd::_finance_hub`, `GameState.weekly_finance_projection`, `finance_domain.gd` | cash-flow summary, one active sponsor, locked/unlocked offers, risk summary | the same authoritative finance projection used by weekly progression | Premium/current |
 | `national_team` — National Team | `main.gd::_national_team_page` | unappointed candidate state; appointment; eligible pool; call-up/release up to six; Club/National context | canonical nationality/team records and national roster IDs | Premium/current |
 | `trophies` — Career History | `main.gd::_trophy_room` | achievements derived only from actual results/fans/history plus archived season timeline | `history`, `season_history`, fans/reputation/placements | Premium/current; cards are informational, no detail drill-down is claimed |
 | `inbox` — Inbox | `main.gd::_inbox` | channel filters; mark read; route action; scrim accept/reject; pending-event choices including transfers | inbox, pending events, scrims, transfer resolution | Premium/current; no selected-message detail screen |

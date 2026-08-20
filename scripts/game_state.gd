@@ -1,7 +1,7 @@
 class_name GameState
 extends RefCounted
 
-const SAVE_VERSION := 10
+const SAVE_VERSION := 11
 const SAVE_PATH := "user://save_slot_01.json"
 const SAVE_SLOT_COUNT := 3
 const ROLES := ["IGL", "Entry", "Support", "Fragger", "Anchor", "Flex"]
@@ -11,12 +11,56 @@ const REGIONS := ["SEA", "EU", "NA", "LATAM", "MENA", "China", "Japan", "Korea"]
 const TEAM_NAMES := ["Crimson Owls", "Neon Tigers", "Astra Nine", "Iron Pulse", "Silent Wave", "Titan Forge", "Azure Foxes", "Quantum Raid", "Solar Vipers", "Night Lotus", "Vertex", "Ember Crown", "Polar Ace", "Orbit Seven", "Rift Kings", "Echo Prime", "Mekong Stars", "Seoul Phoenix", "Tokyo Ronin"]
 const SEASON_START_DATE := "2026-01-05"
 const DATABASE_SCRIPT := preload("res://scripts/game_database.gd")
+const STATE_VALIDATOR := preload("res://scripts/domain/state_validator.gd")
+const SAVE_MIGRATIONS := preload("res://scripts/persistence/save_migrations.gd")
+const FINANCE_DOMAIN := preload("res://scripts/domain/finance_domain.gd")
+const ROSTER_DOMAIN := preload("res://scripts/domain/roster_domain.gd")
+const PLAYER_DEVELOPMENT_DOMAIN := preload("res://scripts/domain/player_development_domain.gd")
+const MATCH_CAREER_FEEDBACK := preload("res://scripts/domain/match_career_feedback.gd")
+
+signal state_changed(result: Dictionary)
 
 var data: Dictionary = {}
 var save_path := SAVE_PATH
 var _generated_player_ids: Dictionary = {}
 var _generated_player_names: Dictionary = {}
 var _generated_player_handles: Dictionary = {}
+var _database_instance = null
+var _database_errors := PackedStringArray()
+
+func career_database(refresh := false):
+	if _database_instance == null or refresh:
+		_database_instance = DATABASE_SCRIPT.new()
+		_database_errors = _database_instance.load_all()
+	return _database_instance
+
+func database_errors() -> PackedStringArray:
+	career_database()
+	return _database_errors.duplicate()
+
+func weekly_finance_projection() -> Dictionary:
+	var payroll := 0
+	for staff in data.get("staff", []): payroll += int(staff.get("salary", 0))
+	for player in data.get("roster", []): payroll += int(player.get("salary", 0))
+	for loaned in data.get("loaned_players", []):
+		var coverage := 0
+		for record in data.get("loan_records", []):
+			if str(record.get("player_id", "")) == str(loaned.get("id", "")) and str(record.get("status", "")) == "ACTIVE": coverage = int(record.get("salary_coverage", 0)); break
+		payroll += roundi(int(loaned.get("salary", 0)) * (100 - coverage) / 100.0)
+	return FINANCE_DOMAIN.weekly_operating_plan(data, payroll, float(difficulty_rules().economy), not get_next_match(true).is_empty())
+
+func validate_state(candidate: Dictionary = {}) -> Dictionary:
+	return STATE_VALIDATOR.validate(data if candidate.is_empty() else candidate, SAVE_VERSION)
+
+func set_calendar_month_offset(offset: int) -> Dictionary:
+	data.calendar_month_offset = clampi(offset, -120, 120)
+	return _command_result(true, "CALENDAR_VIEW_CHANGED", ["calendar_month_offset"], {"offset":int(data.calendar_month_offset)}, false)
+
+func set_active_match_event(event_id: String) -> Dictionary:
+	if not data.get("calendar_events", []).any(func(event): return str(event.get("id", "")) == event_id and str(event.get("type", "")) == "match"):
+		return _command_error("MATCH_EVENT_INVALID", "Match event is not part of the career calendar.", {"event_id":event_id})
+	data.active_match_event_id = event_id
+	return _command_result(true, "MATCH_EVENT_SELECTED", ["active_match_event_id"], {"event_id":event_id}, false)
 
 func difficulty_rules() -> Dictionary:
 	var difficulty := str(data.get("difficulty", "Normal")).to_upper()
@@ -61,9 +105,33 @@ func current_media_story() -> Dictionary:
 func progression_summary(limit := 5) -> Array:
 	return data.get("progression_log", []).slice(0, mini(limit, data.get("progression_log", []).size()))
 
+func career_best_placement() -> int:
+	var best := 0
+	for result in data.get("history", []):
+		var placement := int(result.get("placement", 0))
+		if placement > 0 and (best == 0 or placement < best): best = placement
+	return best
+
+func player_weapon_preference(player_id: String) -> String:
+	for player in data.get("roster", []) + data.get("market", []) + data.get("loaned_players", []):
+		if str(player.get("id", "")) != player_id: continue
+		var preferred: Dictionary = player.get("preferred", {})
+		return str(preferred.get("weapon", preferred.get("weapon_class", "NOT RECORDED"))).to_upper()
+	return "NOT RECORDED"
+
+func featured_match_opponent() -> Dictionary:
+	var next_match := get_next_match(true)
+	var participant_ids: Array = next_match.get("participant_ids", [])
+	var database = career_database()
+	for team_id in participant_ids:
+		if str(team_id) == str(data.get("organization_id", "")): continue
+		var team: Dictionary = database.get_team(str(team_id))
+		if not team.is_empty(): return {"id":str(team.id), "name":str(team.name), "power":int(team.get("ranking", {}).get("power", 0)), "form":int(team.get("performance", {}).get("consistency", 0)), "region":str(team.get("region", "Unknown"))}
+	return data.get("teams", [])[0] if not data.get("teams", []).is_empty() else {}
+
 func career_world_rank() -> int:
-	var database = DATABASE_SCRIPT.new()
-	if not database.load_all().is_empty(): return 0
+	var database = career_database()
+	if not _database_errors.is_empty(): return 0
 	var power_rows: Array = []
 	for team in database.teams:
 		power_rows.append({"id":str(team.get("id", "")), "power":roundi(get_team_power()) if str(team.get("id", "")) == str(data.get("organization_id", "")) else int(team.get("ranking", {}).get("power", 0))})
@@ -76,6 +144,28 @@ func _next_record_id(prefix: String) -> String:
 	var sequence := int(data.get("next_record_sequence", 1))
 	data.next_record_sequence = sequence + 1
 	return "%s:%s:%d" % [prefix, str(data.get("career_id", "career")), sequence]
+
+func _command_error(error_code: String, message: String, details: Dictionary = {}) -> Dictionary:
+	return {"ok":false, "error_code":error_code, "message":message, "error":message, "details":details, "changed":[]}
+
+func _command_result(ok: bool, action: String, changed: Array, event: Dictionary = {}, persist := true, before: Dictionary = {}) -> Dictionary:
+	if not ok: return _command_error("COMMAND_FAILED", action)
+	var result := {"ok":true, "action":action, "changed":changed.duplicate(), "event":event.duplicate(true)}
+	_record_domain_action(action, before, _audit_snapshot(changed), event)
+	if persist and not save_game(): return _command_error("SAVE_FAILED", "Career action could not be persisted.", {"action":action})
+	state_changed.emit(result)
+	return result
+
+func _audit_snapshot(fields: Array) -> Dictionary:
+	var snapshot: Dictionary = {}
+	for field in fields:
+		if data.has(str(field)): snapshot[str(field)] = data[str(field)].duplicate(true) if data[str(field)] is Dictionary or data[str(field)] is Array else data[str(field)]
+	return snapshot
+
+func _record_domain_action(action: String, before: Dictionary, after: Dictionary, reason: Dictionary = {}) -> void:
+	if not data.has("domain_audit_log"): data.domain_audit_log = []
+	data.domain_audit_log.push_front({"id":_next_record_id("action"), "action":action, "date":str(data.get("current_date", SEASON_START_DATE)), "week":int(data.get("week", 1)), "before":before.duplicate(true), "after":after.duplicate(true), "reason":reason.duplicate(true)})
+	if data.domain_audit_log.size() > 60: data.domain_audit_log.resize(60)
 
 func _record_progression(kind: String, title: String, detail: String, values: Dictionary = {}) -> void:
 	var log: Array = data.get("progression_log", [])
@@ -95,8 +185,8 @@ func new_career(org_name: String, background: String, region: String, options: D
 	if options.has("slot_id") or save_path == SAVE_PATH: save_path = slot_path(requested_slot)
 	seed(20260804)
 	_generated_player_ids.clear(); _generated_player_names.clear(); _generated_player_handles.clear()
-	var game_database = DATABASE_SCRIPT.new()
-	var database_errors: PackedStringArray = game_database.load_all()
+	var game_database = career_database()
+	var database_errors: PackedStringArray = _database_errors
 	var roster: Array = []
 	var market: Array = []
 	var default_team_id := "mekong_reapers"
@@ -146,7 +236,7 @@ func new_career(org_name: String, background: String, region: String, options: D
 		"coach_plan": {"drop_policy":"ADAPTIVE", "zone_macro":"CENTER", "formation":"TWO_TWO", "engagement":"SELECTIVE", "positioning":"CENTER_HOLD", "spacing":"NORMAL", "flank":"NONE", "focus_fire":"FOCUS", "target_priority":"LOWEST_HP", "combat_range":"ADAPTIVE", "information":"INFO_FIRST", "resource":"MINIMAL"}, "map_tactics":{}, "match_decisions":{"EARLY":"ROTATE","MID":"HOLD","END":"FIGHT"},
 		"facilities": {"Training Room": 1, "Analytics Lab": 1, "Medical Room": 1, "Streaming Room": 1}, "facility_projects": [],
 		"roster": roster, "market": market, "teams": teams, "inbox": [], "history": [], "last_match": {}, "match_replays": [], "tournament_results": {}, "previous_team_power": 0, "ranking_trend": 0,
-		"days_elapsed":0, "progression_log":[], "season_history":[], "season_transition":{}, "season_start_budget":int(tier_profile.budget), "next_record_sequence":1,
+		"days_elapsed":0, "season_start_days_elapsed":0, "progression_log":[], "season_history":[], "season_transition":{}, "season_start_budget":int(tier_profile.budget), "next_record_sequence":1,
 		"loaned_players":[], "loan_records":[], "inbound_offers":[], "transferred_out_players":[], "media_stories":[],
 		"scrim_requests":initial_scrims, "scrim_history":[], "tactical_familiarity":0,
 		"tournament_registrations":{"gsi_2026_s1":{"status":"REGISTERED","registered_at":SEASON_START_DATE}},
@@ -254,14 +344,14 @@ func adjust_relationship(player_a: String, player_b: String, delta: int, memory 
 	return {"ok":true,"record":record.duplicate(true)}
 
 func player_profile_from_database(player_id: String) -> Dictionary:
-	var database = DATABASE_SCRIPT.new()
-	var errors: PackedStringArray = database.load_all()
+	var database = career_database()
+	var errors: PackedStringArray = _database_errors
 	if not errors.is_empty(): return {}
 	var source: Dictionary = database.get_player(player_id)
 	return _player_from_database(source, false) if not source.is_empty() else {}
 
 func scouting_pool(query := "", role := "") -> Array:
-	var database = DATABASE_SCRIPT.new(); var errors: PackedStringArray = database.load_all()
+	var database = career_database(); var errors: PackedStringArray = _database_errors
 	if not errors.is_empty(): return []
 	var result: Array = []
 	for source in database.search_players(query, "", "" if role in ["", "ALL", "U23", "HIGH POTENTIAL"] else role.capitalize()):
@@ -272,7 +362,7 @@ func scouting_pool(query := "", role := "") -> Array:
 	return result
 
 func eligible_national_players(national_team_id: String) -> Array:
-	var database = DATABASE_SCRIPT.new(); var errors: PackedStringArray = database.load_all()
+	var database = career_database(); var errors: PackedStringArray = _database_errors
 	if not errors.is_empty(): return []
 	var national_team: Dictionary = database.get_team(national_team_id)
 	if national_team.is_empty() or str(national_team.get("team_type", "")) != "NATIONAL": return []
@@ -284,7 +374,7 @@ func eligible_national_players(national_team_id: String) -> Array:
 	return result
 
 func select_national_team(team_id: String) -> Dictionary:
-	var database = DATABASE_SCRIPT.new(); var errors: PackedStringArray = database.load_all(); var team: Dictionary = database.get_team(team_id)
+	var database = career_database(); var errors: PackedStringArray = _database_errors; var team: Dictionary = database.get_team(team_id)
 	if not errors.is_empty() or team.is_empty() or str(team.get("team_type", "")) != "NATIONAL": return {"ok":false,"error":"National team is invalid"}
 	data.national_team_id = team_id; data.management_context = "NATIONAL"; save_game(); return {"ok":true,"team_id":team_id}
 
@@ -328,7 +418,7 @@ func accept_scrim(request_id: String, options: Dictionary = {}) -> Dictionary:
 	data.chemistry = clampi(int(data.get("chemistry",50)) + chemistry_gain, 0, 100); data.tactical_familiarity = clampi(int(data.get("tactical_familiarity",0)) + familiarity_gain, 0, 100)
 	if objective == "PLAYER_FORM":
 		for player in data.get("roster", []).slice(0,4): player.form = clampi(int(player.form) + 1, 0, 99); player.energy = clampi(int(player.energy) - match_count, 0, 100)
-	var record := {"id":"scrim-%d" % Time.get_unix_time_from_system(),"cluster_id":str(request.get("cluster_id","A")),"cluster_name":str(request.get("cluster_name","SCRIM CLUSTER A")),"participants":request.get("participants",[]).duplicate(true),"week":int(data.get("week",1)),"matches":match_count,"map":map_id,"objective":objective,"placement":placement,"chemistry_gain":chemistry_gain,"familiarity_gain":familiarity_gain,"official_ranking_impact":0}
+	var record := {"id":_next_record_id("scrim"),"cluster_id":str(request.get("cluster_id","A")),"cluster_name":str(request.get("cluster_name","SCRIM CLUSTER A")),"participants":request.get("participants",[]).duplicate(true),"week":int(data.get("week",1)),"matches":match_count,"map":map_id,"objective":objective,"placement":placement,"chemistry_gain":chemistry_gain,"familiarity_gain":familiarity_gain,"official_ranking_impact":0}
 	data.scrim_history.push_front(record); requests.erase(request); data.scrim_requests = requests; acknowledge_calendar_event(request_id); save_game(); return {"ok":true,"result":record}
 
 func reject_scrim(request_id: String) -> Dictionary:
@@ -432,25 +522,19 @@ func advance_week(advance_calendar := true) -> Dictionary:
 		payroll += roundi(int(loaned.get("salary", 0)) * (100 - coverage) / 100.0)
 		if int(data.week) % 4 == 0: loaned.contract = maxi(0, int(loaned.get("contract", 0)) - 1)
 	var expired_players:Array = []
+	var development_results: Array = []
 	for p in data.roster:
 		payroll += int(p.salary)
 		var recovery_level := int(data.facilities.get("Medical Room", 1))
 		var training_level := int(data.facilities.get("Training Room", 1))
-		var fatigue_resistance := int(p.get("fatigue_resistance", 60))
-		var energy_change := 7 + recovery_level * 2 if data.schedule == "Nghỉ & hồi phục" else (-8 + fatigue_resistance / 25 if data.schedule == "Cường độ cao" else 1 + recovery_level)
-		p.energy = clampi(int(p.energy) + energy_change + randi_range(-1, 1), 15, 100)
-		var growth_chance := (0.34 if data.schedule == "Cường độ cao" else 0.16) + float(training_level) * 0.04 + head_coach_bonus + float(difficulty_rules().training_chance)
-		if randf() < growth_chance and int(p.overall) < int(p.potential) and int(p.energy) > 40:
-			var focus_key := _training_stat_key(str(data.get("training_focus", "Cân bằng")), str(p.get("role", "Flex")))
-			p[focus_key] = clampi(int(p.get(focus_key, p.overall)) + 1, 1, int(p.potential))
-			var core_average := (int(p.aim) + int(p.game_sense) + int(p.teamwork) + int(p.clutch)) / 4
-			p.overall = mini(int(p.potential), maxi(int(p.overall), roundi(core_average * 0.65 + int(p.overall) * 0.35)))
-		p.form = clampi(int(p.form) + (2 if data.schedule == "Cường độ cao" and int(p.energy) > 55 else -1 if int(p.energy) < 35 else 0), 25, 99)
-		var individual_focus := str(data.get("individual_training", {}).get(str(p.get("id", "")), ""))
-		if not individual_focus.is_empty():
-			var focus_stat: String = str({"Aim":"aim","Strategy":"game_sense","Mental":"clutch","Recovery":"energy","Teamwork":"teamwork"}.get(individual_focus,"aim"))
-			p[focus_stat] = clampi(int(p.get(focus_stat, 50)) + 1, 1, 99); p.energy = clampi(int(p.energy) - (2 if individual_focus != "Recovery" else -mental_bonus), 15, 100)
-		p.happiness = clampi(int(p.get("happiness", 60)) + roundi(float(mental_bonus) / 3.0), 0, 100)
+		development_results.append(PLAYER_DEVELOPMENT_DOMAIN.apply_week(p, data, {
+			"recovery_level":recovery_level,
+			"training_level":training_level,
+			"head_coach_bonus":head_coach_bonus,
+			"mental_bonus":mental_bonus,
+			"difficulty_bonus":float(difficulty_rules().training_chance),
+			"focus_stat":_training_stat_key(str(data.get("training_focus", "Cân bằng")), str(p.get("role", "Flex")))
+		}))
 		if int(data.week) % 4 == 0:
 			p.contract = maxi(0, int(p.get("contract", 0)) - 1)
 			if int(p.contract) == 0: expired_players.append(p)
@@ -458,6 +542,7 @@ func advance_week(advance_calendar := true) -> Dictionary:
 		if data.roster.size() <= 4: expired.contract = 1; _add_news("Contract decision: %s" % expired.name, "The club must resolve this renewal before next week.", "CONTRACT", "player_detail")
 		else:
 			expired.owned = false; expired.scouted = true; expired.confidence = 100; expired.squad_role = "free_agent"; data.market.append(expired); data.roster.erase(expired); _add_news("Contract expired: %s" % expired.name, "The player has entered free agency.", "CONTRACT", "transfer")
+	ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 	data.previous_team_power = old_team_power
 	data.ranking_trend = roundi(get_team_power()) - old_team_power
 	for opponent in data.get("teams", []):
@@ -469,28 +554,10 @@ func advance_week(advance_calendar := true) -> Dictionary:
 		opponent.fans = maxi(1000, int(opponent.get("fans", 10000 + baseline * 250)) + randi_range(-250, 600))
 		opponent.reputation = clampi(int(opponent.get("reputation", baseline)) + signi(int(opponent.trend)), 20, 99)
 		opponent.budget = maxi(50000, int(opponent.get("budget", 400000 + baseline * 5000)) + randi_range(-18000, 26000))
-	var streaming_level := int(data.facilities.get("Streaming Room", 1))
-	var economy_scale := float(difficulty_rules().economy)
-	var merchandise_income := roundi((6500 + int(data.get("fans", 0)) / 18) * economy_scale)
-	var video_income := roundi((4200 + streaming_level * 1700 + int(data.get("reputation", 0)) * 55) * economy_scale)
-	var streaming_income := roundi((7800 + streaming_level * 3100) * economy_scale)
-	var commercial_income := merchandise_income + video_income + streaming_income
-	var sponsor_income := 0
-	for sponsor in data.get("sponsors", []):
-		if str(sponsor.get("id", "")) == str(data.get("active_sponsor_id", "")): sponsor_income = int(sponsor.get("weekly_income", 0)); break
-	var facility_upkeep := 0
-	for facility_level in data.facilities.values(): facility_upkeep += int(facility_level) * 850
-	var scouting_expense := 1800 + int(data.facilities.get("Scouting Department", 1)) * 900
-	var travel_expense := 4500 if not get_next_match(true).is_empty() else 0
-	data.budget += commercial_income + sponsor_income - payroll - facility_upkeep - scouting_expense - travel_expense
-	_add_finance_entry("Merchandise", merchandise_income)
-	_add_finance_entry("Video platforms", video_income)
-	_add_finance_entry("Streaming", streaming_income)
-	if sponsor_income > 0: _add_finance_entry("Sponsor activation", sponsor_income)
-	_add_finance_entry("Player payroll", -payroll)
-	_add_finance_entry("Facility upkeep", -facility_upkeep)
-	_add_finance_entry("Scouting operations", -scouting_expense)
-	if travel_expense > 0: _add_finance_entry("Competition travel", -travel_expense)
+	var finance_plan := FINANCE_DOMAIN.weekly_operating_plan(data, payroll, float(difficulty_rules().economy), not get_next_match(true).is_empty())
+	data.budget += int(finance_plan.net)
+	for finance_entry in finance_plan.entries:
+		_add_finance_entry(str(finance_entry.label), int(finance_entry.amount))
 	if int(data.week) % 2 == 0:
 		_scout_progress()
 	generate_inbound_offers(false)
@@ -508,9 +575,10 @@ func advance_week(advance_calendar := true) -> Dictionary:
 	for player in data.get("roster", []): new_energy += int(player.get("energy", 0))
 	var energy_delta := roundi(float(new_energy - old_energy) / maxi(1, data.get("roster", []).size()))
 	var net_change := int(data.get("budget", 0)) - old_budget
-	_record_progression("week", "Weekly management processed", "Training, contracts and organization finance were processed.", {"energy_delta":energy_delta,"budget_delta":net_change,"team_power_delta":roundi(get_team_power())-old_team_power})
+	var developed_players := development_results.filter(func(result): return bool(result.get("grew", false))).map(func(result): return str(result.get("player_id", "")))
+	_record_progression("week", "Weekly management processed", "Training, contracts and organization finance were processed.", {"energy_delta":energy_delta,"budget_delta":net_change,"team_power_delta":roundi(get_team_power())-old_team_power,"developed_players":developed_players})
 	save_game()
-	return {"payroll": payroll, "income":commercial_income + sponsor_income, "expenses":payroll + facility_upkeep + scouting_expense + travel_expense,"consequences":progression_summary(3)}
+	return {"payroll": payroll, "income":int(finance_plan.income), "expenses":int(finance_plan.expenses), "development":development_results, "consequences":progression_summary(3)}
 
 func _review_sponsor_objective() -> void:
 	if str(data.get("active_sponsor_id", "")).is_empty(): return
@@ -536,14 +604,14 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 	if target_event.is_empty(): return {"ok":false, "error":"No playable calendar event"}
 	var event_id := str(target_event.get("id", ""))
 	var transaction_id := str(runtime_result.get("match_id", event_id))
-	if str(data.get("last_match", {}).get("transaction_id", "")) == transaction_id:
+	if str(data.get("last_match", {}).get("transaction_id", "")) == transaction_id or data.get("telemetry", []).any(func(record): return str(record.get("match_id", "")) == transaction_id) or data.get("history", []).any(func(record): return str(record.get("event_id", "")) == event_id):
 		return {"ok":true, "duplicate":true, "event_id":event_id}
 	var standings: Array = runtime_result.get("scoreboard", [])
 	var players: Array = runtime_result.get("player_stats", [])
 	if standings.is_empty() or players.is_empty(): return {"ok":false, "error":"Empty standings/player stats"}
 	var lobby_size := standings.size()
 	var committed := runtime_result.duplicate(true)
-	committed.source = "match_runtime"; committed.transaction_id = transaction_id; committed.event_id = event_id
+	committed.source = "match_runtime"; committed.transaction_id = transaction_id; committed.event_id = event_id; committed.match_result_contract_version = 1
 	committed.tournament = target_event.get("tournament", data.get("active_tournament_name", "")); committed.date = target_event.get("date", data.get("current_date", ""))
 	var own_row: Dictionary = {}
 	for row in standings:
@@ -564,7 +632,7 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 	var events: Array = next_data.get("calendar_events", [])
 	for item in events:
 		if str(item.get("id", "")) == event_id:
-			item.status = "completed"; item.result = {"placement":int(committed.get("placement", lobby_size)),"kills":int(committed.get("kills", 0)),"points":int(own_row.get("points", 0)),"transaction_id":transaction_id}
+			item.status = "completed"; item.completed = true; item.result = {"placement":int(committed.get("placement", lobby_size)),"kills":int(committed.get("kills", 0)),"points":int(own_row.get("points", 0)),"transaction_id":transaction_id}
 	next_data.calendar_events = events
 	var placement := int(committed.get("placement", own_row.get("rank", lobby_size)))
 	var points := int(own_row.get("points", 0))
@@ -599,6 +667,8 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 		var mvp_score := int(stat.get("kills", 0)) * 300 + int(stat.get("damage", 0)) + int(stat.get("revives", 0)) * 120 + (150 if bool(stat.get("survived", false)) else 0)
 		if mvp.is_empty() or mvp_score > int(mvp.get("score", -1)): mvp = {"player_id":player_id,"name":str(stat.get("name", "")),"score":mvp_score,"kills":int(stat.get("kills", 0)),"damage":int(stat.get("damage", 0))}
 	committed.mvp = mvp
+	var career_feedback := MATCH_CAREER_FEEDBACK.apply(next_data, committed, own_player_stats, placement)
+	committed.career_feedback = career_feedback.duplicate(true)
 	next_data.last_match = committed
 	var replays:Array = next_data.get("match_replays", [])
 	replays.push_front(committed.duplicate(true))
@@ -608,7 +678,7 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 	inbox.push_front({"id":"MATCH-%s" % transaction_id,"title":"Result: placement #%d" % placement,"body":"The squad scored %d kills and %d points. MVP: %s." % [int(committed.get("kills", 0)),points,str(mvp.get("name", "—"))],"week":int(next_data.get("week", 1)),"category":"COMPETITION","action_page":"tournament","read":false})
 	if inbox.size() > 10: inbox.resize(10)
 	next_data.inbox = inbox
-	var telemetry_record := {"match_id":transaction_id,"date":committed.date,"map":str(committed.get("map", target_event.get("map", ""))),"placement":placement,"kills":int(committed.get("kills", 0)),"points":points,"player_stats":own_player_stats.duplicate(true),"weapon_stats":committed.get("weapon_stats", {}).duplicate(true),"zone_events":committed.get("zone_events", []).duplicate(true),"decisions":committed.get("decisions", []).duplicate(true)}
+	var telemetry_record := {"contract_version":1,"match_id":transaction_id,"date":committed.date,"map":str(committed.get("map", target_event.get("map", ""))),"placement":placement,"kills":int(committed.get("kills", 0)),"points":points,"player_stats":own_player_stats.duplicate(true),"weapon_stats":committed.get("weapon_stats", {}).duplicate(true),"zone_events":committed.get("zone_events", []).duplicate(true),"decisions":committed.get("decision_log", committed.get("decisions", [])).duplicate(true),"career_feedback":career_feedback.duplicate(true)}
 	var telemetry:Array = next_data.get("telemetry", []); telemetry.push_front(telemetry_record); if telemetry.size() > 100: telemetry.resize(100); next_data.telemetry = telemetry
 	var sentiment_delta := 5 if placement <= 3 else 2 if placement <= 8 else -5
 	next_data.fan_sentiment = clampi(int(next_data.get("fan_sentiment", 65)) + sentiment_delta, 0, 100)
@@ -619,7 +689,7 @@ func apply_match_runtime_result(runtime_result: Dictionary, event: Dictionary = 
 	pending.append({"id":"%s:%s" % [event_type, transaction_id],"type":event_type,"status":"response_required","created_week":int(next_data.get("week", 1)),"context":{"match_id":transaction_id,"placement":placement,"kills":int(committed.get("kills", 0)),"mvp":mvp.duplicate(true)},"choices":[{"id":"protect_players","label":"Protect the players","effects":{"morale":4,"board_confidence":-2,"fan_sentiment":1}},{"id":"demand_more","label":"Demand improvement","effects":{"morale":-4,"board_confidence":3,"discipline":3}},{"id":"stay_measured","label":"Stay measured","effects":{"morale":1,"board_confidence":1,"fan_sentiment":1}}]})
 	next_data.pending_events = pending
 	data = next_data
-	_record_progression("match", "Match result committed", "Placement #%d • %d kills • %d points." % [placement, int(committed.get("kills",0)), points], {"placement":placement,"kills":int(committed.get("kills",0)),"points":points,"prize":prize_income})
+	_record_progression("match", "Match result committed", "Placement #%d • %d kills • %d points." % [placement, int(committed.get("kills",0)), points], {"placement":placement,"kills":int(committed.get("kills",0)),"points":points,"prize":prize_income,"career_feedback":career_feedback})
 	if not save_game():
 		data = previous_data
 		return {"ok":false,"error":"Failed to save match result transaction; changes rolled back"}
@@ -658,12 +728,16 @@ func apply_meta_patch(changes: Dictionary, note := "Manual balance patch") -> Di
 	var normalized: Dictionary = {}
 	for key in changes:
 		var value := clampf(float(changes[key]), 0.5, 1.5); normalized[str(key)] = value
-	var patch := {"id":"patch-%d" % Time.get_unix_time_from_system(),"week":int(data.get("week",1)),"changes":normalized,"note":note}
+	var patch := {"id":_next_record_id("meta_patch"),"week":int(data.get("week",1)),"changes":normalized,"note":note}
 	data.meta_state.patch_history.append(patch); data.simulation_overrides["weapon_modifiers"] = normalized; save_game(); return {"ok":true,"patch":patch}
 
 func resolve_event(event_id: String, choice_id: String) -> Dictionary:
 	for event in data.get("pending_events", []):
 		if str(event.get("id", "")) != event_id: continue
+		if str(event.get("lifecycle_status", "PENDING")) != "PENDING": return _command_error("EVENT_NOT_PENDING", "Event is no longer pending.", {"event_id":event_id})
+		if int(event.get("deadline_week", 999999)) < int(data.get("week", 1)):
+			event.status = "expired"; event.lifecycle_status = "EXPIRED"; event.resolved_date = str(data.get("current_date", SEASON_START_DATE)); data.event_history.push_front(event.duplicate(true)); data.pending_events.erase(event); save_game()
+			return _command_error("EVENT_EXPIRED", "Event deadline has passed.", {"event_id":event_id})
 		for choice in event.get("choices", []):
 			if str(choice.get("id", "")) != choice_id: continue
 			var effects: Dictionary = choice.get("effects", {})
@@ -682,7 +756,7 @@ func resolve_event(event_id: String, choice_id: String) -> Dictionary:
 							if str(player.get("id", "")) == str(player_id): player.happiness = clampi(int(player.get("happiness",60)) + int(effects[key][player_id]), 0, 100); player.morale = clampi(int(player.get("morale",60)) + int(effects[key][player_id]), 0, 100)
 				elif key == "discipline": data.organization_dna.discipline = clampi(int(data.organization_dna.get("discipline",50)) + int(effects[key]),0,100)
 				elif data.has(key): data[key] = clampi(int(data.get(key, 0)) + int(effects[key]), 0, 100)
-			event.status = "resolved"; event.selected_choice = choice_id; event.resolved_week = int(data.get("week",1)); event.applied_effects = effects.duplicate(true)
+			event.status = "resolved"; event.lifecycle_status = "RESOLVED"; event.selected_choice = choice_id; event.resolved_week = int(data.get("week",1)); event.resolved_date = str(data.get("current_date", SEASON_START_DATE)); event.applied_effects = effects.duplicate(true)
 			data.event_history.push_front(event.duplicate(true)); data.pending_events.erase(event); save_game(); return {"ok":true,"effects":effects}
 		return {"ok":false,"error":"Choice does not exist."}
 	return {"ok":false,"error":"Event does not exist."}
@@ -746,6 +820,7 @@ func sign_player(index: int) -> String:
 	p.confidence = 100
 	p.squad_role = "substitute" if data.roster.size() >= 4 else "starter"
 	data.roster.append(p)
+	ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 	data.market.remove_at(index)
 	for team in data.get("teams", []):
 		if str(team.get("database_id", "")) == source_team_id: team.roster_ids.erase(str(p.id)); break
@@ -765,7 +840,7 @@ func create_transfer_offer(player_id: String, terms: Dictionary = {}) -> Diction
 	var months := clampi(int(terms.get("months", 24)), 12, 48); var role := str(terms.get("role", "ROTATION")); var starter := bool(terms.get("starter_guarantee", false))
 	var interest := int(data.get("reputation", 0)) + int(candidate.get("confidence", 0)) / 4 + (10 if starter else 0) + clampi((salary - int(candidate.get("salary", 0))) / 450, -8, 16)
 	var response := "ACCEPT" if interest >= 62 else "COUNTER" if interest >= 42 else "REJECT"
-	var offer_id := "offer:%s:%d" % [player_id, Time.get_unix_time_from_system()]
+	var offer_id := _next_record_id("transfer_offer")
 	if organization_player_count() >= 7: return {"ok":false,"error":"The organization has reached its seven-player limit, including players on loan."}
 	if int(data.get("budget", 0)) < int(candidate.get("value", 0)): return {"ok":false,"error":"The transfer budget cannot cover the required fee."}
 	var offer := {"id":offer_id,"player_id":player_id,"player_name":str(candidate.get("name","Player")),"fee":int(candidate.get("value",0)),"salary":salary,"months":months,"role":role,"starter_guarantee":starter,"status":"PENDING","response":response,"created_week":int(data.get("week",1)),"counter_salary":salary+1000,"counter_months":mini(48,months+12)}
@@ -789,7 +864,7 @@ func resolve_transfer_offer(offer_id: String, action: String) -> Dictionary:
 		var player: Dictionary = data.market[index]; data.budget -= int(offer.fee); player.salary = int(offer.get("counter_salary",offer.salary)) if action=="counter" else int(offer.salary); player.contract = int(offer.get("counter_months",offer.months)) if action=="counter" else int(offer.months); player.owned=true; player.scouted=true; player.confidence=100; player.team_id=str(data.get("organization_id","")); data.market.remove_at(index)
 		if bool(offer.get("starter_guarantee",false)) and data.roster.size() >= 4: data.roster.insert(3, player)
 		else: data.roster.append(player)
-		for roster_index in data.roster.size(): data.roster[roster_index].squad_role = "starter" if roster_index < 4 else "substitute"
+		ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 		_ensure_personality_and_relationships(); data.chemistry=maxi(25,int(data.chemistry)-4); offer.status="SIGNED"; _add_finance_entry("Transfer • %s" % str(player.name),-int(offer.fee)); _add_news("New signing: %s" % str(player.name),"Contract finalized through negotiation.","TRANSFER","roster"); save_game(); return {"ok":true,"status":"SIGNED"}
 	return {"ok":false,"error":"Offer does not exist."}
 
@@ -842,7 +917,7 @@ func move_roster_player(player_id: String, to_starter: bool) -> Dictionary:
 		if index >= 4: return {"ok":true,"unchanged":true}
 		if roster.size() <= 4: return {"ok":false,"error":"A four-player active squad is required."}
 		var replaced_substitute: Dictionary = roster[4]; roster[4] = roster[index]; roster[index] = replaced_substitute
-	for i in roster.size(): roster[i].squad_role = "starter" if i < 4 else "substitute"
+	ROSTER_DOMAIN.normalize_squad_roles(roster)
 	save_game(); return {"ok":true,"player_id":player_id,"starter":to_starter}
 
 func set_coach_plan_values(values: Dictionary) -> Dictionary:
@@ -921,7 +996,7 @@ func create_loan(player_id: String, destination_id := "", duration_weeks := 8, s
 	var return_date := _add_days(str(data.get("current_date", SEASON_START_DATE)), weeks * 7)
 	var loan_id := "loan:S%d:W%d:%s" % [int(data.get("season",1)), int(data.get("week",1)), player_id]
 	var record := {"id":loan_id,"player_id":player_id,"player_name":str(player.get("name","Player")),"destination_team_id":str(destination.get("id","")),"destination_team_name":str(destination.get("name","Partner club")),"duration_weeks":weeks,"salary_coverage":coverage,"start_date":str(data.get("current_date",SEASON_START_DATE)),"return_date":return_date,"status":"ACTIVE"}
-	data.roster.erase(player); player.loaned = true; player.loan_id = loan_id; player.squad_role = "on_loan"; player.current_team_name = str(destination.get("name","Partner club"))
+	data.roster.erase(player); ROSTER_DOMAIN.normalize_squad_roles(data.roster); player.loaned = true; player.loan_id = loan_id; player.squad_role = "on_loan"; player.current_team_name = str(destination.get("name","Partner club"))
 	data.loaned_players.append(player); data.loan_records.append(record)
 	data.calendar_events.append({"id":"loan-return:%s" % loan_id,"date":return_date,"time":"09:00","priority":45,"requires_player_action":false,"completed":false,"status":"scheduled","type":"loan_return","tournament":"PLAYER LOAN","round":"%s RETURNS" % str(player.get("name","PLAYER")),"player_id":player_id,"loan_id":loan_id})
 	_add_news("Loan agreed: %s" % str(player.name), "%s joined %s until %s. The club retains %d%% of salary cost." % [str(player.name), str(destination.get("name","Partner club")), return_date, 100-coverage], "TRANSFER", "roster")
@@ -940,7 +1015,7 @@ func _process_loan_returns(current_date: String) -> Array:
 		for candidate in data.get("loaned_players", []):
 			if str(candidate.get("id", "")) == str(record.get("player_id", "")): player = candidate; break
 		if player.is_empty(): record.status = "RETURN_ERROR"; continue
-		data.loaned_players.erase(player); player.loaned = false; player.erase("loan_id"); player.squad_role = "substitute"; player.current_team_name = str(data.get("org_name", "Organization")); data.roster.append(player)
+		data.loaned_players.erase(player); player.loaned = false; player.erase("loan_id"); player.current_team_name = str(data.get("org_name", "Organization")); data.roster.append(player); ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 		record.status = "RETURNED"; record.returned_date = current_date; returned.append(record.duplicate(true))
 		for event in data.get("calendar_events", []):
 			if str(event.get("loan_id", "")) == str(record.get("id", "")): event.status = "completed"; event.completed = true
@@ -953,7 +1028,7 @@ func terminate_player_contract(player_id: String) -> String:
 	for player in data.get("roster", []):
 		if str(player.get("id", "")) != player_id: continue
 		var fee := int(player.get("salary", 0)) * maxi(1, int(player.get("contract", 0)))
-		data.budget = maxi(0, int(data.get("budget", 0)) - fee); data.roster.erase(player)
+		data.budget = maxi(0, int(data.get("budget", 0)) - fee); data.roster.erase(player); ROSTER_DOMAIN.normalize_squad_roles(data.roster)
 		player.owned = false; player.squad_role = "free_agent"; data.market.append(player)
 		_add_finance_entry("Termination • %s" % str(player.name), -fee); _add_news("Contract terminated: %s" % str(player.name), "Player released after termination fee.", "CONTRACT", "transfer")
 		save_game(); return "Contract terminated for %s." % str(player.name)
@@ -963,7 +1038,7 @@ func release_player(player_id: String) -> String:
 	if data.get("roster", []).size() <= 4: return "A player cannot be released while only four players remain."
 	for player in data.get("roster", []):
 		if str(player.get("id", "")) != player_id: continue
-		data.roster.erase(player); player.owned = false; player.squad_role = "free_agent"; data.market.append(player)
+		data.roster.erase(player); ROSTER_DOMAIN.normalize_squad_roles(data.roster); player.owned = false; player.squad_role = "free_agent"; data.market.append(player)
 		_add_news("Player released: %s" % str(player.name), "The player is now a free agent.", "CONTRACT", "transfer")
 		save_game(); return "%s released to free agency." % str(player.name)
 	return "Player not found."
@@ -1003,7 +1078,7 @@ func upgrade_facility(name: String) -> String:
 	var duration_days := maxi(2, int(definition.get("construction_days", 3 + level * 2)))
 	var completion_date := _add_days(str(data.get("current_date", SEASON_START_DATE)), duration_days)
 	data.budget -= cost
-	var project := {"id":"facility-%s-%d" % [name.to_lower().replace(" ","-"), Time.get_unix_time_from_system()],"facility":name,"from_level":level,"target_level":level+1,"cost":cost,"start_date":str(data.get("current_date",SEASON_START_DATE)),"completion_date":completion_date,"duration_days":duration_days,"status":"UPGRADING"}
+	var project := {"id":_next_record_id("facility"),"facility":name,"from_level":level,"target_level":level+1,"cost":cost,"start_date":str(data.get("current_date",SEASON_START_DATE)),"completion_date":completion_date,"duration_days":duration_days,"status":"UPGRADING"}
 	data.facility_projects.append(project)
 	data.calendar_events.append({"id":project.id,"date":completion_date,"time":"09:00","priority":90,"requires_player_action":true,"completed":false,"status":"scheduled","type":"facility","tournament":"FACILITY","round":"%s UPGRADE COMPLETE" % name,"facility":name})
 	save_game()
@@ -1129,6 +1204,7 @@ func _end_season() -> void:
 	data.season_history.push_front(summary); data.season_transition = summary.duplicate(true)
 	data.season = completed_season + 1
 	data.week = 1
+	data.season_start_days_elapsed = int(data.get("days_elapsed", 0))
 	data.tournament_results = {}
 	data.tournament_registrations = {}
 	for offer in data.get("inbound_offers", []):
@@ -1164,11 +1240,33 @@ func _add_news(title: String, body: String, category := "SYSTEM", action_page :=
 
 func save_game() -> bool:
 	if data.is_empty(): return false
+	_normalize_runtime_schema()
 	data.save_version = SAVE_VERSION
+	var validation := validate_state()
+	if not bool(validation.get("ok", false)):
+		push_error("Career save rejected by state invariants: %s" % JSON.stringify(validation.get("errors", [])))
+		return false
 	data.last_saved_at = Time.get_datetime_string_from_system()
-	var file := FileAccess.open(save_path, FileAccess.WRITE)
+	var temporary_path := save_path + ".tmp"
+	var backup_path := save_path + ".backup"
+	var file := FileAccess.open(temporary_path, FileAccess.WRITE)
 	if file == null: return false
 	file.store_string(JSON.stringify(data, "  "))
+	file.flush()
+	file = null
+	if FileAccess.file_exists(save_path):
+		var backup := FileAccess.open(backup_path, FileAccess.WRITE)
+		if backup == null:
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(temporary_path))
+			return false
+		backup.store_buffer(FileAccess.get_file_as_bytes(save_path)); backup.flush(); backup = null
+		if DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path)) != OK:
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(temporary_path))
+			return false
+	var rename_error := DirAccess.rename_absolute(ProjectSettings.globalize_path(temporary_path), ProjectSettings.globalize_path(save_path))
+	if rename_error != OK:
+		if FileAccess.file_exists(backup_path): DirAccess.rename_absolute(ProjectSettings.globalize_path(backup_path), ProjectSettings.globalize_path(save_path))
+		return false
 	return true
 
 func load_game() -> bool:
@@ -1177,12 +1275,39 @@ func load_game() -> bool:
 	if parser.parse(FileAccess.get_file_as_string(save_path)) != OK: return false
 	var parsed = parser.data
 	if not parsed is Dictionary: return false
-	data = parsed
+	var migration := SAVE_MIGRATIONS.migrate(parsed, SAVE_VERSION)
+	if not bool(migration.get("ok", false)): return false
+	var previous := data
+	data = migration.data
 	_migrate_save()
-	save_game()
+	_normalize_runtime_schema()
+	var validation := validate_state()
+	if not bool(validation.get("ok", false)):
+		data = previous
+		push_error("Career load rejected by state invariants: %s" % JSON.stringify(validation.get("errors", [])))
+		return false
+	if not save_game():
+		data = previous
+		return false
 	return true
 
+func _normalize_runtime_schema() -> void:
+	if not data.has("domain_audit_log"): data.domain_audit_log = []
+	if not data.has("season_start_days_elapsed"): data.season_start_days_elapsed = maxi(0, int(data.get("days_elapsed", 0)) - maxi(0, int(data.get("week", 1)) - 1) * 7)
+	for event in data.get("pending_events", []):
+		event.lifecycle_status = "PENDING"
+		if not event.has("created_date"): event.created_date = str(data.get("current_date", SEASON_START_DATE))
+		if not event.has("context"): event.context = {}
+	for event in data.get("event_history", []):
+		var terminal := "EXPIRED" if str(event.get("status", "")).to_lower() == "expired" else "CANCELLED" if str(event.get("status", "")).to_lower() == "cancelled" else "RESOLVED"
+		event.lifecycle_status = terminal
+		if not event.has("resolved_date"): event.resolved_date = str(data.get("current_date", SEASON_START_DATE))
+	for entry in data.get("finance_ledger", []):
+		if str(entry.get("id", "")).is_empty(): entry.id = _next_record_id("finance")
+
 func _migrate_save() -> void:
+	var migration := SAVE_MIGRATIONS.migrate(data, SAVE_VERSION)
+	if bool(migration.get("ok", false)): data = migration.data
 	data.save_version = SAVE_VERSION
 	if not data.has("slot_id"): data.slot_id = _slot_from_path(save_path)
 	if not data.has("career_id"): data.career_id = "legacy-%d-%s" % [int(data.slot_id), str(data.get("organization_id", "career"))]
@@ -1308,8 +1433,8 @@ func _migrate_save() -> void:
 	_expire_inbound_offers()
 
 func _tournament_catalog() -> Array:
-	var database = DATABASE_SCRIPT.new()
-	if not database.load_all().is_empty(): return []
+	var database = career_database()
+	if not _database_errors.is_empty(): return []
 	var result: Array = []
 	for source in database.tournaments:
 		var tournament: Dictionary = source.duplicate(true)
@@ -1359,7 +1484,7 @@ func tournament_registration_status(tournament_id: String) -> Dictionary:
 	var reasons: Array = []; var conflicts: Array = []
 	var context_type := "NATIONAL_TEAM" if str(data.get("management_context", "CLUB")) == "NATIONAL" else "CLUB"
 	if str(tournament.get("participant_type", "CLUB")) != context_type: reasons.append("Tournament participant type does not match management context")
-	var database = DATABASE_SCRIPT.new(); database.load_all()
+	var database = career_database()
 	var team_id := str(data.get("national_team_id", "")) if context_type == "NATIONAL_TEAM" else str(data.get("organization_id", "")); var team: Dictionary = database.get_team(team_id)
 	var required_country := str(tournament.get("qualification_rules", {}).get("country", ""))
 	if not required_country.is_empty() and _nationality_key(str(team.get("country", ""))) != _nationality_key(required_country): reasons.append("Team country is not eligible")
@@ -1395,7 +1520,7 @@ func prepare_match_context(event: Dictionary) -> Dictionary:
 	if competition.is_empty(): return {"ok":false,"error":"Competition is missing"}
 	var participants: Array = competition.get("participants", [])
 	if participants.size() < 2: return {"ok":false,"error":"Competition has insufficient participants"}
-	var database = DATABASE_SCRIPT.new(); var errors: PackedStringArray = database.load_all()
+	var database = career_database(); var errors: PackedStringArray = _database_errors
 	if not errors.is_empty(): return {"ok":false,"error":"World database is invalid"}
 	var opponents: Array = []
 	for team_id in participants:
@@ -1407,8 +1532,8 @@ func prepare_match_context(event: Dictionary) -> Dictionary:
 	return {"ok":true,"team_count":participants.size(),"participants":participants.duplicate()}
 
 func _career_content() -> Dictionary:
-	var database = DATABASE_SCRIPT.new()
-	if not database.load_all().is_empty(): return {}
+	var database = career_database()
+	if not _database_errors.is_empty(): return {}
 	return database.career_content.duplicate(true)
 
 func _build_season_calendar(start_date: String) -> Array:
@@ -1438,7 +1563,7 @@ func get_playable_match() -> Dictionary:
 
 func get_tournament_standings(tournament_id: String) -> Array:
 	var rows: Array = []
-	var competition := get_competition(tournament_id); var database = DATABASE_SCRIPT.new(); database.load_all()
+	var competition := get_competition(tournament_id); var database = career_database()
 	for team_id in competition.get("participants", []):
 		var team: Dictionary = database.get_team(str(team_id)); if team.is_empty(): continue
 		var is_player := str(team_id) == str(data.get("organization_id", ""))

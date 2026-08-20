@@ -6,7 +6,6 @@ const UICardScript = preload("res://scripts/ui_card.gd")
 const MatchRuntimeScript = preload("res://scripts/match_runtime.gd")
 const MatchMapOverlayScript = preload("res://scripts/match_map_overlay.gd")
 const MapCatalogScript = preload("res://scripts/map_catalog.gd")
-const GameDatabaseScript = preload("res://scripts/game_database.gd")
 const ContentManagerScript = preload("res://scripts/content_manager.gd")
 const ProbabilityRingScript = preload("res://scripts/probability_ring.gd")
 const TournamentEmblemScript = preload("res://scripts/tournament_emblem.gd")
@@ -224,7 +223,7 @@ func _career_step_team() -> void:
 	var modes:=GridContainer.new(); modes.columns=3; modes.add_theme_constant_override("h_separation",12); content.add_child(modes)
 	for spec in [["existing","USE EXISTING TEAM","Take control of a database organization."],["new","CREATE NEW TEAM","Build a new identity and roster."],["replace","REPLACE EXISTING TEAM","Career-only replacement; official data stays intact."]]:
 		var value:=str(spec[0]); var card:=_choice_card(str(spec[1]),str(spec[2]),"Stable-ID career mapping",str(career_draft.team_mode)==value,ACCENT if value=="existing" else GOLD); card.pressed.connect(func(): career_draft.team_mode=value; _show_new_career()); modes.add_child(card)
-	var database:=GameDatabaseScript.new(); database.load_all()
+	var database = game.career_database()
 	if str(career_draft.team_id).is_empty():
 		for candidate in database.teams:
 			if candidate.get("roster_ids", []).size() >= 4: career_draft.team_id=str(candidate.id); career_draft.org_name=str(candidate.name); career_draft.region=str(candidate.region); break
@@ -236,7 +235,7 @@ func _career_step_team() -> void:
 	_wizard_actions(true,"TEAM IDENTITY")
 
 func _career_step_identity() -> void:
-	var database:=GameDatabaseScript.new(); database.load_all(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var existing:=str(career_draft.team_mode)=="existing"
+	var database = game.career_database(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var existing:=str(career_draft.team_mode)=="existing"
 	var split:=HBoxContainer.new(); split.add_theme_constant_override("separation",16); content.add_child(split); var form:=_panel("TEAM IDENTITY",PANEL_HIGH); form.size_flags_horizontal=Control.SIZE_EXPAND_FILL; split.add_child(form)
 	if existing:
 		form.add_child(_tag("OFFICIAL DATABASE • READ ONLY",SUCCESS))
@@ -251,7 +250,7 @@ func _career_step_identity() -> void:
 	_wizard_actions(true,"REVIEW CAREER")
 
 func _career_step_review() -> void:
-	var database:=GameDatabaseScript.new(); database.load_all(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var team_name:=str(source.get("name","Team")) if str(career_draft.team_mode)=="existing" else str(career_draft.get("org_name","Custom Team"))
+	var database = game.career_database(); var source:Dictionary=database.get_team(str(career_draft.team_id)); var team_name:=str(source.get("name","Team")) if str(career_draft.team_mode)=="existing" else str(career_draft.get("org_name","Custom Team"))
 	var hero:=_panel("TEAM PREVIEW",Color("10212b")); content.add_child(hero); hero.add_child(_team_logo(str(career_draft.get("logo_asset_id",source.get("logo_asset_id",""))),str(career_draft.get("short_name",source.get("tag","TEAM"))),Vector2(120,120))); hero.add_child(_label(team_name,34,TEXT)); hero.add_child(_tag("%s • %s TIER"%[str(career_draft.region),str(career_draft.starting_tier)],GOLD))
 	var details:=GridContainer.new(); details.columns=4; hero.add_child(details); details.add_child(_visual_stat("SAVE SLOT",career_draft.slot_id,CYAN,"Independent career")); details.add_child(_visual_stat("DIFFICULTY",career_draft.difficulty,GOLD,"Board pressure")); details.add_child(_visual_stat("DATABASE MODE",str(career_draft.team_mode).to_upper(),ACCENT,"Official data protected")); details.add_child(_visual_stat("CAREER TYPE",str(career_draft.career_type).to_upper(),PURPLE,"Ruleset"))
 	var start:=_button("CREATE PROFILE",true); start.pressed.connect(func(): var options:=career_draft.duplicate(true); game.new_career(team_name,"Analyst",str(career_draft.region),options); if str(career_draft.team_mode)!="existing": game.set_custom_team_identity(team_name,str(career_draft.get("short_name","TEAM")),str(career_draft.get("logo_asset_id",""))); career_step=1; _notify("SAVE CREATED • Load the career from Profile Select."); _show_save_slots()); content.add_child(start)
@@ -920,7 +919,7 @@ func _calendar_page() -> void:
 		return
 	var nav := HBoxContainer.new(); content.add_child(nav)
 	for spec in [["← PREVIOUS MONTH", -1], ["CURRENT MONTH", 0], ["NEXT MONTH →", 1]]:
-		var b := _button(spec[0], false); b.pressed.connect(func(): game.data.calendar_month_offset = 0 if spec[1] == 0 else int(game.data.calendar_month_offset) + spec[1]; _show_page("calendar")); nav.add_child(b)
+		var b := _button(spec[0], false); b.pressed.connect(func(): game.set_calendar_month_offset(0 if spec[1] == 0 else int(game.data.calendar_month_offset) + spec[1]); _show_page("calendar")); nav.add_child(b)
 	var grid := GridContainer.new(); grid.columns = 7; grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL; grid.add_theme_constant_override("h_separation", 7); grid.add_theme_constant_override("v_separation", 7); content.add_child(grid)
 	for wd in ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]: var h := _label(wd, 12, MUTED); h.size_flags_horizontal = Control.SIZE_EXPAND_FILL; h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; grid.add_child(h)
 	var first_unix := Time.get_unix_time_from_datetime_string("%04d-%02d-01T00:00:00" % [view.year, view.month]); var first := Time.get_datetime_dict_from_unix_time(first_unix)
@@ -978,7 +977,11 @@ func _match_page() -> void:
 			var live_event := game.get_playable_match()
 			var context := game.prepare_match_context(live_event)
 			if not bool(context.get("ok", false)): _notify(str(context.get("error", "Match context failed"))); return
-			game.data.active_match_event_id = str(live_event.get("id", "")); match_runtime_is_career = true; match_final_result.clear()
+			var selection := game.set_active_match_event(str(live_event.get("id", "")))
+			if not bool(selection.get("ok", false)):
+				_notify(str(selection.get("message", "Match selection failed.")))
+				return
+			match_runtime_is_career = true; match_final_result.clear()
 			match_runtime.start_match(game.data, str(live_event.get("map", "verdant_reach")), game.effective_match_plan()); match_ui_mode = "observer"; _show_page("match_lab")
 		); content.add_child(sim)
 	else: _match_result(game.data.last_match)
@@ -1348,20 +1351,18 @@ func _refresh_scoreboard(entries: Array) -> void:
 
 func _finance_hub() -> void:
 	_header("FINANCE & PARTNERS", "Track recorded cash flow, payroll exposure and commercial partners.", "ORGANIZATION OPERATIONS")
-	var finance_summary: Dictionary = GamePresenterScript.finance_overview(game.data)
-	var payroll: int = int(finance_summary.payroll)
+	var projection: Dictionary = game.weekly_finance_projection()
+	var components: Dictionary = projection.get("components", {})
+	var payroll := int(components.get("payroll", 0))
 	var active_name := "NO ACTIVE SPONSOR"
-	var sponsor_income := 0
+	var sponsor_income := int(components.get("sponsor", 0))
 	for sponsor in game.data.get("sponsors", []):
-		if str(sponsor.get("id", "")) == str(game.data.get("active_sponsor_id", "")): active_name = str(sponsor.get("name", "SPONSOR")); sponsor_income = int(sponsor.get("weekly_income", 0)); break
-	var streaming_level := int(game.data.facilities.get("Streaming Room", 1))
-	var merchandise_income := 6500 + int(game.data.get("fans", 0)) / 18
-	var video_income := 4200 + streaming_level * 1700 + int(game.data.get("reputation", 0)) * 55
-	var streaming_income := 7800 + streaming_level * 3100
-	var facility_upkeep := 0
-	for facility_level in game.data.facilities.values(): facility_upkeep += int(facility_level) * 850
-	var operating_cost := facility_upkeep + 1800 + int(game.data.facilities.get("Scouting Department", 1)) * 900 + 4500
-	var weekly_net := sponsor_income + merchandise_income + video_income + streaming_income - payroll - operating_cost
+		if str(sponsor.get("id", "")) == str(game.data.get("active_sponsor_id", "")): active_name = str(sponsor.get("name", "SPONSOR")); break
+	var merchandise_income := int(components.get("merchandise", 0))
+	var video_income := int(components.get("video", 0))
+	var streaming_income := int(components.get("streaming", 0))
+	var operating_cost := int(projection.get("expenses", 0)) - payroll
+	var weekly_net := int(projection.get("net", 0))
 	var runway := 99 if weekly_net >= 0 else maxi(0, int(int(game.data.budget) / maxi(1, -weekly_net)))
 	var economy_hero := UIComponentsScript.hero_panel("CAREER ECONOMY", "Your runway determines how aggressively the organization can recruit, build and compete.", GOLD); content.add_child(economy_hero)
 	var metrics := HBoxContainer.new(); metrics.add_theme_constant_override("separation", 18); economy_hero.add_child(metrics)
@@ -1383,7 +1384,7 @@ func _finance_hub() -> void:
 		ledger_panel.add_child(_label("%02d     %-27s  %s$%s" % [int(entry.get("week", 1)), str(entry.get("label", "Entry")), "+" if amount >= 0 else "-", GameStateScript.money(absi(amount))], 12, color))
 	ledger_panel.add_child(HSeparator.new())
 	ledger_panel.add_child(_action_row("IN", "Weekly income", "+$%s sponsor revenue" % GameStateScript.money(sponsor_income), SUCCESS if sponsor_income > 0 else MUTED))
-	ledger_panel.add_child(_action_row("OUT", "Weekly expenses", "-$%s payroll" % GameStateScript.money(payroll), DANGER))
+	ledger_panel.add_child(_action_row("OUT", "Payroll expense", "-$%s / week" % GameStateScript.money(payroll), DANGER))
 	ledger_panel.add_child(_action_row("NET", "Projected cash flow", "%s$%s / week" % ["+" if weekly_net >= 0 else "-", GameStateScript.money(absi(weekly_net))], SUCCESS if weekly_net >= 0 else DANGER))
 	ledger_panel.add_child(_action_row("MERCH", "Merchandise", "+$%s / week" % GameStateScript.money(merchandise_income), SUCCESS))
 	ledger_panel.add_child(_action_row("VIDEO", "Video platforms", "+$%s / week" % GameStateScript.money(video_income), SUCCESS))
@@ -1591,7 +1592,7 @@ func _training_page() -> void:
 	var plan := _panel("TEAM TRAINING PLAN", PANEL_HIGH); plan.size_flags_horizontal = Control.SIZE_EXPAND_FILL; training_split.add_child(plan)
 	var presets := GridContainer.new(); presets.columns = 3; presets.add_theme_constant_override("h_separation", 8); presets.add_theme_constant_override("v_separation", 8); plan.add_child(presets)
 	for spec in [["Cân bằng", "BALANCED", ACCENT], ["Cường độ cao", "AGGRESSIVE", ORANGE], ["Nghỉ & hồi phục", "RECOVERY", SUCCESS]]:
-		var preview: Dictionary=game.training_plan_preview(str(spec[0])); var consequence := "Energy %+d • %d%% growth chance" % [int(preview.get("energy_change",0)),roundi(float(preview.get("growth_chance",0.0))*100.0)]; var choice := _choice_card(str(spec[1]), consequence, "Applied during weekly progression", str(game.data.schedule) == str(spec[0]), spec[2]); choice.pressed.connect(func(): game.set_team_training_schedule(str(spec[0])); _show_page("training")); presets.add_child(choice)
+		var preview: Dictionary=game.training_plan_preview(str(spec[0])); var consequence := "Energy %+d • %d%% base growth chance" % [int(preview.get("energy_change",0)),roundi(float(preview.get("growth_chance",0.0))*100.0)]; var choice := _choice_card(str(spec[1]), consequence, "Player age, potential, morale, role and form modify this baseline", str(game.data.schedule) == str(spec[0]), spec[2]); choice.pressed.connect(func(): game.set_team_training_schedule(str(spec[0])); _show_page("training")); presets.add_child(choice)
 	plan.add_child(_label("CURRENT PLAN  •  %s" % _training_schedule_display(str(game.data.schedule)), 12, CYAN))
 	var workload := _panel("NEXT MATCH READINESS", PANEL); workload.custom_minimum_size.x = 330; training_split.add_child(workload)
 	workload.add_child(_decision_signal("INTENSITY", _training_schedule_display(str(game.data.schedule)), GOLD))
@@ -1886,7 +1887,7 @@ func _rankings() -> void:
 	if rows.is_empty(): table.add_child(_empty_state("NO RESULTS", "No team matches the current filter."))
 
 func _team_profile() -> void:
-	var database := GameDatabaseScript.new(); var errors := database.load_all()
+	var database = game.career_database(); var errors := game.database_errors()
 	var team: Dictionary = database.get_team(selected_world_team_id)
 	if not errors.is_empty() or team.is_empty():
 		_header("TEAM PROFILE", "World database entity", "ERROR")
@@ -1901,14 +1902,14 @@ func _team_profile() -> void:
 	var metrics := _panel("COMPETITIVE", PANEL); metrics.size_flags_horizontal = Control.SIZE_EXPAND_FILL; hero.add_child(metrics); metrics.add_child(_visual_stat("POWER", power, GOLD, "World database rating")); metrics.add_child(_visual_stat("FORM", form, SUCCESS, "Current consistency")); metrics.add_child(_visual_stat("ROSTER", team.get("roster_ids", []).size(), CYAN, "Currently linked players"))
 	var roster_panel := _panel("ROSTER", PANEL_HIGH); content.add_child(roster_panel)
 	var roster_grid := GridContainer.new(); roster_grid.columns = ResponsiveScript.columns(get_viewport_rect().size, 3, 2, 2); roster_grid.add_theme_constant_override("h_separation", 10); roster_grid.add_theme_constant_override("v_separation", 10); roster_panel.add_child(roster_grid)
-	var players := database.get_team_players(str(team.get("id", "")))
+	var players: Array = database.get_team_players(str(team.get("id", "")))
 	for source in players:
 		var ratings: Dictionary = source.get("ratings", {}); var card := _button("@%s\n%s\n%s • OVR %d" % [source.get("handle", "player"), source.get("display_name", "Unknown"), source.get("role", "Flex"), int(ratings.get("overall", 0))], false); card.alignment = HORIZONTAL_ALIGNMENT_LEFT; card.custom_minimum_size = Vector2(330, 110); card.icon = assets.texture(str(source.get("avatar_asset_id", ""))); card.expand_icon = true; card.add_theme_constant_override("icon_max_width", 76); card.tooltip_text = "Open full Player Profile"; card.pressed.connect(func(): selected_profile_player = game.player_profile_from_database(str(source.get("id", ""))); _show_page("player_detail")); roster_grid.add_child(card)
 	if players.is_empty(): roster_panel.add_child(_empty_state("NO ACTIVE ROSTER", "No current players are linked to this team in the PUBG source data."))
 	var knowledge := _panel("TEAM IDENTITY & HISTORY", PANEL); content.add_child(knowledge); knowledge.add_child(_action_row("TACTICS", "Insufficient data", "No verified tactical identity exists in the source database.", MUTED)); knowledge.add_child(_action_row("RESULTS", "Insufficient data", "Match history has not been imported for this entity.", MUTED)); knowledge.add_child(_action_row("HISTORY", "Source profile available", str(team.get("source_url", "No source URL")), CYAN))
 
 func _national_team_page() -> void:
-	var database := GameDatabaseScript.new(); database.load_all(); var selected_id := str(game.data.get("national_team_id", ""))
+	var database = game.career_database(); var selected_id := str(game.data.get("national_team_id", ""))
 	if selected_id.is_empty():
 		_header("NATIONAL TEAM", "Accept an international role and select players without changing their club careers.", "INTERNATIONAL DUTY")
 		var candidates: Array = []
@@ -2542,8 +2543,8 @@ func _refresh_tactical_preview() -> void:
 	tactical_preview.text = "%s\n%s\n%s" % [drop_text, zone_text, fight_text]
 func _trend_text(value: int) -> String: return "↑ strong form" if value >= 75 else "→ stable" if value >= 55 else "↓ needs attention"
 func _map_asset(map_name: String) -> String: return "match.map.sunscorch_basin" if map_name == "Sunscorch Basin" else "match.map.verdant_reach" if map_name == "Verdant Reach" else "match.map.astra"
-func _favorite_weapon(p: Dictionary) -> String: return ["AR 5.56", "DMR 7.62", "Bolt Sniper", "SMG 9mm", "LMG 5.56"][abs(int(p.id)) % 5]
-func _featured_opponent() -> Dictionary: return game.data.teams[int(game.data.week) % game.data.teams.size()]
+func _favorite_weapon(p: Dictionary) -> String: return game.player_weapon_preference(str(p.get("id", "")))
+func _featured_opponent() -> Dictionary: return game.featured_match_opponent()
 func _opponent_rank(opponent: Dictionary) -> int: return clampi(30 - int(opponent.power) / 4, 1, 40)
 func _build_tasks() -> Array:
 	var tasks: Array = []
@@ -2585,7 +2586,7 @@ func _ranking_rows() -> Array:
 	var career_prize := 0
 	for entry in game.data.get("finance_ledger", []):
 		if str(entry.get("type", "")) == "prize": career_prize += int(entry.get("amount", 0))
-	var database := GameDatabaseScript.new(); database.load_all()
+	var database = game.career_database()
 	for team in database.teams:
 		var is_player := str(team.get("id", "")) == str(game.data.get("organization_id", ""))
 		rows.append({"id":str(team.get("id", "")), "name":str(game.data.org_name) if is_player else str(team.name), "power":roundi(game.get_team_power()) if is_player else int(team.get("ranking", {}).get("power", 50)), "form":_average("form") if is_player else int(team.get("performance", {}).get("consistency", 50)), "trend":int(game.data.get("ranking_trend", 0)) if is_player else 0, "prize_money":career_prize if is_player else 0, "region":str(team.region), "logo_asset_id":str(game.data.get("org_logo_asset_id", "")) if is_player else str(team.get("logo_asset_id", "")), "is_player":is_player})
@@ -2611,17 +2612,10 @@ func _ranking_podium_card(row: Dictionary) -> Button:
 	var copy:=VBoxContainer.new(); copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL; body.add_child(copy); copy.add_child(_label("#%02d" % int(row.rank),28,tone)); copy.add_child(_label(str(row.name),18,TEXT)); copy.add_child(_label("POWER %s  ·  FORM %s" % [str(row.power),str(row.form)],11,MUTED))
 	return card
 func _best_placement() -> int:
-	var best := 20
-	for result in game.data.history: best = mini(best, int(result.get("placement", 20)))
-	return best
+	var best := game.career_best_placement()
+	return best if best > 0 else 20
 func _average(key: String) -> int:
-	var count := mini(4, game.data.roster.size())
-	if count == 0:
-		return 0
-	var total := 0
-	for p in game.data.roster.slice(0, count):
-		total += int(p[key])
-	return total / count
+	return GamePresenterScript.average(game.data.get("roster", []).slice(0, mini(4, game.data.get("roster", []).size())), key)
 
 func _update_nav() -> void:
 	for key in nav_buttons:
