@@ -1251,25 +1251,28 @@ func _refresh_match_lab(state: Dictionary) -> void:
 func _map_manager_page() -> void:
 	match_lab_nodes.clear(); map_editor_controls.clear()
 	if map_editor_data.is_empty(): map_editor_data = map_catalog.load_map("verdant_reach")
-	_header("MAP MANAGER", "Tune loot, heat and traversal through descriptors; changes apply to new matches", "DATA-DRIVEN TOOL")
+	_header("MAP MANAGER", "POI → compound → roads → isolated loot → transport; changes apply to new matches", "DATA-DRIVEN TOOL")
 	var toolbar := HBoxContainer.new(); toolbar.add_theme_constant_override("separation", 8); content.add_child(toolbar)
 	for id in ["verdant_reach", "sunscorch_basin", "tactical_island", "frostline_valley", "coastal_breakwater", "highland_reserve"]:
 		var choose := _button(id.to_upper(), str(map_editor_data.get("id", "")) == id); choose.pressed.connect(func(): map_editor_data = map_catalog.load_map(id); _show_page("map_manager")); toolbar.add_child(choose)
 	var save := _button("SAVE OVERRIDE", true); save.pressed.connect(func(): _notify("Map override saved." if map_catalog.save_override(map_editor_data) else "The map descriptor is invalid.")); toolbar.add_child(save)
 	save.icon=assets.texture("icons.navigation.save"); save.expand_icon=true
 	var add_region:=_button("ADD REGION",false); add_region.icon=assets.texture("icons.replay.zone"); add_region.expand_icon=true; add_region.pressed.connect(_add_map_region); toolbar.add_child(add_region)
+	var add_compound:=_button("ADD COMPOUND",false); add_compound.icon=assets.texture("icons.replay.loot"); add_compound.expand_icon=true; add_compound.pressed.connect(_add_map_compound); toolbar.add_child(add_compound)
 	var add_point:=_button("ADD LOOT POINT",false); add_point.icon=assets.texture("icons.replay.loot"); add_point.expand_icon=true; add_point.pressed.connect(_add_map_point); toolbar.add_child(add_point)
 	var reset := _button("RESET DEFAULT", false); reset.pressed.connect(func(): var id := str(map_editor_data.id); map_catalog.reset_override(id); map_editor_data = map_catalog.load_map(id); _show_page("map_manager")); toolbar.add_child(reset)
 	var back := _button("BACK TO LAB", false); back.pressed.connect(_show_page.bind("match_lab")); toolbar.add_child(back)
 	var split := HBoxContainer.new(); split.add_theme_constant_override("separation", 14); content.add_child(split)
-	var preview := _panel("MAP PREVIEW — YELLOW = LOOT ENABLED", PANEL_HIGH); preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL; split.add_child(preview)
-	var layer := Control.new(); layer.custom_minimum_size = Vector2(900, 600); preview.add_child(layer)
-	var image := _asset_preview(str(map_editor_data.asset_id), Vector2(900, 600)); image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.add_child(image)
+	var preview := _panel("SQUARE MAP PREVIEW — POI / COMPOUND / ROAD / LOOT / VEHICLE", PANEL_HIGH); preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL; split.add_child(preview)
+	var layer := Control.new(); layer.custom_minimum_size = Vector2(720, 720); preview.add_child(layer)
+	var image := _asset_preview(str(map_editor_data.asset_id), Vector2(720, 720)); image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.add_child(image)
 	var map_overlay := MatchMapOverlayScript.new(); map_overlay.mouse_filter = Control.MOUSE_FILTER_STOP; map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); map_overlay.set_map(map_editor_data); map_overlay.enable_editor(); map_overlay.editor_item_moved.connect(_on_map_editor_item_moved); layer.add_child(map_overlay); match_lab_nodes.map_editor_overlay=map_overlay
 	var settings := _panel("MASTER LIST & DETAIL INSPECTOR", PANEL); settings.custom_minimum_size.x = 600; split.add_child(settings)
 	settings.add_child(_label("MASTER LIST", 14, GOLD))
 	for i in map_editor_data.get("regions", []).size():
 		var region_master := _button("REGION  %s" % str(map_editor_data.regions[i].get("name", "Unnamed")), map_editor_selected_kind == "region" and map_editor_selected_index == i); region_master.pressed.connect(_select_map_editor_item.bind("region", i)); settings.add_child(region_master)
+	for i in map_editor_data.get("compounds", []).size():
+		var compound_master := _button("COMPOUND  %s" % str(map_editor_data.compounds[i].get("name", "Unnamed")), map_editor_selected_kind == "compound" and map_editor_selected_index == i); compound_master.pressed.connect(_select_map_editor_item.bind("compound", i)); settings.add_child(compound_master)
 	for i in map_editor_data.get("points", []).size():
 		var point_master := _button("POINT   %s" % str(map_editor_data.points[i].get("name", "Unnamed")), map_editor_selected_kind == "point" and map_editor_selected_index == i); point_master.pressed.connect(_select_map_editor_item.bind("point", i)); settings.add_child(point_master)
 	settings.add_child(HSeparator.new())
@@ -1282,11 +1285,16 @@ func _map_manager_page() -> void:
 		var geometry:=HBoxContainer.new(); row.add_child(geometry); var rx:=_map_number_editor(geometry,"X",float(region.position[0]),0.0,1.0,0.01,func(value): map_editor_data.regions[i].position[0]=value; _refresh_map_editor_preview()); var ry:=_map_number_editor(geometry,"Y",float(region.position[1]),0.0,1.0,0.01,func(value): map_editor_data.regions[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["region:%d:x"%i]=rx; map_editor_controls["region:%d:y"%i]=ry; _map_number_editor(geometry,"R",float(region.get("radius",0.08)),0.01,0.30,0.01,func(value): map_editor_data.regions[i].radius=value; _refresh_map_editor_preview()); var remove_region:=_button("REMOVE",false); remove_region.pressed.connect(_remove_map_region.bind(i)); geometry.add_child(remove_region)
 		var loot := HBoxContainer.new(); row.add_child(loot); var loot_label := _label("Loot ×%.2f" % float(region.loot_multiplier), 12, MUTED); loot_label.custom_minimum_size.x=110; loot.add_child(loot_label); var loot_slider := HSlider.new(); loot_slider.min_value=0.0; loot_slider.max_value=2.5; loot_slider.step=0.05; loot_slider.value=float(region.loot_multiplier); loot_slider.custom_minimum_size.x=250; loot_slider.value_changed.connect(func(value): map_editor_data.regions[i].loot_multiplier=value; loot_label.text="Loot ×%.2f" % value; _refresh_map_editor_preview()); loot.add_child(loot_slider)
 		var heat := HBoxContainer.new(); row.add_child(heat); var heat_label := _label("Hotness %.0f%%" % (float(region.hotness)*100.0), 12, MUTED); heat_label.custom_minimum_size.x=110; heat.add_child(heat_label); var heat_slider := HSlider.new(); heat_slider.min_value=0.0; heat_slider.max_value=1.0; heat_slider.step=0.05; heat_slider.value=float(region.hotness); heat_slider.custom_minimum_size.x=250; heat_slider.value_changed.connect(func(value): map_editor_data.regions[i].hotness=value; heat_label.text="Hotness %.0f%%" % (value*100.0)); heat.add_child(heat_slider)
+	settings.add_child(_label("COMPOUND DETAIL", 13, CYAN))
+	for i in map_editor_data.get("compounds", []).size():
+		var compound: Dictionary = map_editor_data.compounds[i]; var compound_box:=VBoxContainer.new(); compound_box.visible=map_editor_selected_kind=="compound" and map_editor_selected_index==i; settings.add_child(compound_box)
+		var compound_identity:=HBoxContainer.new(); compound_box.add_child(compound_identity); var compound_name:=LineEdit.new(); compound_name.text=str(compound.name); compound_name.custom_minimum_size.x=220; compound_name.text_changed.connect(func(value): map_editor_data.compounds[i].name=value; _refresh_map_editor_preview()); compound_identity.add_child(compound_name); compound_identity.add_child(_tag("%d BUILDINGS"%int(compound.get("building_count",1)),GOLD))
+		var compound_row:=HBoxContainer.new(); compound_box.add_child(compound_row); var cx:=_map_number_editor(compound_row,"X",float(compound.position[0]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[0]=value; _refresh_map_editor_preview()); var cy:=_map_number_editor(compound_row,"Y",float(compound.position[1]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["compound:%d:x"%i]=cx; map_editor_controls["compound:%d:y"%i]=cy; _map_number_editor(compound_row,"LOOT",float(compound.loot_multiplier),0.0,2.5,0.05,func(value): map_editor_data.compounds[i].loot_multiplier=value; _refresh_map_editor_preview()); _map_number_editor(compound_row,"CAP",float(compound.get("capacity",20)),1.0,100.0,1.0,func(value): map_editor_data.compounds[i].capacity=roundi(value)); var remove_compound:=_button("REMOVE",false); remove_compound.pressed.connect(_remove_map_compound.bind(i)); compound_row.add_child(remove_compound)
 	settings.add_child(_label("POINT DETAIL", 13, CYAN))
 	for i in map_editor_data.get("points", []).size():
 		var point: Dictionary = map_editor_data.points[i]; var point_box:=VBoxContainer.new(); point_box.visible = map_editor_selected_kind == "point" and map_editor_selected_index == i; settings.add_child(point_box); var point_identity:=HBoxContainer.new(); point_box.add_child(point_identity); var enabled := CheckBox.new(); enabled.button_pressed=bool(point.enabled); enabled.icon=assets.texture("icons.replay.loot"); enabled.toggled.connect(func(value): map_editor_data.points[i].enabled=value; _refresh_map_editor_preview()); point_identity.add_child(enabled); var point_name:=LineEdit.new(); point_name.text=str(point.name); point_name.custom_minimum_size.x=190; point_name.text_changed.connect(func(value): map_editor_data.points[i].name=value; _refresh_map_editor_preview()); point_identity.add_child(point_name); var point_type:=OptionButton.new(); for type_name in ["house","compound","bridge","warehouse","tower","container","vehicle_spawn","airdrop"]: point_type.add_item(type_name); if type_name==str(point.get("type","house")): point_type.select(point_type.item_count-1); point_type.item_selected.connect(_on_map_point_type_selected.bind(i)); point_identity.add_child(point_type)
 		var point_row := HBoxContainer.new(); point_box.add_child(point_row); var px:=_map_number_editor(point_row,"X",float(point.position[0]),0.0,1.0,0.01,func(value): map_editor_data.points[i].position[0]=value; _refresh_map_editor_preview()); var py:=_map_number_editor(point_row,"Y",float(point.position[1]),0.0,1.0,0.01,func(value): map_editor_data.points[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["point:%d:x"%i]=px; map_editor_controls["point:%d:y"%i]=py; _map_number_editor(point_row,"LOOT",float(point.loot_multiplier),0.0,2.5,0.05,func(value): map_editor_data.points[i].loot_multiplier=value; _refresh_map_editor_preview()); _map_number_editor(point_row,"CAP",float(point.get("capacity",8)),1.0,100.0,1.0,func(value): map_editor_data.points[i].capacity=roundi(value)); var remove_point:=_button("REMOVE",false); remove_point.pressed.connect(_remove_map_point.bind(i)); point_row.add_child(remove_point)
-	settings.add_child(_label("OVERLAP RULE: overlapping regions or points use only the highest loot multiplier; values do not stack. Stock falls after each loot pass.",11,GOLD))
+	settings.add_child(_label("SIZE %sx%s KM  •  LOOT DENSITY ×%.2f  •  VEHICLE NEED ×%.2f\nOverlapping loot sources use only the highest multiplier; stock falls after every loot pass." % [str(map_editor_data.map_size_km[0]),str(map_editor_data.map_size_km[1]),map_catalog.loot_density_factor(map_editor_data),map_catalog.vehicle_need_factor(map_editor_data)],11,GOLD))
 	var traversal := _panel("TRAVERSAL RULES", PANEL); content.add_child(traversal)
 	for terrain in map_editor_data.get("terrain_rules", {}):
 		var rule: Dictionary = map_editor_data.terrain_rules[terrain]; var terrain_row := HBoxContainer.new(); terrain_row.add_theme_constant_override("separation", 10); traversal.add_child(terrain_row)
@@ -1304,13 +1312,13 @@ func _refresh_map_editor_preview()->void:
 	if match_lab_nodes.has("map_editor_overlay"): match_lab_nodes.map_editor_overlay.set_map(map_editor_data)
 
 func _select_map_editor_item(kind: String, index: int) -> void:
-	var collection: Array = map_editor_data.get("regions" if kind == "region" else "points", [])
+	var collection: Array = map_editor_data.get("regions" if kind == "region" else "compounds" if kind == "compound" else "points", [])
 	if index < 0 or index >= collection.size(): return
 	map_editor_selected_kind = kind; map_editor_selected_index = index
 	_show_page("map_manager")
 
 func _on_map_editor_item_moved(kind:String,index:int,position:Vector2)->void:
-	var collection:Array=map_editor_data.get("regions" if kind=="region" else "points",[])
+	var collection:Array=map_editor_data.get("regions" if kind=="region" else "compounds" if kind=="compound" else "points",[])
 	if index<0 or index>=collection.size(): return
 	map_editor_selected_kind=kind; map_editor_selected_index=index
 	collection[index].position=[snappedf(position.x,0.001),snappedf(position.y,0.001)]
@@ -1320,13 +1328,20 @@ func _on_map_editor_item_moved(kind:String,index:int,position:Vector2)->void:
 	_refresh_map_editor_preview()
 
 func _add_map_region()->void:
-	var index:int=map_editor_data.get("regions",[]).size(); map_editor_data.regions.append({"id":"custom_region_%02d"%(index+1),"name":"Custom Region %02d"%(index+1),"position":[0.5,0.5],"radius":0.08,"loot_multiplier":1.0,"hotness":0.5,"terrain":"urban","walkable":true,"vehicle":true,"capacity":60}); map_editor_selected_kind="region"; map_editor_selected_index=index; _show_page("map_manager")
+	var index:int=map_editor_data.get("regions",[]).size(); map_editor_data.regions.append({"id":"custom_region_%02d"%(index+1),"name":"Custom POI %02d"%(index+1),"poi_type":"village","position":[0.5,0.5],"radius":0.08,"loot_multiplier":1.0,"hotness":0.5,"terrain":"urban"}); map_editor_selected_kind="region"; map_editor_selected_index=index; _show_page("map_manager")
+
+func _add_map_compound()->void:
+	if map_editor_data.get("regions",[]).is_empty(): return
+	var index:int=map_editor_data.get("compounds",[]).size(); map_editor_data.compounds.append({"id":"custom_compound_%02d"%(index+1),"poi_id":str(map_editor_data.regions[0].id),"name":"Custom Compound %02d"%(index+1),"position":[0.5,0.5],"radius":0.04,"building_count":4,"building_types":["house","yard"],"loot_multiplier":1.0,"capacity":20,"cover_rating":0.5,"hotness":0.5}); map_editor_selected_kind="compound"; map_editor_selected_index=index; _show_page("map_manager")
 
 func _add_map_point()->void:
 	var index:int=map_editor_data.get("points",[]).size(); map_editor_data.points.append({"id":"custom_point_%02d"%(index+1),"name":"Custom Point %02d"%(index+1),"position":[0.5,0.5],"type":"house","loot_multiplier":1.0,"capacity":10,"enabled":true}); map_editor_selected_kind="point"; map_editor_selected_index=index; _show_page("map_manager")
 
 func _remove_map_region(index:int)->void:
 	if index>=0 and index<map_editor_data.regions.size(): map_editor_data.regions.remove_at(index); _show_page("map_manager")
+
+func _remove_map_compound(index:int)->void:
+	if index>=0 and index<map_editor_data.compounds.size(): map_editor_data.compounds.remove_at(index); _show_page("map_manager")
 
 func _remove_map_point(index:int)->void:
 	if index>=0 and index<map_editor_data.points.size(): map_editor_data.points.remove_at(index); _show_page("map_manager")

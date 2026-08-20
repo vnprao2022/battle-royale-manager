@@ -4,7 +4,11 @@
     "friendly_fire": true,
     "maps": [
       "verdant_reach",
-      "sunscorch_basin"
+      "sunscorch_basin",
+      "tactical_island",
+      "frostline_valley",
+      "coastal_breakwater",
+      "highland_reserve"
     ],
     "players": 64,
     "players_per_team": 4,

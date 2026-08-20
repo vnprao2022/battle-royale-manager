@@ -114,7 +114,7 @@ func start_match(game_data: Dictionary, requested_map := "verdant_reach", reques
 	map_data = catalog.load_map(map_id)
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(TACTICS_PATH)); tactics_data = parsed if parsed is Dictionary else {}
 	game_database.load_all()
-	simulation_overrides = game_data.get("simulation_overrides", {}).duplicate(true) if bool(game_data.get("developer_mode", false)) and str(game_data.get("career_type", "normal")) == "sandbox" else {}
+	simulation_overrides = game_data.get("simulation_overrides", {}).duplicate(true) if bool(game_data.get("developer_mode", false)) else {}
 	coach_plan = game_data.get("coach_plan", coach_plan).duplicate(true); for key in TACTICAL_DEFAULTS: if not coach_plan.has(key): coach_plan[key] = TACTICAL_DEFAULTS[key]
 	for key in requested_plan: coach_plan[key] = requested_plan[key]
 	formation = {"STACK":"4 Stack","TWO_TWO":"2-2 Split","ONE_THREE":"1-3 Scout","FOUR_WAY":"4-way Split","ANCHOR_THREE":"Anchor + 3"}.get(str(coach_plan.formation),"2-2 Split")
@@ -154,7 +154,7 @@ func start_match(game_data: Dictionary, requested_map := "verdant_reach", reques
 		scoreboard.append({"rank":i+1,"name":team_names[i] if i < team_names.size() else "Team %d" % i,"tag":acronym,"alive":TEAM_SIZE,"kills":0,"points":0,"color":i,"eliminated_at":-1.0})
 	team_positions[0].members=roster
 	team_positions[0].alive=roster.size()
-	resources = {"ammo":0,"heal":0,"throwables":0,"armor":0,"boost":0,"fuel":64,"vehicle_hp":100}
+	resources = {"ammo":0,"heal":0,"throwables":0,"armor":0,"boost":0,"fuel":roundi(64.0 * catalog.vehicle_need_factor(map_data)),"vehicle_hp":100}
 	next_event_at = 92.0
 	next_action_check = 82.0; next_proximity_check=82.0
 	_emit_event("flight", "Đường bay ngẫu nhiên đã xác lập. IGL đang chọn điểm thả.", "FLIGHT")
@@ -175,7 +175,7 @@ func toggle_pause() -> void: paused = not paused; updated.emit(snapshot())
 func set_speed(value: float) -> void: speed = value; paused = false; updated.emit(snapshot())
 
 func snapshot() -> Dictionary:
-	return {"snapshot_version":replay_version,"snapshot_id":"%s-s%05d" % [match_id,event_sequence],"match_id":match_id,"match_seed":match_seed,"event_sequence":event_sequence,"running":running,"paused":paused,"speed":speed,"elapsed":elapsed,"duration":duration,"phase":phase,"zone_number":zone_number,"blue_radius":blue_radius,"zone_center":[zone_center.x,zone_center.y],"target_zone_center":[target_zone_center.x,target_zone_center.y],"target_zone_radius":target_zone_radius,"blue_damage":blue_damage,"red_zone":{"active":bool(red_zone.get("active",false)),"center":[Vector2(red_zone.get("center",Vector2(0.5,0.5))).x,Vector2(red_zone.get("center",Vector2(0.5,0.5))).y],"radius":float(red_zone.get("radius",0.0)),"ends_at":float(red_zone.get("ends_at",0.0)),"shells":int(red_zone.get("shells",0))},"flight_path":[[flight_path[0].x,flight_path[0].y],[flight_path[1].x,flight_path[1].y]],"plane_progress":plane_progress,"teams_alive":teams_alive,"players_alive":players_alive,"placement":placement,"kills":kills,"damage":damage,"morale":morale,"formation":formation,"strategy":strategy,"coach_plan":coach_plan.duplicate(true),"contacts":contacts.duplicate(true),"detection_attempts":detection_attempts,"confirmed_contacts":confirmed_contacts,"kill_feed":kill_feed.duplicate(true),"effects":effects.duplicate(true),"bullet_trails":bullet_trails.duplicate(true),"scoreboard":scoreboard.duplicate(true),"winner":winner.duplicate(true),"resources":resources.duplicate(true),"roster":roster.duplicate(true),"team_positions":team_positions.duplicate(true),"timeline":timeline.duplicate(true),"map_id":map_id,"map_data":map_data.duplicate(true)}
+	return {"snapshot_version":replay_version,"snapshot_id":"%s-s%05d" % [match_id,event_sequence],"match_id":match_id,"match_seed":match_seed,"event_sequence":event_sequence,"running":running,"paused":paused,"speed":speed,"elapsed":elapsed,"duration":duration,"phase":phase,"zone_number":zone_number,"blue_radius":blue_radius,"zone_center":[zone_center.x,zone_center.y],"target_zone_center":[target_zone_center.x,target_zone_center.y],"target_zone_radius":target_zone_radius,"blue_damage":blue_damage,"red_zone":{"active":bool(red_zone.get("active",false)),"center":[Vector2(red_zone.get("center",Vector2(0.5,0.5))).x,Vector2(red_zone.get("center",Vector2(0.5,0.5))).y],"radius":float(red_zone.get("radius",0.0)),"ends_at":float(red_zone.get("ends_at",0.0)),"shells":int(red_zone.get("shells",0))},"flight_path":[[flight_path[0].x,flight_path[0].y],[flight_path[1].x,flight_path[1].y]],"plane_progress":plane_progress,"teams_alive":teams_alive,"players_alive":players_alive,"placement":placement,"kills":kills,"damage":damage,"morale":morale,"formation":formation,"strategy":strategy,"coach_plan":coach_plan.duplicate(true),"contacts":contacts.duplicate(true),"detection_attempts":detection_attempts,"confirmed_contacts":confirmed_contacts,"kill_feed":kill_feed.duplicate(true),"effects":effects.duplicate(true),"bullet_trails":bullet_trails.duplicate(true),"scoreboard":scoreboard.duplicate(true),"winner":winner.duplicate(true),"resources":resources.duplicate(true),"roster":roster.duplicate(true),"team_positions":team_positions.duplicate(true),"timeline":timeline.duplicate(true),"map_id":map_id,"map_data":map_data.duplicate(true),"map_profile":{"size_km":catalog.map_size_km(map_data),"loot_density_factor":catalog.loot_density_factor(map_data),"vehicle_need_factor":catalog.vehicle_need_factor(map_data),"loot_sources":catalog.loot_sources(map_data).size()}}
 
 func _make_flight_path() -> void:
 	var side := randi_range(0, 3); var a: Vector2; var b: Vector2
@@ -198,11 +198,22 @@ func _choose_drop_style(player: Dictionary, index: int) -> String:
 
 func _choose_destination(style: String, regions: Array, index: int) -> Vector2:
 	if regions.is_empty(): return Vector2(0.5,0.5)
+	if style == "LOOT_ROUTE":
+		var safe_points: Array = map_data.get("points", []).filter(func(point): return bool(point.get("enabled", true)))
+		if not safe_points.is_empty():
+			safe_points.sort_custom(func(a,b): return float(a.get("safety", 0.0)) > float(b.get("safety", 0.0)))
+			var safe_point: Dictionary = safe_points[index % mini(2, safe_points.size())]
+			return Vector2(float(safe_point.position[0]), float(safe_point.position[1]))
 	var sorted := regions.duplicate()
 	if style == "HOT_DROP": sorted.sort_custom(func(a,b): return float(a.hotness) > float(b.hotness))
 	elif style == "LOOT_ROUTE": sorted.sort_custom(func(a,b): return float(a.hotness) < float(b.hotness))
 	else: sorted.sort_custom(func(a,b): return Vector2(float(a.position[0]),float(a.position[1])).distance_to(Vector2(0.5,0.5)) < Vector2(float(b.position[0]),float(b.position[1])).distance_to(Vector2(0.5,0.5)))
 	var chosen: Dictionary = sorted[index % mini(2, sorted.size())]
+	var compounds: Array = map_data.get("compounds", []).filter(func(compound): return str(compound.get("poi_id", "")) == str(chosen.id))
+	if not compounds.is_empty():
+		compounds.sort_custom(func(a,b): return float(a.get("hotness", 0.0)) > float(b.get("hotness", 0.0)))
+		var compound: Dictionary = compounds[index % compounds.size()]
+		return Vector2(float(compound.position[0]), float(compound.position[1]))
 	return Vector2(float(chosen.position[0]),float(chosen.position[1]))
 
 func _update_deployment(scaled_delta: float) -> void:
@@ -254,7 +265,7 @@ func _update_deployment(scaled_delta: float) -> void:
 					if Vector2(member.position).distance_to(move_target) < 0.018:
 						move_target = _tactical_zone_target(i) if zone_number > 0 else Vector2(t.target)
 						move_target += _formation_offset(m,i) + Vector2(randf_range(-0.025,0.025),randf_range(-0.025,0.025)); member.move_target = move_target
-					var use_vehicle := elapsed < float(member.get("vehicle_until",0.0)) or (elapsed > 110.0 and randf() < 0.0008 * scaled_delta)
+					var use_vehicle := elapsed < float(member.get("vehicle_until",0.0)) or (elapsed > 110.0 and _can_acquire_vehicle(Vector2(member.position), 0.0008 * scaled_delta))
 					if use_vehicle and elapsed >= float(member.get("vehicle_until",0.0)): member.vehicle_until=elapsed+randf_range(18.0,42.0); member.route_target=member.destination
 					if use_vehicle:
 						member.vehicle_fuel=maxf(0.0,float(member.get("vehicle_fuel",100.0))-scaled_delta*0.035)
@@ -319,13 +330,20 @@ func _update_player_movement(scaled_delta: float) -> void:
 		if zone_number>0 and Vector2(p.position).distance_to(target_zone_center)>maxf(0.02,target_zone_radius*0.88): target=_tactical_zone_target(0)+_formation_offset(i,0); p.move_target=target
 		if Vector2(p.position).distance_to(target) < 0.025:
 			target = _tactical_zone_target(0) if zone_number > 0 else _regroup_point(); target += Vector2(randf_range(-0.04,0.04),randf_range(-0.04,0.04)); p.move_target = target
-		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and randf()<0.002*scaled_delta) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport)
+		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and _can_acquire_vehicle(Vector2(p.position), 0.002*scaled_delta)) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport,Vector2(p.position))
 		if transport=="vehicle" and not keep_vehicle: p.vehicle_until=elapsed+randf_range(18.0,42.0)
 		if transport=="vehicle" and profile.allowed: p.state="DRIVING"; p.transport="vehicle"; resources.fuel=maxi(0,int(resources.fuel)-roundi(scaled_delta*0.04))
 		elif terrain=="water": p.state="SWIMMING"; p.transport="swim"
 		else: p.state="WALKING"; p.transport="foot"
 		var urgency:=1.0+float(zone_number)*0.22+(1.4 if zone_number>=5 else 0.0); var base_speed := (0.00075 if p.state=="WALKING" else 0.00038 if p.state=="SWIMMING" else 0.0022)*urgency
 		p.position = Vector2(p.position).move_toward(target,base_speed*float(profile.get("speed_multiplier",1.0))*scaled_delta); roster[i]=p
+
+func _can_acquire_vehicle(position: Vector2, base_chance: float) -> bool:
+	var need_factor := catalog.vehicle_need_factor(map_data) * float(simulation_overrides.get("vehicle_density_scale", 1.0))
+	for node in map_data.get("transport_nodes", []):
+		if position.distance_to(Vector2(float(node.position[0]), float(node.position[1]))) <= 0.065:
+			return randf() < base_chance * need_factor * float(node.get("spawn_chance", 0.5))
+	return false
 
 func _update_player_actions(scaled_delta: float) -> void:
 	_update_squad_actions(roster,"MR",scaled_delta)
@@ -614,9 +632,11 @@ func _generate_event() -> void:
 			if int(team_positions[0].get("alive", 0)) > 0: _world_fire_between(pressure_team, 0)
 
 func _loot_event() -> void:
-	var region: Dictionary = map_data.get("regions", []).pick_random(); var multiplier := float(region.get("loot_multiplier",1.0))
+	var sources := catalog.loot_sources(map_data)
+	if sources.is_empty(): return
+	var source: Dictionary = sources.pick_random(); var multiplier := float(source.get("effective_multiplier",1.0))
 	resources.ammo += roundi(randf_range(22,48)*multiplier); resources.heal += roundi(randf_range(0.5,2.0)*multiplier); resources.throwables += roundi(randf_range(0.0,1.5)*multiplier); resources.armor = mini(100,int(resources.armor)+roundi(18*multiplier))
-	_emit_event("loot","Loot %s ×%.2f: cập nhật tài nguyên đội." % [region.name,multiplier],"LOOT")
+	_emit_event("loot","Loot %s (%s) ×%.2f: cập nhật tài nguyên đội." % [source.name,source.source_kind,multiplier],"LOOT")
 
 func _rotation_event() -> void:
 	strategy = _macro_name()
@@ -680,7 +700,7 @@ func _check_proximity_combat()->void:
 			if int(second.alive)<=0: continue
 			var distance:=Vector2(first.position).distance_to(Vector2(second.position))
 			if distance>0.105: continue
-			var contact_chance:=clampf(0.76-distance*4.0,0.28,0.78)
+			var contact_chance:=clampf((0.76-distance*4.0)*float(simulation_overrides.get("ai_aggression_scale",1.0)),0.08,0.96)
 			if randf()<contact_chance: _world_fire_between(first_index,second_index)
 
 func _select_combat_target(attacker: Dictionary, victim: Dictionary, standing: Array, knocked: Array, attacker_index: int) -> Dictionary:
@@ -825,22 +845,24 @@ func _make_loadout(index: int, loot_efficiency := 60) -> Dictionary:
 	return {"primary":"Unarmed","secondary":"—","scope":"—","ammo":0,"primary_ammo":0,"secondary_ammo":0,"helmet":"None","helmet_durability":0.0,"vest":"None","vest_durability":0.0,"backpack":"None","backpack_capacity":50,"weight":0.0,"bandage":0,"first_aid":0,"medkit":0,"energy_drink":0,"painkiller":0,"adrenaline":0,"smoke":0,"frag":0,"molotov":0,"flash":0,"loot_stage":0,"weapon_seed":index,"loot_efficiency":loot_efficiency,"attachments":[],"discarded":[]}
 
 func _initialize_loot_stock()->void:
-	for region in map_data.get("regions",[]): loot_stock["region:"+str(region.id)]={"remaining":int(region.get("capacity",roundi(70.0*float(region.get("loot_multiplier",1.0))))),"multiplier":float(region.get("loot_multiplier",1.0))}
-	for point in map_data.get("points",[]): loot_stock["point:"+str(point.id)]={"remaining":int(point.get("capacity",8)),"multiplier":float(point.get("loot_multiplier",1.0))}
+	var custom_loot_scale := float(simulation_overrides.get("loot_density_scale", 1.0))
+	for source in catalog.loot_sources(map_data):
+		var key := "%s:%s" % [str(source.source_kind), str(source.id)]
+		var capacity := int(source.get("capacity", roundi(float(source.get("building_count", 1)) * 4.0)))
+		loot_stock[key] = {"remaining":roundi(capacity * catalog.loot_density_factor(map_data) * custom_loot_scale),"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name)}
 
 func _loot_player(player:Dictionary)->Dictionary:
 	var candidates:Array=[]; var position:=Vector2(player.position)
-	for region in map_data.get("regions",[]):
-		if position.distance_to(Vector2(float(region.position[0]),float(region.position[1])))<=float(region.get("radius",0.06)): candidates.append({"key":"region:"+str(region.id),"multiplier":float(region.get("loot_multiplier",1.0))})
-	for point in map_data.get("points",[]):
-		if bool(point.get("enabled",true)) and position.distance_to(Vector2(float(point.position[0]),float(point.position[1])))<=0.035: candidates.append({"key":"point:"+str(point.id),"multiplier":float(point.get("loot_multiplier",1.0))})
+	for source in catalog.loot_sources(map_data):
+		if position.distance_to(Vector2(float(source.position[0]),float(source.position[1])))<=float(source.get("radius",0.035)):
+			candidates.append({"key":"%s:%s" % [str(source.source_kind),str(source.id)],"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name)})
 	if candidates.is_empty(): return player
 	candidates.sort_custom(func(a,b): return float(a.multiplier)>float(b.multiplier))
 	var source:Dictionary=candidates[0]; var stock:Dictionary=loot_stock.get(source.key,{"remaining":0,"multiplier":0.0})
 	if int(stock.remaining)<=0: return player
 	var resource_plan := str(player.get("tactical_resource","MINIMAL")); var loot_factor := 0.70 if resource_plan == "MINIMAL" else 1.35 if resource_plan == "FULL" else 1.0
 	var take:=mini(int(stock.remaining),maxi(1,roundi(2.0*float(source.multiplier)*loot_factor))); stock.remaining=int(stock.remaining)-take; loot_stock[source.key]=stock
-	var loadout:Dictionary=player.loadout; var stage:=int(loadout.get("loot_stage",0))+1; loadout.loot_stage=stage
+	var loadout:Dictionary=player.loadout; var stage:=int(loadout.get("loot_stage",0))+1; loadout.loot_stage=stage; loadout.last_loot_source=source.get("name",source.key); loadout.last_loot_source_kind=source.get("source_kind","")
 	if stage==1: loadout.primary=WEAPONS[int(loadout.weapon_seed)%WEAPONS.size()]; loadout.primary_ammo=30+take*5; loadout.ammo=loadout.primary_ammo
 	elif stage==2: loadout.helmet="Lv.1"; loadout.helmet_durability=80.0; loadout.vest="Lv.1"; loadout.vest_durability=200.0; loadout.backpack="Lv.1"; loadout.bandage=3+take
 	elif stage==3:
@@ -873,7 +895,13 @@ func _enforce_loadout_capacity(player: Dictionary) -> void:
 
 func _team_drop_target(regions:Array,team_index:int)->Vector2:
 	if regions.is_empty(): return Vector2(0.5,0.5)
-	var region:Dictionary=regions[team_index%regions.size()]; var center:=Vector2(float(region.position[0]),float(region.position[1])); var radius:=float(region.get("radius",0.06))*0.42
+	var region:Dictionary=regions[team_index%regions.size()]
+	var region_compounds: Array = map_data.get("compounds", []).filter(func(compound): return str(compound.get("poi_id", "")) == str(region.id))
+	var center:=Vector2(float(region.position[0]),float(region.position[1]))
+	if not region_compounds.is_empty():
+		var compound: Dictionary = region_compounds[team_index % region_compounds.size()]
+		center = Vector2(float(compound.position[0]), float(compound.position[1]))
+	var radius:=float(region.get("radius",0.06))*0.18
 	var target:=center+Vector2.from_angle(float(team_index)*2.399)*radius
 	return Vector2(clampf(target.x,0.04,0.96),clampf(target.y,0.04,0.96))
 
@@ -951,7 +979,7 @@ func _finish() -> void:
 	var own_players:Array=player_stats.filter(func(stat): return str(stat.get("team", "")) == "MR")
 	var loot_statistics:Array=[]
 	for member in roster:
-		loot_statistics.append({"player_id":member.get("player_id", ""),"name":member.get("name", ""),"loot_stage":int(member.get("loadout", {}).get("loot_stage", 0)),"weight":float(member.get("loadout", {}).get("weight", 0.0)),"capacity":int(member.get("loadout", {}).get("backpack_capacity", 50)),"discarded":member.get("loadout", {}).get("discarded", []).duplicate()})
+		loot_statistics.append({"player_id":member.get("player_id", ""),"name":member.get("name", ""),"loot_stage":int(member.get("loadout", {}).get("loot_stage", 0)),"last_source":member.get("loadout", {}).get("last_loot_source", ""),"last_source_kind":member.get("loadout", {}).get("last_loot_source_kind", ""),"weight":float(member.get("loadout", {}).get("weight", 0.0)),"capacity":int(member.get("loadout", {}).get("backpack_capacity", 50)),"discarded":member.get("loadout", {}).get("discarded", []).duplicate()})
 	var combat_events:=chronological_timeline.filter(func(event): return str(event.get("type", "")) in ["combat","knock","kill","flush","damage"])
 	var zone_events:=chronological_timeline.filter(func(event): return str(event.get("type", "")) in ["zone","red_zone_start","red_zone_hit","red_zone_end"])
 	var vehicle_events:=chronological_timeline.filter(func(event): return str(event.get("type", "")) == "vehicle")

@@ -33,6 +33,13 @@ func _p(normalized: Variant) -> Vector2:
 func _draw() -> void:
 	if map_data.is_empty(): return
 	var font:=ThemeDB.fallback_font
+	for road in map_data.get("roads", []):
+		var path := PackedVector2Array()
+		for point in road.get("path", []): path.append(_p(point))
+		var road_class := str(road.get("road_class", "secondary"))
+		var width := 5.0 if road_class == "highway" else 3.0 if road_class == "secondary" else 1.5
+		var color := Color(0.92,0.85,0.62,0.72) if road_class == "highway" else Color(0.78,0.82,0.84,0.62) if road_class == "secondary" else Color(0.63,0.48,0.28,0.58)
+		if path.size() >= 2: draw_polyline(path,color,width,true)
 	for region_index in map_data.get("regions", []).size():
 		var region:Dictionary=map_data.regions[region_index]
 		var center := _p(region.position)
@@ -41,6 +48,13 @@ func _draw() -> void:
 		draw_circle(center, radius, Color(1.0, 0.72, 0.08, 0.08 + loot * 0.05))
 		draw_arc(center, radius, 0.0, TAU, 48, Color("2ee6b1") if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else Color(1.0, 0.78, 0.16, 0.62),3.0 if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else 1.5)
 		if editor_enabled: draw_circle(center,6.0,Color("2ee6b1")); draw_string(font,center+Vector2(9,-7),str(region.get("name","Region")),HORIZONTAL_ALIGNMENT_LEFT,140,11,Color.WHITE)
+	for compound_index in map_data.get("compounds", []).size():
+		var compound: Dictionary = map_data.compounds[compound_index]
+		var center := _p(compound.position); var radius := float(compound.get("radius",0.04))*minf(size.x,size.y)
+		var selected: bool = editor_enabled and str(editor_selection.kind)=="compound" and int(editor_selection.index)==compound_index
+		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color(0.95,0.66,0.14,0.12),true)
+		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color("2ee6b1") if selected else Color(0.96,0.72,0.24,0.72),false,2.5 if selected else 1.2)
+		if editor_enabled: draw_string(font,center+Vector2(7,-5),str(compound.get("name","Compound")),HORIZONTAL_ALIGNMENT_LEFT,125,9,Color(1,0.86,0.55,0.95))
 	for point_index in map_data.get("points", []).size():
 		var point:Dictionary=map_data.points[point_index]
 		if bool(point.get("enabled", true)):
@@ -48,6 +62,10 @@ func _draw() -> void:
 			var selected:bool=editor_enabled and str(editor_selection.kind)=="point" and int(editor_selection.index)==point_index
 			draw_rect(Rect2(pos - Vector2(6 if selected else 4, 6 if selected else 4), Vector2(12 if selected else 8,12 if selected else 8)),Color("2ee6b1") if selected else Color("ffd34e"),true)
 			if editor_enabled: draw_string(font,pos+Vector2(8,12),str(point.get("name","Node")),HORIZONTAL_ALIGNMENT_LEFT,120,10,Color("ffd34e"))
+	for node in map_data.get("transport_nodes", []):
+		var pos := _p(node.position)
+		draw_circle(pos,5.5,Color(0.18,0.78,1.0,0.86)); draw_circle(pos,2.0,Color(0.02,0.08,0.12,1.0))
+		if editor_enabled: draw_string(font,pos+Vector2(8,-7),str(node.get("name","Vehicle")),HORIZONTAL_ALIGNMENT_LEFT,120,9,Color(0.4,0.85,1.0,0.95))
 	if state.is_empty(): return
 	var flight: Array = state.get("flight_path", [])
 	if flight.size() == 2 and float(state.get("plane_progress",0.0))<1.0:
@@ -154,6 +172,9 @@ func _gui_input(event: InputEvent) -> void:
 
 func _editor_hit_test(position:Vector2)->Dictionary:
 	var best:={"kind":"","index":-1}; var best_distance:=24.0
+	for compound_index in map_data.get("compounds",[]).size():
+		var distance:=_p(map_data.compounds[compound_index].position).distance_to(position)
+		if distance<best_distance: best={"kind":"compound","index":compound_index}; best_distance=distance
 	for point_index in map_data.get("points",[]).size():
 		var distance:=_p(map_data.points[point_index].position).distance_to(position)
 		if distance<best_distance: best={"kind":"point","index":point_index}; best_distance=distance

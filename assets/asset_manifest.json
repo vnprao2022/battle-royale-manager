@@ -1351,9 +1351,9 @@
       "lazy": true,
       "path": "res://assets/match/maps/tactical_island.png"
     },
-    "match.map.coastal_breakwater": {"kind":"map","lazy":true,"path":"res://assets/match/maps/coastal_breakwater.png"},
-    "match.map.frostline_valley": {"kind":"map","lazy":true,"path":"res://assets/match/maps/frostline_valley.png"},
-    "match.map.highland_reserve": {"kind":"map","lazy":true,"path":"res://assets/match/maps/highland_reserve.png"},
+    "match.map.coastal_breakwater": {"kind":"map","lazy":true,"path":"res://assets/match/maps/coastal_breakwater_square.png"},
+    "match.map.frostline_valley": {"kind":"map","lazy":true,"path":"res://assets/match/maps/frostline_valley_square.png"},
+    "match.map.highland_reserve": {"kind":"map","lazy":true,"path":"res://assets/match/maps/highland_reserve_square.png"},
     "match.map.sunscorch_basin": {
       "kind": "map",
       "lazy": true,
