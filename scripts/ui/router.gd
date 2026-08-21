@@ -17,7 +17,7 @@ const ROUTES := {
 	"player_stats":{"title":"PLAYER PERFORMANCE","group":"PLAYERS & SCOUTING","breadcrumb":"Team / Player Performance"},
 	"match":{"title":"MATCH CENTER","group":"MATCHES & EVENTS","breadcrumb":"Matches & Events / Match Center"},
 	"match_lab":{"title":"MATCH OBSERVER","group":"MATCHES & EVENTS","breadcrumb":"Matches & Events / Live Observer"},
-	"map_manager":{"title":"MAP MANAGER","group":"SYSTEM","breadcrumb":"Sandbox / Map Manager"},
+	"map_manager":{"title":"MAP LAB","group":"SYSTEM","breadcrumb":"Sandbox / Map LAB"},
 	"calendar":{"title":"SCHEDULE","group":"MATCHES & EVENTS","breadcrumb":"Matches & Events / Schedule"},
 	"tournament":{"title":"TOURNAMENTS","group":"MATCHES & EVENTS","breadcrumb":"Matches & Events / Tournaments"},
 	"competition_detail":{"title":"TOURNAMENT DETAIL","group":"MATCHES & EVENTS","breadcrumb":"Tournaments / Detail"},

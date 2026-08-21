@@ -8,13 +8,15 @@ var failures:=0
 func _init()->void:
 	var catalog=MapCatalogScript.new(); var map_data:Dictionary=catalog.load_map("verdant_reach")
 	map_data.terrain_strokes=[{"id":"test_river","name":"Test River","terrain":"water","width":0.08,"movement_multiplier":0.5,"vision_multiplier":0.9,"path":[[0.1,0.5],[0.9,0.5]]},{"id":"test_forest","name":"Test Forest","terrain":"forest","width":0.1,"movement_multiplier":0.82,"vision_multiplier":0.55,"path":[[0.1,0.2],[0.9,0.2]]}]
-	map_data.buildings=[{"id":"test_house","name":"Test House","building_type":"house","rect":[0.4,0.4,0.1,0.1],"cover_rating":0.3,"loot_multiplier":0.75,"loot_slots":3,"enabled":true}]
+	map_data.buildings=[{"id":"test_house","name":"Test House","building_type":"house","rect":[0.4,0.4,0.1,0.1],"cover_rating":0.3,"concealment_rating":0.2,"detection_multiplier":0.7,"loot_enabled":false,"enabled":true}]
 	_check(catalog.validate(map_data),"Editable brush/building schema was rejected")
 	_check(str(catalog.terrain_profile_at(map_data,Vector2(0.5,0.5)).terrain)=="water" and float(catalog.terrain_profile_at(map_data,Vector2(0.5,0.5)).movement_multiplier)==0.5,"River brush does not produce swimming speed")
 	_check(float(catalog.terrain_profile_at(map_data,Vector2(0.5,0.2)).vision_multiplier)==0.55,"Forest brush does not reduce vision")
 	_check(float(catalog.building_profile_at(map_data,Vector2(0.45,0.45)).cover_rating)==0.3,"Building rectangle does not provide cover")
 	var building_sources:=catalog.loot_sources(map_data).filter(func(source): return str(source.get("source_kind",""))=="building")
-	_check(building_sources.size()==1 and catalog.loot_slot_count(building_sources[0])==3,"Building loot slots are not connected")
+	_check(building_sources.is_empty(),"Building incorrectly became a loot source by default")
+	map_data.buildings[0].loot_enabled=true; map_data.buildings[0].loot_slots=3; map_data.buildings[0].loot_multiplier=0.75; building_sources=catalog.loot_sources(map_data).filter(func(source): return str(source.get("source_kind",""))=="building")
+	_check(building_sources.size()==1 and catalog.loot_slot_count(building_sources[0])==3,"Explicit building loot association is not connected")
 	var road:=catalog.road_profile(map_data,Vector2(0.3,0.3)); _check(float(road.get("vehicle_spawn_chance",0.0))>0.0,"Road vehicle spawning is not available")
 
 	var runtime=MatchRuntimeScript.new(); runtime.map_data=map_data

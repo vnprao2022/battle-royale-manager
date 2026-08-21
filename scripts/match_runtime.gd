@@ -8,6 +8,7 @@ signal match_finished(result: Dictionary)
 const MapCatalogScript = preload("res://scripts/map_catalog.gd")
 const GameDatabaseScript = preload("res://scripts/game_database.gd")
 const TACTICS_PATH := "res://data/tactics/coach_presets.json"
+const LOOT_PROFILES_PATH := "res://data/loot/loot_profiles.json"
 const DEFAULT_TEAM_COUNT := 16
 const MAX_TEAM_COUNT := 25
 const TEAM_SIZE := 4
@@ -112,6 +113,8 @@ var red_zone := {"active":false,"center":Vector2(0.5,0.5),"radius":0.0,"ends_at"
 var next_airdrop_at := 285.0
 var airdrops_spawned := 0
 var simulation_overrides: Dictionary = {}
+var loot_profiles:Dictionary={}
+var vehicle_sources:Dictionary={}
 
 func start_match(game_data: Dictionary, requested_map := "verdant_reach", requested_plan: Dictionary = {}, requested_seed: int = -1) -> void:
 	var seed_source := "%s|%s|%s" % [str(game_data.get("active_match_event_id", game_data.get("week", 1))), requested_map, str(game_data.get("season", 1))]
@@ -122,6 +125,7 @@ func start_match(game_data: Dictionary, requested_map := "verdant_reach", reques
 	map_id = requested_map
 	map_data = catalog.load_map(map_id)
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(TACTICS_PATH)); tactics_data = parsed if parsed is Dictionary else {}
+	var parsed_loot=JSON.parse_string(FileAccess.get_file_as_string(LOOT_PROFILES_PATH)); loot_profiles=parsed_loot.get("profiles",{}) if parsed_loot is Dictionary else {}
 	game_database.load_all()
 	simulation_overrides = game_data.get("simulation_overrides", {}).duplicate(true) if bool(game_data.get("developer_mode", false)) else {}
 	coach_plan = game_data.get("coach_plan", coach_plan).duplicate(true); for key in TACTICAL_DEFAULTS: if not coach_plan.has(key): coach_plan[key] = TACTICAL_DEFAULTS[key]
@@ -140,6 +144,7 @@ func start_match(game_data: Dictionary, requested_map := "verdant_reach", reques
 	red_zone = {"active":false,"center":Vector2(0.5,0.5),"radius":0.0,"ends_at":0.0,"next_at":randf_range(145.0,190.0),"shells":0}
 	var regions: Array = map_data.get("regions", [])
 	_initialize_loot_stock()
+	_initialize_vehicle_sources()
 	for i in mini(TEAM_SIZE, game_data.get("roster", []).size()):
 		var source: Dictionary = game_data.roster[i]
 		var choice := _choose_drop_style(source, i)
@@ -341,7 +346,7 @@ func _update_player_movement(scaled_delta: float) -> void:
 		if zone_number>0 and Vector2(p.position).distance_to(target_zone_center)>maxf(0.02,target_zone_radius*0.88): target=_tactical_zone_target(0)+_formation_offset(i,0); p.move_target=target
 		if Vector2(p.position).distance_to(target) < 0.025:
 			target = _tactical_zone_target(0) if zone_number > 0 else _regroup_point(); target += Vector2(randf_range(-0.04,0.04),randf_range(-0.04,0.04)); p.move_target = target
-		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and _can_acquire_vehicle(Vector2(p.position), 0.002*scaled_delta)) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport,Vector2(p.position)); var brush_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(p.position)); if bool(brush_profile.inside) and transport!="vehicle": profile.speed_multiplier=float(brush_profile.movement_multiplier)
+		var terrain := _nearest_terrain(Vector2(p.position)); var keep_vehicle := elapsed<float(p.get("vehicle_until",0.0)); var transport := "vehicle" if keep_vehicle or (int(resources.fuel)>10 and _can_acquire_vehicle(Vector2(p.position), 0.002*scaled_delta)) else "walk"; var profile: Dictionary = catalog.movement_profile(map_data,terrain,transport,Vector2(p.position)); var brush_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(p.position)); if bool(brush_profile.inside) and transport!="vehicle": profile.speed_multiplier=float(brush_profile.movement_multiplier); p.occupancy_building_id=str(catalog.gameplay_profile_at(map_data,Vector2(p.position)).occupancy_id)
 		if transport=="vehicle" and not keep_vehicle: p.vehicle_until=elapsed+randf_range(18.0,42.0)
 		if transport=="vehicle" and profile.allowed: p.state="DRIVING"; p.transport="vehicle"; resources.fuel=maxi(0,int(resources.fuel)-roundi(scaled_delta*0.04))
 		elif terrain=="water": p.state="SWIMMING"; p.transport="swim"
@@ -353,11 +358,18 @@ func _can_acquire_vehicle(position: Vector2, base_chance: float) -> bool:
 	var need_factor := catalog.vehicle_need_factor(map_data) * float(simulation_overrides.get("vehicle_density_scale", 1.0))
 	var road:Dictionary=catalog.road_profile(map_data,position)
 	if float(road.get("distance",99.0))<=float(road.get("width",0.025))*0.6 and float(road.get("vehicle_spawn_chance",0.0))>0.0:
-		if randf()<base_chance*need_factor*float(road.vehicle_spawn_chance): return true
+		var road_key:="road:%s"%str(road.get("road_id",""))
+		if bool(vehicle_sources.get(road_key,true)) and randf()<base_chance*need_factor*float(road.vehicle_spawn_chance): vehicle_sources[road_key]=false; return true
 	for node in map_data.get("transport_nodes", []):
 		if position.distance_to(Vector2(float(node.position[0]), float(node.position[1]))) <= 0.065:
-			return randf() < base_chance * need_factor * float(node.get("spawn_chance", 0.5))
+			var node_key:="node:%s"%str(node.id)
+			if bool(vehicle_sources.get(node_key,true)) and randf() < base_chance * need_factor * float(node.get("spawn_chance", 0.5)): vehicle_sources[node_key]=false; return true
 	return false
+
+func _initialize_vehicle_sources()->void:
+	vehicle_sources.clear()
+	for road in map_data.get("roads",[]): vehicle_sources["road:%s"%str(road.id)]=true
+	for node in map_data.get("transport_nodes",[]): vehicle_sources["node:%s"%str(node.id)]=true
 
 func _update_player_actions(scaled_delta: float) -> void:
 	_update_squad_actions(roster,"MR",scaled_delta)
@@ -757,7 +769,7 @@ func _world_fire_between(attacker_index:int,victim_index:int)->void:
 			if bool(outcome.eliminated): attacker.kills=int(attacker.kills)+1; shooter.kills=int(shooter.get("kills",0))+1
 		_store_team_member(attacker,shooter)
 		_resolve_squad_wipe(victim.members,str(victim.tag)); victim.alive=victim.members.filter(func(member): return str(member.state)!="DEAD").size(); _commit_combat_team(attacker_index,attacker); _commit_combat_team(victim_index,victim); _update_scoreboard(); return
-	var weapon_accuracy:=float(_weapon_profile(weapon).get("accuracy",0.72)); var range_rule:=_weapon_range_rule(weapon); var max_range:=float(range_rule.max_m); var range_accuracy:=clampf(1.0-distance_m/maxf(max_range,1.0)*0.58,0.18,1.0); var target_building:=catalog.building_profile_at(map_data,Vector2(target.position)); var cover_penalty:=float(target_building.get("cover_rating",0.0))*0.38; var competitive_modifier := 0.07 if victim_index==0 else -0.035 if attacker_index==0 else 0.0; var hit_chance:=0.01 if distance_m>max_range else clampf(float(shooter.get("aim",60))/115.0*weapon_accuracy*range_accuracy+competitive_modifier+_combat_plan_bonus(attacker_index,distance)-cover_penalty,0.05,0.84); var shot_hit:=randf()<hit_chance
+	var weapon_accuracy:=float(_weapon_profile(weapon).get("accuracy",0.72)); var range_rule:=_weapon_range_rule(weapon); var max_range:=float(range_rule.max_m); var range_accuracy:=clampf(1.0-distance_m/maxf(max_range,1.0)*0.58,0.18,1.0); var target_gameplay:=catalog.gameplay_profile_at(map_data,Vector2(target.position)); var cover_penalty:=float(target_gameplay.get("cover_modifier",0.0))*0.38+float(target_gameplay.get("concealment_rating",0.0))*0.12+(0.18 if bool(target_gameplay.get("los_blocking",false)) else 0.0); var competitive_modifier := 0.07 if victim_index==0 else -0.035 if attacker_index==0 else 0.0; var hit_chance:=0.01 if distance_m>max_range else clampf(float(shooter.get("aim",60))/115.0*weapon_accuracy*range_accuracy+competitive_modifier+_combat_plan_bonus(attacker_index,distance)-cover_penalty,0.05,0.84); var shot_hit:=randf()<hit_chance
 	bullet_trails.append({"from":shooter.position,"to":target.position,"ttl":3.5,"weapon":weapon,"outcome":"HIT" if shot_hit else "MISS"})
 	if not shot_hit: _store_team_member(attacker,shooter); _commit_combat_team(attacker_index,attacker); _emit_event("shot_miss","%s [%s] bắn hụt %s." % [shooter.name,weapon,target.name],"COMBAT"); return
 	shooter.hits=int(shooter.get("hits",0))+1
@@ -880,33 +892,43 @@ func _initialize_loot_stock()->void:
 		loot_stock[key] = {"remaining":items.size(),"items":items,"multiplier":float(source.effective_multiplier),"source_kind":str(source.source_kind),"name":str(source.name),"slots":slots}
 
 func _generate_source_loot(source:Dictionary,slots:int)->Array:
-	var items:Array=[]
+	var items:Array=[]; var weights:=_source_category_weights(source)
 	for index in slots:
-		if index==0: items.append({"kind":"weapon","weapon":_roll_loot_weapon(float(source.get("effective_multiplier",1.0)))})
-		elif index==1: items.append({"kind":"ammo","shots":randi_range(1,3)})
-		else:
-			var roll:=randf()
-			if roll<0.24: items.append({"kind":"weapon","weapon":_roll_loot_weapon(float(source.get("effective_multiplier",1.0)))})
-			elif roll<0.46: items.append({"kind":"ammo","shots":randi_range(1,3)})
-			elif roll<0.58: items.append({"kind":"armor","slot":"vest","level":1 if randf()<0.76 else 2})
-			elif roll<0.68: items.append({"kind":"armor","slot":"helmet","level":1 if randf()<0.8 else 2})
-			elif roll<0.82: items.append({"kind":"heal","item":"bandage" if randf()<0.62 else "first_aid"})
-			elif roll<0.91: items.append({"kind":"boost","item":"energy_drink" if randf()<0.74 else "painkiller"})
-			else: items.append({"kind":"throwable","item":["smoke","frag","molotov","flash"].pick_random()})
+		var category:=_weighted_key(weights); if category.is_empty(): break
+		items.append(_loot_item_for_category(category,source))
 	return items
 
-func _roll_loot_weapon(source_multiplier:float)->String:
-	var roll:=randf(); var category:="SMG"
-	if roll<0.30: category="SMG"
-	elif roll<0.60: category="AR"
-	elif roll<0.73: category="SHOTGUN"
-	elif roll<0.88: category="DMR"
-	elif roll<0.94: category="LMG"
-	elif roll<0.985: category="PISTOL"
-	else: category="SR"
-	if source_multiplier>=1.45 and randf()<0.035: category="SR"
+func _source_category_weights(source:Dictionary)->Dictionary:
+	var profile_name:=str(source.get("source_type","standard")); var profile:Dictionary=loot_profiles.get(profile_name,loot_profiles.get("standard",{})); var weights:Dictionary=profile.get("category_weights",{}).duplicate(true)
+	for key in source.get("category_weights",{}): weights[str(key).to_upper()]=maxf(0.0,float(source.category_weights[key]))
+	var allowed:Array=source.get("allowed_categories",[]).map(func(value): return str(value).to_upper()); var excluded:Array=source.get("excluded_categories",[]).map(func(value): return str(value).to_upper())
+	for key in weights.keys():
+		if (not allowed.is_empty() and str(key) not in allowed) or str(key) in excluded: weights[key]=0.0
+	return weights
+
+func _weighted_key(weights:Dictionary)->String:
+	var total:=0.0; for key in weights: total+=maxf(0.0,float(weights[key]))
+	if total<=0.0: return ""
+	var roll:=randf()*total
+	for key in weights:
+		roll-=maxf(0.0,float(weights[key])); if roll<=0.0: return str(key)
+	return str(weights.keys()[-1])
+
+func _loot_item_for_category(category:String,source:Dictionary)->Dictionary:
+	if category in ["AR","SMG","SHOTGUN","DMR","LMG","PISTOL","SR"]: return {"kind":"weapon","weapon":_roll_loot_weapon(category,source)}
+	if category=="AMMO": return {"kind":"ammo","shots":randi_range(maxi(1,int(source.get("min_quantity",1))),maxi(1,int(source.get("max_quantity",3))))}
+	if category in ["VEST","HELMET"]: return {"kind":"armor","slot":category.to_lower(),"level":1 if randf()>0.22*float(source.get("rarity_multiplier",1.0)) else 2}
+	if category=="HEAL": return {"kind":"heal","item":"bandage" if randf()<0.62 else "first_aid"}
+	if category=="BOOST": return {"kind":"boost","item":"energy_drink" if randf()<0.74 else "painkiller"}
+	if category=="ATTACHMENT": return {"kind":"attachment","item":["Red Dot","2x","3x","4x","6x","8x","Compensator","Suppressor","Flash Hider","Extended Mag","Quickdraw Mag","Vertical Grip","Angled Grip","Lightweight Grip","Tactical Stock","Cheek Pad"].pick_random()}
+	return {"kind":"throwable","item":["smoke","frag","molotov","flash"].pick_random()}
+
+func _roll_loot_weapon(category:String,source:Dictionary)->String:
 	var pool:=WEAPONS.filter(func(weapon): return str(_weapon_profile(str(weapon)).get("category",""))==category and str(weapon) not in ["AWM","Lynx AMR"])
-	return str(pool.pick_random()) if not pool.is_empty() else "M416"
+	if pool.is_empty(): return "M416"
+	var item_weights:Dictionary=source.get("item_weights",{}); if item_weights.is_empty(): return str(pool.pick_random())
+	var weighted:Dictionary={}; for weapon in pool: weighted[str(weapon)]=maxf(0.0,float(item_weights.get(str(weapon),1.0)))
+	return _weighted_key(weighted)
 
 func _role_weapon_score(player:Dictionary,weapon:String)->float:
 	var category:=str(_weapon_profile(weapon).get("category","AR")); var role:=str(player.get("role","Flex")).to_upper(); var preferred:Array
@@ -931,6 +953,7 @@ func _choose_loot_item(player:Dictionary,items:Array)->int:
 		elif kind=="heal": score=3.0 if int(loadout.get(str(item.item),0))<4 else -0.5
 		elif kind=="boost": score=2.2 if int(loadout.get(str(item.item),0))<3 else -0.5
 		elif kind=="throwable": score=1.8 if int(loadout.get(str(item.item),0))<3 else -0.5
+		elif kind=="attachment": score=1.5 if _can_equip_attachment(str(loadout.get("primary","Unarmed")),str(item.item)) or _can_equip_attachment(str(loadout.get("secondary","—")),str(item.item)) else -1.0
 		if resource_plan=="HEAL" and kind in ["heal","boost"]: score+=4.0
 		elif resource_plan=="UTILITY" and kind=="throwable": score+=4.0
 		elif resource_plan=="FULL": score+=0.5
@@ -952,6 +975,8 @@ func _pickup_loot_item(player:Dictionary,item:Dictionary)->Dictionary:
 		elif str(loadout.secondary)!="—": loadout.secondary_ammo=int(loadout.secondary_ammo)+int(item.shots)
 	elif kind=="armor":
 		var level:=int(item.level); loadout[str(item.slot)]="Lv.%d"%level; loadout[str(item.slot)+"_durability"]=[0,35,60,90][level] if str(item.slot)=="helmet" else [0,50,80,120][level]
+	elif kind=="attachment":
+		if not _equip_attachment(loadout,"primary",str(item.item)): _equip_attachment(loadout,"secondary",str(item.item))
 	elif kind in ["heal","boost","throwable"]: loadout[str(item.item)]=int(loadout.get(str(item.item),0))+1
 	loadout.ammo=int(loadout.get("primary_ammo",0))+int(loadout.get("secondary_ammo",0)); loadout.loot_stage=int(loadout.get("loot_stage",0))+1; player.loadout=loadout; _enforce_loadout_capacity(player); return player
 
@@ -1020,11 +1045,11 @@ func _contact_event() -> void:
 	if observers.is_empty(): return
 	var enemy_teams:=team_positions.filter(func(team): return str(team.tag)!="MR" and int(team.alive)>0)
 	if enemy_teams.is_empty(): return
-	var observer: Dictionary = observers.pick_random(); var enemy: Dictionary = enemy_teams.pick_random(); var distance: float = Vector2(observer.position).distance_to(Vector2(enemy.position)); var terrain: String = _nearest_terrain(Vector2(observer.position)); var terrain_profile:Dictionary=catalog.terrain_profile_at(map_data,Vector2(observer.position)); var vision_multiplier:=float(terrain_profile.get("vision_multiplier",0.55 if terrain=="forest" else 1.0)); var concealment: float = 0.28 if terrain in ["forest","urban"] else 0.12 if terrain in ["rock","industrial"] else 0.04
+	var observer: Dictionary = observers.pick_random(); var enemy: Dictionary = enemy_teams.pick_random(); var distance: float = Vector2(observer.position).distance_to(Vector2(enemy.position)); var terrain: String = _nearest_terrain(Vector2(observer.position)); var observer_profile:Dictionary=catalog.gameplay_profile_at(map_data,Vector2(observer.position)); var target_profile:Dictionary=catalog.gameplay_profile_at(map_data,Vector2(enemy.position)); var vision_multiplier:=float(observer_profile.get("vision_multiplier",1.0)); var target_detection:=float(target_profile.get("detection_multiplier",1.0)); var hearing_modifier:=float(target_profile.get("hearing_modifier",1.0)); var concealment: float = 0.28 if terrain in ["forest","urban"] else 0.12 if terrain in ["rock","industrial"] else 0.04; concealment+=float(target_profile.get("concealment_rating",0.0))*0.35
 	var formation_vision: float = float({"STACK":-0.08,"TWO_TWO":0.12,"ONE_THREE":0.18,"FOUR_WAY":0.28,"ANCHOR_THREE":0.14}.get(str(coach_plan.formation),0.0))
 	var noise: float = randf_range(0.0,0.35) + (0.22 if randf()<0.25 else 0.0)
 	var information_plan := str(coach_plan.get("information","INFO_FIRST")); var information_bonus: float = float({"INFO_FIRST":0.08,"SCOUT_FIRST":0.13,"CONFIRM_PUSH":0.10,"IMMEDIATE":-0.03}.get(information_plan,0.0))
-	var our_score: float = float(observer.vision)/100.0*0.46*vision_multiplier + float(observer.hearing)/100.0*0.16 + float(observer.game_sense)/100.0*0.18 + formation_vision + information_bonus + noise - distance*0.42 - concealment
+	var our_score: float = (float(observer.vision)/100.0*0.46*vision_multiplier + float(observer.hearing)/100.0*0.16*hearing_modifier + float(observer.game_sense)/100.0*0.18 + formation_vision + information_bonus + noise - distance*0.42 - concealment)*target_detection
 	var enemy_score: float = randf_range(0.32,0.82) + noise*0.35 - float(observer.stealth)/100.0*0.28 - distance*0.30
 	var ours := randf() < clampf(our_score,0.04,0.94); var theirs := randf() < clampf(enemy_score,0.04,0.92); detection_attempts += 1; if ours: confirmed_contacts += 1
 	var contact := {"time":elapsed,"observer":observer.name,"distance":roundi(distance*float(map_data.get("world_size_m",5000))),"ours_detected":ours,"enemy_detected":theirs,"confidence":clampf(our_score,0.0,1.0),"terrain":terrain,"noise":noise}; contacts.push_front(contact); if contacts.size()>12: contacts.resize(12)

@@ -1334,7 +1334,11 @@ func generate_inbound_offers(force := false) -> Array:
 		data.inbound_offers.push_front(offer); created.append(offer.duplicate(true))
 		data.pending_events.append({"id":"event:%s" % offer_id,"type":"inbound_transfer_offer","status":"response_required","blocks_progression":false,"created_week":int(data.get("week",1)),"deadline_week":int(data.get("week",1))+1,"context":{"offer_id":offer_id,"player_id":player_id,"player_name":str(player.get("name","Player")),"buyer_name":str(buyer.get("name","Club")),"amount":amount},"choices":[{"id":"accept","label":"Accept $%s" % money(amount),"effects":{"inbound_offer":{"id":offer_id,"action":"accept"}}},{"id":"counter","label":"Counter +10%","effects":{"inbound_offer":{"id":offer_id,"action":"counter"}}},{"id":"reject","label":"Reject offer","effects":{"inbound_offer":{"id":offer_id,"action":"reject"}}}]})
 		_add_news("Inbound offer: %s" % str(player.get("name","Player")), "%s submitted a $%s offer. A response is required in Inbox." % [str(buyer.get("name","Club")), money(amount)], "TRANSFER", "inbox")
-	if not created.is_empty(): save_game()
+	# During advance_week(), week 13 is a transient state immediately before
+	# _end_season() normalizes the career to the next season/week 1. Do not run
+	# an invariant-checked intermediate save; advance_week() saves the finalized
+	# season state at the end of the transaction.
+	if not created.is_empty() and int(data.get("week",1))<=12: save_game()
 	return created
 
 func resolve_inbound_offer(offer_id: String, action: String) -> Dictionary:

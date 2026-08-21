@@ -10,10 +10,11 @@ const MAP_PATHS := {
 	"highland_reserve": "res://data/maps/highland_reserve.json"
 }
 const OVERRIDE_DIR := "user://map_overrides"
+var override_dir := OVERRIDE_DIR
 
 func load_map(map_id: String) -> Dictionary:
 	var id := map_id if MAP_PATHS.has(map_id) else "verdant_reach"
-	var override_path := "%s/%s.json" % [OVERRIDE_DIR, id]
+	var override_path := "%s/%s.json" % [override_dir, id]
 	if FileAccess.file_exists(override_path):
 		var override = JSON.parse_string(FileAccess.get_file_as_string(override_path))
 		if override is Dictionary and validate(override): return _with_editor_layers(override)
@@ -24,18 +25,48 @@ func _with_editor_layers(data: Dictionary) -> Dictionary:
 	var result := data.duplicate(true)
 	if not result.has("terrain_strokes"): result.terrain_strokes = []
 	if not result.has("buildings"): result.buildings = []
+	# Older descriptors stored rivers as full-map rectangles. Normalize them into
+	# editable center-line strokes before discarding the duplicate legacy layer.
+	for water_zone in result.get("water_zones",[]):
+		var legacy_id:="legacy_%s"%str(water_zone.get("id","water"))
+		if _find_by_id(result.terrain_strokes,legacy_id).is_empty():
+			var rect:Array=water_zone.get("rect",[])
+			if rect.size()==4:
+				var horizontal:=float(rect[2])>=float(rect[3]); var center_x:=float(rect[0])+float(rect[2])*0.5; var center_y:=float(rect[1])+float(rect[3])*0.5
+				var path:Array=[[float(rect[0]),center_y],[float(rect[0])+float(rect[2]),center_y]] if horizontal else [[center_x,float(rect[1])],[center_x,float(rect[1])+float(rect[3])]]
+				result.terrain_strokes.append({"id":legacy_id,"name":str(water_zone.get("name","River")),"terrain":"water","path":path,"width":float(rect[3]) if horizontal else float(rect[2]),"movement_multiplier":0.5,"vision_multiplier":0.9,"detection_multiplier":0.92,"hearing_modifier":1.0,"cover_modifier":0.0,"density":0.0,"swim_allowed":true,"vehicle_allowed":false})
+	# Once normalized, the stroke is the single source of truth. Keeping the old
+	# rectangles would make a deleted/moved river silently reappear on reload.
+	result.water_zones=[]
+	if not result.has("loot_zones"):
+		result.loot_zones=[]
+		for compound in result.get("compounds",[]):
+			var poi:=_find_by_id(result.get("regions",[]),str(compound.get("poi_id",""))); var source_type:="military" if str(poi.get("poi_type",""))=="military_base" else "standard"
+			result.loot_zones.append({"id":"zone_%s"%str(compound.id),"name":str(compound.name),"position":compound.position.duplicate(),"radius":float(compound.get("radius",0.04)),"source_type":source_type,"loot_multiplier":float(compound.get("loot_multiplier",1.0)),"loot_slots":maxi(4,int(compound.get("building_count",2))*2),"hotness":float(compound.get("hotness",0.5)),"allowed_categories":[],"excluded_categories":[],"category_weights":{},"item_weights":{},"rarity_multiplier":1.0,"enabled":true})
+	if not result.has("loot_nodes"):
+		result.loot_nodes=[]
+		for point in result.get("points",[]): result.loot_nodes.append({"id":"node_%s"%str(point.id),"name":str(point.name),"position":point.position.duplicate(),"radius":float(point.get("radius",0.025)),"source_type":"village","loot_multiplier":float(point.get("loot_multiplier",0.45)),"loot_slots":int(point.get("loot_slots",3)),"safety":float(point.get("safety",0.8)),"allowed_categories":[],"excluded_categories":[],"category_weights":{},"item_weights":{},"rarity_multiplier":0.75,"enabled":bool(point.get("enabled",true))})
+	for stroke in result.terrain_strokes:
+		var is_water:=str(stroke.get("terrain","forest"))=="water"; stroke.movement_multiplier=float(stroke.get("movement_multiplier",0.5 if is_water else 0.82)); stroke.vision_multiplier=float(stroke.get("vision_multiplier",0.9 if is_water else 0.68)); stroke.detection_multiplier=float(stroke.get("detection_multiplier",0.92 if is_water else 0.62)); stroke.hearing_modifier=float(stroke.get("hearing_modifier",1.0 if is_water else 0.86)); stroke.cover_modifier=float(stroke.get("cover_modifier",0.0 if is_water else 0.16)); stroke.density=float(stroke.get("density",0.0 if is_water else 0.7)); stroke.swim_allowed=bool(stroke.get("swim_allowed",is_water)); stroke.vehicle_allowed=bool(stroke.get("vehicle_allowed",false))
+	for building in result.buildings:
+		building.cover_rating=float(building.get("cover_rating",0.25)); building.concealment_rating=float(building.get("concealment_rating",0.22)); building.detection_multiplier=float(building.get("detection_multiplier",0.72)); building.los_blocking=bool(building.get("los_blocking",false)); building.occupancy_capacity=int(building.get("occupancy_capacity",4)); building.loot_enabled=bool(building.get("loot_enabled",false))
 	return result
+
+func _find_by_id(items:Array,id:String)->Dictionary:
+	for item in items:
+		if str(item.get("id",""))==id: return item
+	return {}
 
 func save_override(map_data: Dictionary) -> bool:
 	if not validate(map_data): return false
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OVERRIDE_DIR))
-	var file := FileAccess.open("%s/%s.json" % [OVERRIDE_DIR, map_data.id], FileAccess.WRITE)
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(override_dir))
+	var file := FileAccess.open("%s/%s.json" % [override_dir, map_data.id], FileAccess.WRITE)
 	if file == null: return false
 	file.store_string(JSON.stringify(map_data, "  "))
 	return true
 
 func reset_override(map_id: String) -> void:
-	var path := ProjectSettings.globalize_path("%s/%s.json" % [OVERRIDE_DIR, map_id])
+	var path := ProjectSettings.globalize_path("%s/%s.json" % [override_dir, map_id])
 	if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 
 func validate(data: Dictionary) -> bool:
@@ -63,6 +94,10 @@ func validate(data: Dictionary) -> bool:
 	for building in data.get("buildings", []):
 		if not building.has("id") or not building.get("rect", []) is Array or building.rect.size() != 4: return false
 		if float(building.rect[2]) <= 0.0 or float(building.rect[3]) <= 0.0: return false
+	for zone in data.get("loot_zones",[]):
+		if not _valid_positioned_item(zone) or float(zone.get("radius",0.0))<=0.0 or int(zone.get("loot_slots",0))<1: return false
+	for node in data.get("loot_nodes",[]):
+		if not _valid_positioned_item(node) or int(node.get("loot_slots",0))<1: return false
 	return true
 
 func _valid_positioned_item(item: Dictionary) -> bool:
@@ -81,20 +116,21 @@ func vehicle_need_factor(data: Dictionary) -> float:
 
 func loot_sources(data: Dictionary) -> Array:
 	var sources: Array = []
-	for compound in data.get("compounds", []):
-		var source: Dictionary = compound.duplicate(true)
-		source["source_kind"] = "compound"
-		source["effective_multiplier"] = float(compound.get("loot_multiplier", 1.0)) * loot_density_factor(data)
+	for zone in data.get("loot_zones", []):
+		if not bool(zone.get("enabled",true)): continue
+		var source: Dictionary = zone.duplicate(true)
+		source["source_kind"] = "loot_zone"
+		source["effective_multiplier"] = float(zone.get("loot_multiplier", 1.0)) * loot_density_factor(data)
 		sources.append(source)
-	for point in data.get("points", []):
-		if not bool(point.get("enabled", true)): continue
-		var source: Dictionary = point.duplicate(true)
-		source["source_kind"] = "isolated_point"
-		source["radius"] = float(point.get("radius", 0.032))
-		source["effective_multiplier"] = float(point.get("loot_multiplier", 0.45)) * loot_density_factor(data)
+	for node in data.get("loot_nodes", []):
+		if not bool(node.get("enabled", true)): continue
+		var source: Dictionary = node.duplicate(true)
+		source["source_kind"] = "loot_node"
+		source["radius"] = float(node.get("radius", 0.025))
+		source["effective_multiplier"] = float(node.get("loot_multiplier", 0.45)) * loot_density_factor(data)
 		sources.append(source)
 	for building in data.get("buildings", []):
-		if not bool(building.get("enabled", true)): continue
+		if not bool(building.get("enabled", true)) or not bool(building.get("loot_enabled",false)): continue
 		var source: Dictionary = building.duplicate(true)
 		var rect: Array = building.get("rect", [0.45,0.45,0.1,0.1])
 		source["position"] = [float(rect[0]) + float(rect[2]) * 0.5, float(rect[1]) + float(rect[3]) * 0.5]
@@ -105,27 +141,27 @@ func loot_sources(data: Dictionary) -> Array:
 	return sources
 
 func road_profile(data: Dictionary, position: Vector2) -> Dictionary:
-	var best := {"road_class":"offroad", "speed_multiplier":1.0, "vehicle_spawn_chance":0.0, "width":0.025, "distance":99.0}
+	var best := {"road_id":"","road_class":"offroad", "speed_multiplier":1.0, "vehicle_spawn_chance":0.0, "width":0.025, "distance":99.0}
 	for road in data.get("roads", []):
 		var path: Array = road.get("path", [])
 		for index in range(path.size() - 1):
 			var distance := _distance_to_segment(position, Vector2(float(path[index][0]), float(path[index][1])), Vector2(float(path[index + 1][0]), float(path[index + 1][1])))
 			if distance < float(best.distance):
 				var road_class:=str(road.get("road_class","secondary")); var default_spawn:=0.45 if road_class=="highway" else 0.25 if road_class=="secondary" else 0.08
-				best = {"road_class":road_class, "speed_multiplier":float(road.get("vehicle_speed", 1.0)), "vehicle_spawn_chance":float(road.get("vehicle_spawn_chance", default_spawn)), "width":float(road.get("width", 0.025)), "distance":distance}
+				best = {"road_id":str(road.get("id","")),"road_class":road_class, "speed_multiplier":float(road.get("vehicle_speed", 1.0)), "vehicle_spawn_chance":float(road.get("vehicle_spawn_chance", default_spawn)), "width":float(road.get("width", 0.025)), "distance":distance}
 	return best
 
 func terrain_profile_at(data: Dictionary, position: Vector2) -> Dictionary:
-	var profile := {"terrain":"", "movement_multiplier":1.0, "vision_multiplier":1.0, "inside":false}
+	var profile := {"terrain":"", "movement_multiplier":1.0, "vision_multiplier":1.0,"detection_multiplier":1.0,"hearing_modifier":1.0,"cover_modifier":0.0,"swim_allowed":false,"vehicle_allowed":true,"inside":false}
 	for zone in data.get("water_zones", []):
 		var rect: Array = zone.get("rect", [])
 		if rect.size() == 4 and Rect2(float(rect[0]),float(rect[1]),float(rect[2]),float(rect[3])).has_point(position):
-			profile = {"terrain":"water", "movement_multiplier":0.5, "vision_multiplier":0.9, "inside":true}
+			profile = {"terrain":"water", "movement_multiplier":0.5, "vision_multiplier":0.9,"detection_multiplier":0.92,"hearing_modifier":1.0,"cover_modifier":0.0,"swim_allowed":true,"vehicle_allowed":false,"inside":true}
 	for stroke in data.get("terrain_strokes", []):
 		var path: Array = stroke.get("path", [])
 		for index in range(path.size() - 1):
 			if _distance_to_segment(position, Vector2(float(path[index][0]),float(path[index][1])), Vector2(float(path[index + 1][0]),float(path[index + 1][1]))) <= float(stroke.get("width",0.05)) * 0.5:
-				profile = {"terrain":str(stroke.terrain),"movement_multiplier":float(stroke.get("movement_multiplier",0.5 if str(stroke.terrain)=="water" else 0.82)),"vision_multiplier":float(stroke.get("vision_multiplier",0.9 if str(stroke.terrain)=="water" else 0.55)),"inside":true}
+				profile = {"terrain":str(stroke.terrain),"movement_multiplier":float(stroke.get("movement_multiplier",1.0)),"vision_multiplier":float(stroke.get("vision_multiplier",1.0)),"detection_multiplier":float(stroke.get("detection_multiplier",1.0)),"hearing_modifier":float(stroke.get("hearing_modifier",1.0)),"cover_modifier":float(stroke.get("cover_modifier",0.0)),"swim_allowed":bool(stroke.get("swim_allowed",str(stroke.terrain)=="water")),"vehicle_allowed":bool(stroke.get("vehicle_allowed",false)),"inside":true}
 				break
 	return profile
 
@@ -137,8 +173,12 @@ func building_profile_at(data: Dictionary, position: Vector2) -> Dictionary:
 
 func loot_slot_count(source: Dictionary) -> int:
 	if source.has("loot_slots"): return maxi(1,int(source.loot_slots))
-	if str(source.get("source_kind","")) in ["isolated_point","building"]: return 3
+	if str(source.get("source_kind","")) in ["loot_node","building"]: return 3
 	return maxi(4, int(source.get("building_count",1)) * 2)
+
+func gameplay_profile_at(data:Dictionary,position:Vector2)->Dictionary:
+	var terrain:=terrain_profile_at(data,position); var building:=building_profile_at(data,position)
+	return {"terrain":terrain,"building":building,"movement_multiplier":float(terrain.get("movement_multiplier",1.0)),"vision_multiplier":float(terrain.get("vision_multiplier",1.0)),"detection_multiplier":float(terrain.get("detection_multiplier",1.0))*float(building.get("detection_multiplier",1.0)),"hearing_modifier":float(terrain.get("hearing_modifier",1.0)),"cover_modifier":clampf(float(terrain.get("cover_modifier",0.0))+float(building.get("cover_rating",0.0)),0.0,0.9),"concealment_rating":float(building.get("concealment_rating",0.0)),"los_blocking":bool(building.get("los_blocking",false)),"occupancy_id":str(building.get("id",""))}
 
 func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
 	var delta := finish - start

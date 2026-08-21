@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "standard": {
+      "category_weights": {
+        "AR": 26,
+        "SMG": 20,
+        "SHOTGUN": 11,
+        "DMR": 10,
+        "LMG": 5,
+        "PISTOL": 9,
+        "SR": 1.5,
+        "AMMO": 22,
+        "VEST": 8,
+        "HELMET": 7,
+        "HEAL": 12,
+        "BOOST": 7,
+        "THROWABLE": 7,
+        "ATTACHMENT": 8
+      }
+    },
+    "village": {
+      "category_weights": {
+        "AR": 18,
+        "SMG": 26,
+        "SHOTGUN": 20,
+        "DMR": 5,
+        "LMG": 2,
+        "PISTOL": 13,
+        "SR": 0,
+        "AMMO": 24,
+        "VEST": 6,
+        "HELMET": 5,
+        "HEAL": 16,
+        "BOOST": 7,
+        "THROWABLE": 5,
+        "ATTACHMENT": 4
+      }
+    },
+    "military": {
+      "category_weights": {
+        "AR": 30,
+        "SMG": 8,
+        "SHOTGUN": 2,
+        "DMR": 20,
+        "LMG": 8,
+        "PISTOL": 0,
+        "SR": 5,
+        "AMMO": 22,
+        "VEST": 14,
+        "HELMET": 13,
+        "HEAL": 8,
+        "BOOST": 7,
+        "THROWABLE": 9,
+        "ATTACHMENT": 10
+      }
+    }
+  }
+}

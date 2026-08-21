@@ -9,6 +9,10 @@ signal editor_item_moved(kind: String, index: int, normalized_position: Vector2)
 signal editor_item_selected(kind: String, index: int)
 signal editor_brush_completed(kind: String, normalized_path: Array, brush_width: float)
 signal editor_rect_completed(normalized_rect: Rect2)
+signal editor_delete_requested(kind:String,index:int)
+signal editor_edit_started()
+signal editor_cursor_moved(normalized_position:Vector2)
+signal editor_brush_size_requested(delta:float)
 
 var state: Dictionary = {}
 var map_data: Dictionary = {}
@@ -23,6 +27,9 @@ var editor_brush_width := 0.04
 var _brush_path: Array = []
 var _rect_start := Vector2.ZERO
 var _rect_current := Vector2.ZERO
+var editor_grid_visible:=false
+var editor_cursor:=Vector2(-1,-1)
+var layer_visibility:Dictionary={"poi":true,"compound":true,"loot":true,"building":true,"road":true,"terrain":true,"transport":true}
 
 func enable_editor(value:bool=true)->void:
 	editor_enabled=value; design_layers_visible=value or design_layers_visible; queue_redraw()
@@ -32,6 +39,9 @@ func set_design_layers_visible(value:bool=true)->void:
 
 func set_editor_tool(tool: String, brush_width: float) -> void:
 	editor_tool=tool; editor_brush_width=clampf(brush_width,0.008,0.18); _brush_path.clear(); queue_redraw()
+
+func set_editor_view_options(grid_visible:bool,visibility:Dictionary)->void:
+	editor_grid_visible=grid_visible; layer_visibility=visibility.duplicate(true); queue_redraw()
 
 func set_state(value: Dictionary) -> void:
 	state = value
@@ -47,25 +57,27 @@ func _p(normalized: Variant) -> Vector2:
 func _draw() -> void:
 	if map_data.is_empty(): return
 	var font:=ThemeDB.fallback_font; var design_data:Dictionary=map_data if design_layers_visible or editor_enabled else {}
-	for stroke in design_data.get("terrain_strokes", []):
+	if editor_grid_visible:
+		for index in range(1,10): draw_line(Vector2(size.x*index/10.0,0),Vector2(size.x*index/10.0,size.y),Color(1,1,1,0.1),1); draw_line(Vector2(0,size.y*index/10.0),Vector2(size.x,size.y*index/10.0),Color(1,1,1,0.1),1)
+	for stroke in design_data.get("terrain_strokes", []) if bool(layer_visibility.get("terrain",true)) else []:
 		var path := PackedVector2Array(); for point in stroke.get("path",[]): path.append(_p(point))
 		var terrain := str(stroke.get("terrain","forest")); var color := Color(0.12,0.55,0.92,0.52) if terrain=="water" else Color(0.08,0.42,0.18,0.42)
 		if path.size()>=2: draw_polyline(path,color,float(stroke.get("width",0.05))*minf(size.x,size.y),true)
-	for road in design_data.get("roads", []):
+	for road in design_data.get("roads", []) if bool(layer_visibility.get("road",true)) else []:
 		var path := PackedVector2Array()
 		for point in road.get("path", []): path.append(_p(point))
 		var road_class := str(road.get("road_class", "secondary"))
 		var width := float(road.get("width",0.0))*minf(size.x,size.y) if float(road.get("width",0.0))>0.0 else 5.0 if road_class == "highway" else 3.0 if road_class == "secondary" else 1.5
 		var color := Color(0.92,0.85,0.62,0.72) if road_class == "highway" else Color(0.78,0.82,0.84,0.62) if road_class == "secondary" else Color(0.63,0.48,0.28,0.58)
 		if path.size() >= 2: draw_polyline(path,color,width,true)
-	for building_index in design_data.get("buildings", []).size():
+	for building_index in (design_data.get("buildings", []) if bool(layer_visibility.get("building",true)) else []).size():
 		var building: Dictionary=design_data.buildings[building_index]; var rect_data:Array=building.get("rect",[])
 		if rect_data.size()!=4 or not bool(building.get("enabled",true)): continue
 		var rect:=Rect2(float(rect_data[0])*size.x,float(rect_data[1])*size.y,float(rect_data[2])*size.x,float(rect_data[3])*size.y)
 		var selected:bool=editor_enabled and str(editor_selection.kind)=="building" and int(editor_selection.index)==building_index
 		draw_rect(rect,Color(0.08,0.12,0.15,0.7),true); draw_rect(rect,Color("2ee6b1") if selected else Color(0.95,0.95,0.88,0.82),false,3.0 if selected else 1.4)
 		if editor_enabled: draw_string(font,rect.position+Vector2(4,12),str(building.get("name","House")),HORIZONTAL_ALIGNMENT_LEFT,rect.size.x-8,9,Color.WHITE)
-	for region_index in design_data.get("regions", []).size():
+	for region_index in (design_data.get("regions", []) if bool(layer_visibility.get("poi",true)) else []).size():
 		var region:Dictionary=design_data.regions[region_index]
 		var center := _p(region.position)
 		var radius := float(region.get("radius", 0.06)) * minf(size.x, size.y)
@@ -73,21 +85,24 @@ func _draw() -> void:
 		draw_circle(center, radius, Color(1.0, 0.72, 0.08, 0.08 + loot * 0.05))
 		draw_arc(center, radius, 0.0, TAU, 48, Color("2ee6b1") if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else Color(1.0, 0.78, 0.16, 0.62),3.0 if editor_enabled and editor_selection.kind=="region" and int(editor_selection.index)==region_index else 1.5)
 		if editor_enabled: draw_circle(center,6.0,Color("2ee6b1")); draw_string(font,center+Vector2(9,-7),str(region.get("name","Region")),HORIZONTAL_ALIGNMENT_LEFT,140,11,Color.WHITE)
-	for compound_index in design_data.get("compounds", []).size():
+	for compound_index in (design_data.get("compounds", []) if bool(layer_visibility.get("compound",true)) else []).size():
 		var compound: Dictionary = design_data.compounds[compound_index]
 		var center := _p(compound.position); var radius := float(compound.get("radius",0.04))*minf(size.x,size.y)
 		var selected: bool = editor_enabled and str(editor_selection.kind)=="compound" and int(editor_selection.index)==compound_index
 		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color(0.95,0.66,0.14,0.12),true)
 		draw_rect(Rect2(center-Vector2(radius*0.72,radius*0.55),Vector2(radius*1.44,radius*1.1)),Color("2ee6b1") if selected else Color(0.96,0.72,0.24,0.72),false,2.5 if selected else 1.2)
 		if editor_enabled: draw_string(font,center+Vector2(7,-5),str(compound.get("name","Compound")),HORIZONTAL_ALIGNMENT_LEFT,125,9,Color(1,0.86,0.55,0.95))
-	for point_index in design_data.get("points", []).size():
-		var point:Dictionary=design_data.points[point_index]
-		if bool(point.get("enabled", true)):
-			var pos := _p(point.position)
-			var selected:bool=editor_enabled and str(editor_selection.kind)=="point" and int(editor_selection.index)==point_index
-			draw_rect(Rect2(pos - Vector2(6 if selected else 4, 6 if selected else 4), Vector2(12 if selected else 8,12 if selected else 8)),Color("2ee6b1") if selected else Color("ffd34e"),true)
-			if editor_enabled: draw_string(font,pos+Vector2(8,12),str(point.get("name","Node")),HORIZONTAL_ALIGNMENT_LEFT,120,10,Color("ffd34e"))
-	for node in design_data.get("transport_nodes", []):
+	if bool(layer_visibility.get("loot",true)):
+		for zone_index in design_data.get("loot_zones",[]).size():
+			var zone:Dictionary=design_data.loot_zones[zone_index]; if not bool(zone.get("enabled",true)): continue
+			var center:=_p(zone.position); var radius:=float(zone.get("radius",0.05))*minf(size.x,size.y); var selected:bool=editor_enabled and str(editor_selection.kind)=="loot_zone" and int(editor_selection.index)==zone_index
+			draw_circle(center,radius,Color(1.0,0.52,0.05,0.13)); draw_arc(center,radius,0,TAU,40,Color("2ee6b1") if selected else Color("ff8a00"),3.0 if selected else 1.6)
+			if editor_enabled: draw_string(font,center+Vector2(8,4),str(zone.get("name","Loot Zone")),HORIZONTAL_ALIGNMENT_LEFT,130,10,Color("ffb52e"))
+		for node_index in design_data.get("loot_nodes",[]).size():
+			var point:Dictionary=design_data.loot_nodes[node_index]; if not bool(point.get("enabled",true)): continue
+			var pos:=_p(point.position); var selected:bool=editor_enabled and str(editor_selection.kind)=="loot_node" and int(editor_selection.index)==node_index
+			draw_circle(pos,7 if selected else 5,Color("2ee6b1") if selected else Color("ff8a00")); if editor_enabled: draw_string(font,pos+Vector2(8,12),str(point.get("name","Loot Node")),HORIZONTAL_ALIGNMENT_LEFT,120,10,Color("ffb52e"))
+	for node in design_data.get("transport_nodes", []) if bool(layer_visibility.get("transport",true)) else []:
 		var pos := _p(node.position)
 		draw_circle(pos,5.5,Color(0.18,0.78,1.0,0.86)); draw_circle(pos,2.0,Color(0.02,0.08,0.12,1.0))
 		if editor_enabled: draw_string(font,pos+Vector2(8,-7),str(node.get("name","Vehicle")),HORIZONTAL_ALIGNMENT_LEFT,120,9,Color(0.4,0.85,1.0,0.95))
@@ -98,6 +113,8 @@ func _draw() -> void:
 	if editor_enabled and editor_tool=="building" and _rect_start!=_rect_current:
 		var preview_rect:=Rect2(_p([minf(_rect_start.x,_rect_current.x),minf(_rect_start.y,_rect_current.y)]),Vector2(absf(_rect_current.x-_rect_start.x)*size.x,absf(_rect_current.y-_rect_start.y)*size.y))
 		draw_rect(preview_rect,Color(0.1,0.9,0.7,0.22),true); draw_rect(preview_rect,Color("2ee6b1"),false,2.0)
+	if editor_enabled and editor_cursor.x>=0.0 and editor_tool in ["road_highway","road_secondary","road_dirt","river","forest"]:
+		draw_circle(_p([editor_cursor.x,editor_cursor.y]),editor_brush_width*minf(size.x,size.y)*0.5,Color(1,1,1,0.75),false,1.5)
 	if state.is_empty(): return
 	var flight: Array = state.get("flight_path", [])
 	if flight.size() == 2 and float(state.get("plane_progress",0.0))<1.0:
@@ -176,6 +193,12 @@ func _draw_status_icon(pos:Vector2,status:String,team_color:Color)->void:
 
 func _gui_input(event: InputEvent) -> void:
 	if editor_enabled:
+		if event is InputEventMouseMotion:
+			editor_cursor=Vector2(clampf(event.position.x/maxf(size.x,1.0),0.0,1.0),clampf(event.position.y/maxf(size.y,1.0),0.0,1.0)); editor_cursor_moved.emit(editor_cursor); queue_redraw()
+		if event is InputEventMouseButton and event.ctrl_pressed and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: editor_brush_size_requested.emit(0.004 if event.button_index==MOUSE_BUTTON_WHEEL_UP else -0.004); accept_event(); return
+		if event is InputEventKey and event.pressed and event.keycode in [KEY_BRACKETLEFT,KEY_BRACKETRIGHT]: editor_brush_size_requested.emit(0.004 if event.keycode==KEY_BRACKETRIGHT else -0.004); accept_event(); return
+		if editor_tool=="erase" and event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
+			var hit:=_editor_hit_test(event.position); if int(hit.index)>=0: editor_edit_started.emit(); editor_delete_requested.emit(str(hit.kind),int(hit.index)); accept_event(); return
 		if editor_tool!="select":
 			if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
 				var normalized:=Vector2(clampf(event.position.x/maxf(size.x,1.0),0.0,1.0),clampf(event.position.y/maxf(size.y,1.0),0.0,1.0))
@@ -198,7 +221,7 @@ func _gui_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				var hit:=_editor_hit_test(event.position); _editor_drag_kind=str(hit.kind); _editor_drag_index=int(hit.index)
-				if _editor_drag_index>=0: editor_selection=hit; editor_item_selected.emit(_editor_drag_kind,_editor_drag_index); accept_event()
+				if _editor_drag_index>=0: editor_edit_started.emit(); editor_selection=hit; editor_item_selected.emit(_editor_drag_kind,_editor_drag_index); accept_event()
 			else: _editor_drag_kind=""; _editor_drag_index=-1; accept_event()
 			return
 		if event is InputEventMouseMotion and _editor_drag_index>=0:
@@ -226,6 +249,13 @@ func _editor_hit_test(position:Vector2)->Dictionary:
 	for building_index in map_data.get("buildings",[]).size():
 		var rect:Array=map_data.buildings[building_index].get("rect",[])
 		if rect.size()==4 and Rect2(float(rect[0])*size.x,float(rect[1])*size.y,float(rect[2])*size.x,float(rect[3])*size.y).has_point(position): return {"kind":"building","index":building_index}
+	for kind in ["loot_node","transport_node"]:
+		var collection:Array=map_data.get("loot_nodes" if kind=="loot_node" else "transport_nodes",[])
+		for index in collection.size():
+			var distance:=_p(collection[index].position).distance_to(position); if distance<best_distance: best={"kind":kind,"index":index}; best_distance=distance
+	for zone_index in map_data.get("loot_zones",[]).size():
+		var center:=_p(map_data.loot_zones[zone_index].position); var radius:=float(map_data.loot_zones[zone_index].get("radius",0.05))*minf(size.x,size.y); var distance:=center.distance_to(position)
+		if distance<best_distance or absf(distance-radius)<10: best={"kind":"loot_zone","index":zone_index}; best_distance=distance
 	for compound_index in map_data.get("compounds",[]).size():
 		var distance:=_p(map_data.compounds[compound_index].position).distance_to(position)
 		if distance<best_distance: best={"kind":"compound","index":compound_index}; best_distance=distance
@@ -235,4 +265,14 @@ func _editor_hit_test(position:Vector2)->Dictionary:
 	for region_index in map_data.get("regions",[]).size():
 		var center:=_p(map_data.regions[region_index].position); var radius:=float(map_data.regions[region_index].get("radius",0.06))*minf(size.x,size.y); var distance:=center.distance_to(position)
 		if distance<best_distance or absf(distance-radius)<10.0: best={"kind":"region","index":region_index}; best_distance=distance
+	for kind in ["road","terrain_stroke"]:
+		var collection:Array=map_data.get("roads" if kind=="road" else "terrain_strokes",[])
+		for item_index in collection.size():
+			var path:Array=collection[item_index].get("path",[])
+			for path_index in range(path.size()-1):
+				var distance:=_distance_to_segment_px(position,_p(path[path_index]),_p(path[path_index+1])); if distance<maxf(10.0,float(collection[item_index].get("width",0.03))*minf(size.x,size.y)*0.6): return {"kind":kind,"index":item_index}
 	return best
+
+func _distance_to_segment_px(point:Vector2,start:Vector2,finish:Vector2)->float:
+	var delta:=finish-start; if delta.length_squared()<0.0001: return point.distance_to(start)
+	return point.distance_to(start+delta*clampf((point-start).dot(delta)/delta.length_squared(),0.0,1.0))

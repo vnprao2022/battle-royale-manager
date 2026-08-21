@@ -93,6 +93,12 @@ var map_editor_selected_kind := "region"
 var map_editor_selected_index := 0
 var map_editor_tool := "select"
 var map_editor_brush_width := 0.04
+var map_editor_zoom:=1.0
+var map_editor_grid_visible:=true
+var map_editor_layer_visibility:Dictionary={"poi":true,"compound":false,"loot":true,"building":true,"road":true,"terrain":true,"transport":true}
+var map_editor_undo:Array=[]
+var map_editor_redo:Array=[]
+var map_editor_cursor:=Vector2.ZERO
 var match_loadout_signature := ""
 var match_killfeed_signature := ""
 var match_scoreboard_signature := ""
@@ -372,8 +378,9 @@ func _build_settings_controls(in_career: bool) -> void:
 	var vsync := CheckButton.new(); vsync.text = "VERTICAL SYNC"; vsync.button_pressed = bool(user_settings.values.get("vsync", true)); vsync.toggled.connect(func(value): user_settings.set_value("vsync", value, get_window())); display.add_child(vsync)
 	var accessibility := _panel("INTERFACE & ACCESSIBILITY", PANEL); accessibility.size_flags_horizontal=Control.SIZE_EXPAND_FILL; accessibility.custom_minimum_size.x=480; layout.add_child(accessibility)
 	_settings_slider(accessibility, "UI SCALE", "ui_scale", 80, 130)
-	for spec in [["reduce_motion", "REDUCE MOTION"], ["high_contrast", "HIGH CONTRAST"], ["autosave", "AUTOSAVE"]]:
+	for spec in [["reduce_motion", "REDUCE MOTION"]]:
 		var toggle := CheckButton.new(); toggle.text = str(spec[1]); toggle.button_pressed = bool(user_settings.values.get(spec[0], false)); toggle.toggled.connect(func(value): user_settings.set_value(str(spec[0]), value, get_window())); accessibility.add_child(toggle)
+	accessibility.add_child(_label("HIGH CONTRAST  •  UNAVAILABLE\nAUTOSAVE TOGGLE  •  UNAVAILABLE — career actions currently save automatically",11,MUTED))
 	var gameplay := _panel("GAMEPLAY", PANEL); gameplay.size_flags_horizontal=Control.SIZE_EXPAND_FILL; gameplay.custom_minimum_size.x=480; layout.add_child(gameplay)
 	if in_career:
 		var difficulty := OptionButton.new(); difficulty.custom_minimum_size.y = 42
@@ -1253,7 +1260,7 @@ func _refresh_match_lab(state: Dictionary) -> void:
 func _map_manager_page() -> void:
 	match_lab_nodes.clear(); map_editor_controls.clear()
 	if map_editor_data.is_empty(): map_editor_data = map_catalog.load_map("verdant_reach")
-	_header("MAP MANAGER", "POI → compound → roads → isolated loot → transport; changes apply to new matches", "DATA-DRIVEN TOOL")
+	_header("MAP LAB", "Author one selected map through explicit gameplay layers; saved overrides affect new matches and Analyst Map.", "DATA-DRIVEN AUTHORING")
 	var toolbar := VBoxContainer.new(); toolbar.add_theme_constant_override("separation", 6); content.add_child(toolbar)
 	var map_row := HBoxContainer.new(); map_row.add_theme_constant_override("separation", 8); toolbar.add_child(map_row)
 	var map_choice := OptionButton.new(); map_choice.custom_minimum_size.x=250
@@ -1261,64 +1268,88 @@ func _map_manager_page() -> void:
 		map_choice.add_item(id.replace("_"," ").to_upper()); map_choice.set_item_metadata(map_choice.item_count-1,id)
 		if str(map_editor_data.get("id", "")) == id: map_choice.select(map_choice.item_count-1)
 	map_choice.item_selected.connect(_on_map_editor_map_selected.bind(map_choice)); map_row.add_child(map_choice)
+	var state_copy:=_label("CURRENT MAP  %s  •  %sx%s KM  |  MODE  EDIT  |  LAYER/TOOL  %s  |  SIZE  %dm"%[str(map_editor_data.get("name",map_editor_data.get("id","Map"))).to_upper(),str(map_editor_data.map_size_km[0]),str(map_editor_data.map_size_km[1]),map_editor_tool.replace("_"," ").to_upper(),roundi(map_editor_brush_width*float(map_editor_data.get("world_size_m",5000)))],11,CYAN); state_copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL; map_row.add_child(state_copy)
+	match_lab_nodes.map_state_label=state_copy
 	var save := _button("SAVE OVERRIDE", true); save.pressed.connect(func(): _notify("Map override saved." if map_catalog.save_override(map_editor_data) else "The map descriptor is invalid.")); map_row.add_child(save)
 	save.icon=assets.texture("icons.navigation.save"); save.expand_icon=true
-	var reset := _button("RESET DEFAULT", false); reset.pressed.connect(func(): var id := str(map_editor_data.id); map_catalog.reset_override(id); map_editor_data = map_catalog.load_map(id); _show_page("map_manager")); map_row.add_child(reset)
+	var undo:=_button("UNDO",false); undo.disabled=map_editor_undo.is_empty(); undo.pressed.connect(_map_editor_undo_action); map_row.add_child(undo)
+	var redo:=_button("REDO",false); redo.disabled=map_editor_redo.is_empty(); redo.pressed.connect(_map_editor_redo_action); map_row.add_child(redo)
+	var reset := _button("RESET", false); reset.pressed.connect(_reset_map_override); map_row.add_child(reset)
 	var back := _button("BACK TO LAB", false); back.pressed.connect(_show_page.bind("match_lab")); map_row.add_child(back)
 	var tool_row := HBoxContainer.new(); tool_row.add_theme_constant_override("separation",8); toolbar.add_child(tool_row)
-	var add_region:=_button("ADD REGION",false); add_region.icon=assets.texture("icons.replay.zone"); add_region.expand_icon=true; add_region.pressed.connect(_add_map_region); tool_row.add_child(add_region)
-	var add_compound:=_button("ADD COMPOUND",false); add_compound.icon=assets.texture("icons.replay.loot"); add_compound.expand_icon=true; add_compound.pressed.connect(_add_map_compound); tool_row.add_child(add_compound)
-	var add_point:=_button("ADD LOOT POINT",false); add_point.icon=assets.texture("icons.replay.loot"); add_point.expand_icon=true; add_point.pressed.connect(_add_map_point); tool_row.add_child(add_point)
 	var brush_mode:=OptionButton.new(); brush_mode.custom_minimum_size.x=170
-	for option in [["SELECT / MOVE","select"],["ROAD • HIGHWAY","road_highway"],["ROAD • SECONDARY","road_secondary"],["ROAD • DIRT","road_dirt"],["RIVER BRUSH","river"],["FOREST BRUSH","forest"],["HOUSE RECTANGLE","building"]]: brush_mode.add_item(str(option[0])); brush_mode.set_item_metadata(brush_mode.item_count-1,str(option[1])); if str(option[1])==map_editor_tool: brush_mode.select(brush_mode.item_count-1)
+	for option in [["SELECT / MOVE","select"],["ERASER / DELETE","erase"],["ROAD • HIGHWAY","road_highway"],["ROAD • SECONDARY","road_secondary"],["ROAD • DIRT","road_dirt"],["RIVER BRUSH","river"],["FOREST BRUSH","forest"],["BUILDING RECTANGLE","building"]]: brush_mode.add_item(str(option[0])); brush_mode.set_item_metadata(brush_mode.item_count-1,str(option[1])); if str(option[1])==map_editor_tool: brush_mode.select(brush_mode.item_count-1)
 	brush_mode.item_selected.connect(_on_map_brush_mode_selected.bind(brush_mode)); tool_row.add_child(brush_mode)
-	var brush_size:=SpinBox.new(); brush_size.prefix="SIZE "; brush_size.min_value=0.008; brush_size.max_value=0.18; brush_size.step=0.004; brush_size.value=map_editor_brush_width; brush_size.custom_minimum_size.x=110; brush_size.value_changed.connect(_on_map_brush_size_changed); tool_row.add_child(brush_size)
-	var split: Container = VBoxContainer.new() if ResponsiveScript.is_compact(get_viewport_rect().size) else HBoxContainer.new(); split.add_theme_constant_override("separation", 14); content.add_child(split)
-	var preview := _panel("SQUARE MAP PREVIEW — POI / COMPOUND / ROAD / LOOT / VEHICLE", PANEL_HIGH); preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL; split.add_child(preview)
-	var layer := AspectRatioContainer.new(); layer.ratio=1.0; layer.stretch_mode=AspectRatioContainer.STRETCH_WIDTH_CONTROLS_HEIGHT; layer.custom_minimum_size = Vector2(720, 720); preview.add_child(layer)
-	var image := _asset_preview(str(map_editor_data.asset_id), Vector2(720, 720)); image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.add_child(image)
-	var map_overlay := MatchMapOverlayScript.new(); map_overlay.mouse_filter = Control.MOUSE_FILTER_STOP; map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); map_overlay.set_map(map_editor_data); map_overlay.enable_editor(); map_overlay.set_editor_tool(map_editor_tool,map_editor_brush_width); map_overlay.editor_item_moved.connect(_on_map_editor_item_moved); map_overlay.editor_brush_completed.connect(_on_map_editor_brush_completed); map_overlay.editor_rect_completed.connect(_on_map_editor_rect_completed); layer.add_child(map_overlay); match_lab_nodes.map_editor_overlay=map_overlay
-	var settings := _panel("MASTER LIST & DETAIL INSPECTOR", PANEL); settings.custom_minimum_size.x = 600; split.add_child(settings)
-	settings.add_child(_label("MASTER LIST", 14, GOLD))
+	var brush_size:=SpinBox.new(); brush_size.prefix="WIDTH "; brush_size.suffix=" normalized"; brush_size.min_value=0.008; brush_size.max_value=0.18; brush_size.step=0.004; brush_size.value=map_editor_brush_width; brush_size.custom_minimum_size.x=165; brush_size.value_changed.connect(_on_map_brush_size_changed); tool_row.add_child(brush_size)
+	for spec in [["ADD POI",_add_map_region],["ADD LOOT ZONE",_add_map_loot_zone],["ADD LOOT NODE",_add_map_loot_node],["ADD VEHICLE NODE",_add_map_transport_node]]:
+		var add:=_button(str(spec[0]),false); add.pressed.connect(spec[1]); tool_row.add_child(add)
+	var layer_row:=HBoxContainer.new(); layer_row.add_theme_constant_override("separation",8); toolbar.add_child(layer_row); layer_row.add_child(_label("VISIBLE LAYERS",10,MUTED))
+	for layer_name in ["poi","loot","building","road","terrain","transport"]:
+		var toggle:=CheckButton.new(); toggle.text=layer_name.to_upper(); toggle.button_pressed=bool(map_editor_layer_visibility.get(layer_name,true)); toggle.toggled.connect(_on_map_layer_visibility_changed.bind(layer_name)); layer_row.add_child(toggle)
+	var split: Container = HBoxContainer.new() if get_viewport_rect().size.x>=1200 else VBoxContainer.new(); split.add_theme_constant_override("separation", 14); content.add_child(split)
+	var preview := _panel("EDITOR CANVAS • 1:1 SQUARE", PANEL_HIGH); preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL; split.add_child(preview)
+	var canvas_tools:=HBoxContainer.new(); preview.add_child(canvas_tools); var zoom_out:=_button("−",false); zoom_out.pressed.connect(_change_map_editor_zoom.bind(-0.2)); canvas_tools.add_child(zoom_out); var fit:=_button("FIT MAP",false); fit.pressed.connect(_fit_map_editor); canvas_tools.add_child(fit); var zoom_in:=_button("+",false); zoom_in.pressed.connect(_change_map_editor_zoom.bind(0.2)); canvas_tools.add_child(zoom_in); var grid:=CheckButton.new(); grid.text="GRID"; grid.button_pressed=map_editor_grid_visible; grid.toggled.connect(func(value): map_editor_grid_visible=value; _refresh_map_editor_preview()); canvas_tools.add_child(grid); var coord:=_label("X 0.000  Y 0.000  •  0m, 0m",11,CYAN); coord.size_flags_horizontal=Control.SIZE_EXPAND_FILL; canvas_tools.add_child(coord); match_lab_nodes.map_cursor_label=coord
+	var editor_scroll:=ScrollContainer.new(); editor_scroll.custom_minimum_size.y=560 if get_viewport_rect().size.y>=900 else 460; editor_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO; editor_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO; preview.add_child(editor_scroll); match_lab_nodes.map_editor_scroll=editor_scroll
+	var layer := AspectRatioContainer.new(); layer.ratio=1.0; layer.stretch_mode=AspectRatioContainer.STRETCH_WIDTH_CONTROLS_HEIGHT; var canvas_size:=(900.0 if get_viewport_rect().size.x>=1800 else 700.0 if get_viewport_rect().size.x>=1500 else 620.0)*map_editor_zoom; layer.custom_minimum_size = Vector2(canvas_size,canvas_size); editor_scroll.add_child(layer); match_lab_nodes.map_editor_layer=layer
+	var image := _asset_preview(str(map_editor_data.asset_id), Vector2(canvas_size,canvas_size)); image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.add_child(image)
+	var map_overlay := MatchMapOverlayScript.new(); map_overlay.mouse_filter = Control.MOUSE_FILTER_STOP; map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); map_overlay.set_map(map_editor_data); map_overlay.enable_editor(); map_overlay.editor_selection={"kind":map_editor_selected_kind,"index":map_editor_selected_index}; map_overlay.set_editor_tool(map_editor_tool,map_editor_brush_width); map_overlay.set_editor_view_options(map_editor_grid_visible,map_editor_layer_visibility); map_overlay.editor_item_moved.connect(_on_map_editor_item_moved); map_overlay.editor_item_selected.connect(_on_map_overlay_item_selected); map_overlay.editor_edit_started.connect(_map_editor_checkpoint); map_overlay.editor_brush_completed.connect(_on_map_editor_brush_completed); map_overlay.editor_rect_completed.connect(_on_map_editor_rect_completed); map_overlay.editor_delete_requested.connect(_remove_map_layer); map_overlay.editor_cursor_moved.connect(_on_map_editor_cursor_moved); map_overlay.editor_brush_size_requested.connect(func(delta): _on_map_brush_size_changed(map_editor_brush_width+delta)); map_overlay.zoom_requested.connect(_zoom_map_editor_at_cursor); map_overlay.pan_requested.connect(_pan_map_editor); layer.add_child(map_overlay); match_lab_nodes.map_editor_overlay=map_overlay
+	var test_readout:=_label("GAMEPLAY PREVIEW • move the cursor over the map to inspect terrain, cover, detection, loot and vehicle chance.",10,MUTED); test_readout.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; preview.add_child(test_readout); match_lab_nodes.map_test_label=test_readout
+	var settings := _panel("LAYER LIST & INSPECTOR", PANEL); settings.custom_minimum_size.x = 430 if get_viewport_rect().size.x>=1800 else 390 if get_viewport_rect().size.x>=1200 else 0; split.add_child(settings)
+	var master_list:=VBoxContainer.new(); master_list.add_theme_constant_override("separation",4); settings.add_child(master_list); master_list.add_child(_label("LAYER OBJECTS", 14, GOLD))
 	for i in map_editor_data.get("regions", []).size():
-		var region_master := _button("REGION  %s" % str(map_editor_data.regions[i].get("name", "Unnamed")), map_editor_selected_kind == "region" and map_editor_selected_index == i); region_master.pressed.connect(_select_map_editor_item.bind("region", i)); settings.add_child(region_master)
-	for i in map_editor_data.get("compounds", []).size():
-		var compound_master := _button("COMPOUND  %s" % str(map_editor_data.compounds[i].get("name", "Unnamed")), map_editor_selected_kind == "compound" and map_editor_selected_index == i); compound_master.pressed.connect(_select_map_editor_item.bind("compound", i)); settings.add_child(compound_master)
-	for i in map_editor_data.get("points", []).size():
-		var point_master := _button("POINT   %s" % str(map_editor_data.points[i].get("name", "Unnamed")), map_editor_selected_kind == "point" and map_editor_selected_index == i); point_master.pressed.connect(_select_map_editor_item.bind("point", i)); settings.add_child(point_master)
+		var region_master := _button("POI   %s" % str(map_editor_data.regions[i].get("name", "Unnamed")), map_editor_selected_kind == "region" and map_editor_selected_index == i); region_master.pressed.connect(_select_map_editor_item.bind("region", i)); master_list.add_child(region_master)
+	for i in map_editor_data.get("loot_zones", []).size():
+		var zone_master:=_button("LOOT ZONE   %s"%str(map_editor_data.loot_zones[i].get("name","Unnamed")),map_editor_selected_kind=="loot_zone" and map_editor_selected_index==i); zone_master.pressed.connect(_select_map_editor_item.bind("loot_zone",i)); master_list.add_child(zone_master)
+	for i in map_editor_data.get("loot_nodes", []).size():
+		var node_master:=_button("LOOT NODE   %s"%str(map_editor_data.loot_nodes[i].get("name","Unnamed")),map_editor_selected_kind=="loot_node" and map_editor_selected_index==i); node_master.pressed.connect(_select_map_editor_item.bind("loot_node",i)); master_list.add_child(node_master)
 	for i in map_editor_data.get("roads", []).size():
-		var road_master := _button("ROAD   %s" % str(map_editor_data.roads[i].get("name", "Unnamed")), map_editor_selected_kind == "road" and map_editor_selected_index == i); road_master.pressed.connect(_select_map_editor_item.bind("road", i)); settings.add_child(road_master)
+		var road_master := _button("ROAD   %s" % str(map_editor_data.roads[i].get("name", "Unnamed")), map_editor_selected_kind == "road" and map_editor_selected_index == i); road_master.pressed.connect(_select_map_editor_item.bind("road", i)); master_list.add_child(road_master)
 	for i in map_editor_data.get("terrain_strokes", []).size():
-		var stroke_master := _button("%s BRUSH   %s" % [str(map_editor_data.terrain_strokes[i].get("terrain","terrain")).to_upper(),str(map_editor_data.terrain_strokes[i].get("name", "Unnamed"))], map_editor_selected_kind == "terrain_stroke" and map_editor_selected_index == i); stroke_master.pressed.connect(_select_map_editor_item.bind("terrain_stroke", i)); settings.add_child(stroke_master)
+		var stroke_master := _button("%s BRUSH   %s" % [str(map_editor_data.terrain_strokes[i].get("terrain","terrain")).to_upper(),str(map_editor_data.terrain_strokes[i].get("name", "Unnamed"))], map_editor_selected_kind == "terrain_stroke" and map_editor_selected_index == i); stroke_master.pressed.connect(_select_map_editor_item.bind("terrain_stroke", i)); master_list.add_child(stroke_master)
 	for i in map_editor_data.get("buildings", []).size():
-		var building_master := _button("BUILDING   %s" % str(map_editor_data.buildings[i].get("name", "House")), map_editor_selected_kind == "building" and map_editor_selected_index == i); building_master.pressed.connect(_select_map_editor_item.bind("building", i)); settings.add_child(building_master)
+		var building_master := _button("BUILDING   %s" % str(map_editor_data.buildings[i].get("name", "House")), map_editor_selected_kind == "building" and map_editor_selected_index == i); building_master.pressed.connect(_select_map_editor_item.bind("building", i)); master_list.add_child(building_master)
+	for i in map_editor_data.get("transport_nodes",[]).size():
+		var transport_master:=_button("VEHICLE NODE   %s"%str(map_editor_data.transport_nodes[i].get("name","Vehicle")),map_editor_selected_kind=="transport_node" and map_editor_selected_index==i); transport_master.pressed.connect(_select_map_editor_item.bind("transport_node",i)); master_list.add_child(transport_master)
 	settings.add_child(HSeparator.new())
 	settings.add_child(_label("DETAIL INSPECTOR", 14, GOLD))
 	settings.add_child(_label("Select an item from Master List, or drag it on the map. Coordinates update immediately.", 11, MUTED))
-	settings.add_child(_label("REGION DETAIL", 13, CYAN))
+	settings.add_child(_label("POI DETAIL", 13, CYAN))
 	for i in map_editor_data.get("regions", []).size():
 		var region: Dictionary = map_editor_data.regions[i]
 		var row := VBoxContainer.new(); row.visible = map_editor_selected_kind == "region" and map_editor_selected_index == i; settings.add_child(row); var identity:=HBoxContainer.new(); row.add_child(identity); var region_name:=LineEdit.new(); region_name.text=str(region.name); region_name.placeholder_text="Region name"; region_name.custom_minimum_size.x=220; region_name.text_changed.connect(func(value): map_editor_data.regions[i].name=value; _refresh_map_editor_preview()); identity.add_child(region_name); var terrain:=OptionButton.new(); for terrain_name in ["urban","forest","field","rock","industrial","water","road"]: terrain.add_item(terrain_name); if terrain_name==str(region.terrain): terrain.select(terrain.item_count-1); terrain.item_selected.connect(_on_map_region_terrain_selected.bind(i)); identity.add_child(terrain)
 		var geometry:=HBoxContainer.new(); row.add_child(geometry); var rx:=_map_number_editor(geometry,"X",float(region.position[0]),0.0,1.0,0.01,func(value): map_editor_data.regions[i].position[0]=value; _refresh_map_editor_preview()); var ry:=_map_number_editor(geometry,"Y",float(region.position[1]),0.0,1.0,0.01,func(value): map_editor_data.regions[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["region:%d:x"%i]=rx; map_editor_controls["region:%d:y"%i]=ry; _map_number_editor(geometry,"R",float(region.get("radius",0.08)),0.01,0.30,0.01,func(value): map_editor_data.regions[i].radius=value; _refresh_map_editor_preview()); var remove_region:=_button("REMOVE",false); remove_region.pressed.connect(_remove_map_region.bind(i)); geometry.add_child(remove_region)
-		var loot := HBoxContainer.new(); row.add_child(loot); var loot_label := _label("Loot ×%.2f" % float(region.loot_multiplier), 12, MUTED); loot_label.custom_minimum_size.x=110; loot.add_child(loot_label); var loot_slider := HSlider.new(); loot_slider.min_value=0.0; loot_slider.max_value=2.5; loot_slider.step=0.05; loot_slider.value=float(region.loot_multiplier); loot_slider.custom_minimum_size.x=250; loot_slider.value_changed.connect(func(value): map_editor_data.regions[i].loot_multiplier=value; loot_label.text="Loot ×%.2f" % value; _refresh_map_editor_preview()); loot.add_child(loot_slider)
+		row.add_child(_label("POI defines geography/drop identity. Loot is authored separately through Loot Zones and Loot Nodes.",10,MUTED))
 		var heat := HBoxContainer.new(); row.add_child(heat); var heat_label := _label("Hotness %.0f%%" % (float(region.hotness)*100.0), 12, MUTED); heat_label.custom_minimum_size.x=110; heat.add_child(heat_label); var heat_slider := HSlider.new(); heat_slider.min_value=0.0; heat_slider.max_value=1.0; heat_slider.step=0.05; heat_slider.value=float(region.hotness); heat_slider.custom_minimum_size.x=250; heat_slider.value_changed.connect(func(value): map_editor_data.regions[i].hotness=value; heat_label.text="Hotness %.0f%%" % (value*100.0)); heat.add_child(heat_slider)
 	settings.add_child(_label("COMPOUND DETAIL", 13, CYAN))
 	for i in map_editor_data.get("compounds", []).size():
 		var compound: Dictionary = map_editor_data.compounds[i]; var compound_box:=VBoxContainer.new(); compound_box.visible=map_editor_selected_kind=="compound" and map_editor_selected_index==i; settings.add_child(compound_box)
 		var compound_identity:=HBoxContainer.new(); compound_box.add_child(compound_identity); var compound_name:=LineEdit.new(); compound_name.text=str(compound.name); compound_name.custom_minimum_size.x=220; compound_name.text_changed.connect(func(value): map_editor_data.compounds[i].name=value; _refresh_map_editor_preview()); compound_identity.add_child(compound_name); compound_identity.add_child(_tag("%d BUILDINGS"%int(compound.get("building_count",1)),GOLD))
-		var compound_row:=HBoxContainer.new(); compound_box.add_child(compound_row); var cx:=_map_number_editor(compound_row,"X",float(compound.position[0]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[0]=value; _refresh_map_editor_preview()); var cy:=_map_number_editor(compound_row,"Y",float(compound.position[1]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["compound:%d:x"%i]=cx; map_editor_controls["compound:%d:y"%i]=cy; _map_number_editor(compound_row,"LOOT",float(compound.loot_multiplier),0.0,2.5,0.05,func(value): map_editor_data.compounds[i].loot_multiplier=value; _refresh_map_editor_preview()); _map_number_editor(compound_row,"CAP",float(compound.get("capacity",20)),1.0,100.0,1.0,func(value): map_editor_data.compounds[i].capacity=roundi(value)); var remove_compound:=_button("REMOVE",false); remove_compound.pressed.connect(_remove_map_compound.bind(i)); compound_row.add_child(remove_compound)
-	settings.add_child(_label("POINT DETAIL", 13, CYAN))
+		var compound_row:=HBoxContainer.new(); compound_box.add_child(compound_row); var cx:=_map_number_editor(compound_row,"X",float(compound.position[0]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[0]=value; _refresh_map_editor_preview()); var cy:=_map_number_editor(compound_row,"Y",float(compound.position[1]),0.0,1.0,0.01,func(value): map_editor_data.compounds[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["compound:%d:x"%i]=cx; map_editor_controls["compound:%d:y"%i]=cy; _map_number_editor(compound_row,"BUILDINGS",float(compound.get("building_count",1)),1.0,30.0,1.0,func(value): map_editor_data.compounds[i].building_count=roundi(value)); _map_number_editor(compound_row,"HOT",float(compound.get("hotness",0.5)),0,1,0.05,func(value): map_editor_data.compounds[i].hotness=value); var remove_compound:=_button("REMOVE",false); remove_compound.pressed.connect(_remove_map_compound.bind(i)); compound_row.add_child(remove_compound)
+	settings.add_child(_label("LEGACY POINT DATA • normalized into explicit Loot Nodes when the map loads", 10, MUTED))
 	for i in map_editor_data.get("points", []).size():
 		var point: Dictionary = map_editor_data.points[i]; var point_box:=VBoxContainer.new(); point_box.visible = map_editor_selected_kind == "point" and map_editor_selected_index == i; settings.add_child(point_box); var point_identity:=HBoxContainer.new(); point_box.add_child(point_identity); var enabled := CheckBox.new(); enabled.button_pressed=bool(point.enabled); enabled.icon=assets.texture("icons.replay.loot"); enabled.toggled.connect(func(value): map_editor_data.points[i].enabled=value; _refresh_map_editor_preview()); point_identity.add_child(enabled); var point_name:=LineEdit.new(); point_name.text=str(point.name); point_name.custom_minimum_size.x=190; point_name.text_changed.connect(func(value): map_editor_data.points[i].name=value; _refresh_map_editor_preview()); point_identity.add_child(point_name); var point_type:=OptionButton.new(); for type_name in ["house","compound","bridge","warehouse","tower","container","vehicle_spawn","airdrop"]: point_type.add_item(type_name); if type_name==str(point.get("type","house")): point_type.select(point_type.item_count-1); point_type.item_selected.connect(_on_map_point_type_selected.bind(i)); point_identity.add_child(point_type)
 		var point_row := HBoxContainer.new(); point_box.add_child(point_row); var px:=_map_number_editor(point_row,"X",float(point.position[0]),0.0,1.0,0.01,func(value): map_editor_data.points[i].position[0]=value; _refresh_map_editor_preview()); var py:=_map_number_editor(point_row,"Y",float(point.position[1]),0.0,1.0,0.01,func(value): map_editor_data.points[i].position[1]=value; _refresh_map_editor_preview()); map_editor_controls["point:%d:x"%i]=px; map_editor_controls["point:%d:y"%i]=py; _map_number_editor(point_row,"LOOT",float(point.loot_multiplier),0.0,2.5,0.05,func(value): map_editor_data.points[i].loot_multiplier=value; _refresh_map_editor_preview()); _map_number_editor(point_row,"CAP",float(point.get("capacity",8)),1.0,100.0,1.0,func(value): map_editor_data.points[i].capacity=roundi(value)); var remove_point:=_button("REMOVE",false); remove_point.pressed.connect(_remove_map_point.bind(i)); point_row.add_child(remove_point)
+	settings.add_child(_label("LOOT SOURCE DETAIL",13,CYAN))
+	for source_kind in ["loot_zone","loot_node"]:
+		var source_collection:="loot_zones" if source_kind=="loot_zone" else "loot_nodes"; var sources:Array=map_editor_data.get(source_collection,[])
+		for source_index in sources.size():
+			var source:Dictionary=sources[source_index]; var source_box:=VBoxContainer.new(); source_box.visible=map_editor_selected_kind==source_kind and map_editor_selected_index==source_index; settings.add_child(source_box)
+			var identity_row:=HBoxContainer.new(); source_box.add_child(identity_row); var source_name:=LineEdit.new(); source_name.text=str(source.get("name","Loot Source")); source_name.custom_minimum_size.x=180; source_name.text_changed.connect(func(value): map_editor_data[source_collection][source_index].name=value; _refresh_map_editor_preview()); identity_row.add_child(source_name); var profile:=OptionButton.new(); for profile_name in ["standard","village","military"]: profile.add_item(profile_name.to_upper()); profile.set_item_metadata(profile.item_count-1,profile_name); if profile_name==str(source.get("source_type","standard")): profile.select(profile.item_count-1); profile.item_selected.connect(func(selected): map_editor_data[source_collection][source_index].source_type=str(profile.get_item_metadata(selected))); identity_row.add_child(profile)
+			var number_row:=HBoxContainer.new(); source_box.add_child(number_row); _map_number_editor(number_row,"SLOTS",float(source.get("loot_slots",3)),1,80,1,func(value): map_editor_data[source_collection][source_index].loot_slots=roundi(value)); _map_number_editor(number_row,"LOOT ×",float(source.get("loot_multiplier",1.0)),0,3,0.05,func(value): map_editor_data[source_collection][source_index].loot_multiplier=value); if source_kind=="loot_zone": _map_number_editor(number_row,"RADIUS",float(source.get("radius",0.06)),0.01,0.3,0.005,func(value): map_editor_data[source_collection][source_index].radius=value; _refresh_map_editor_preview()); var remove_source:=_button("REMOVE",false); remove_source.pressed.connect(_remove_map_layer.bind(source_kind,source_index)); number_row.add_child(remove_source)
+			var allowed:=LineEdit.new(); allowed.placeholder_text="Allowed: AR, DMR, SR, HELMET… (blank = profile)"; allowed.text=", ".join(source.get("allowed_categories",[])); allowed.text_changed.connect(func(value): map_editor_data[source_collection][source_index].allowed_categories=_parse_category_list(value)); source_box.add_child(allowed)
+			var excluded:=LineEdit.new(); excluded.placeholder_text="Excluded categories"; excluded.text=", ".join(source.get("excluded_categories",[])); excluded.text_changed.connect(func(value): map_editor_data[source_collection][source_index].excluded_categories=_parse_category_list(value)); source_box.add_child(excluded)
+			source_box.add_child(_label("STANDARD balanced • VILLAGE has no SR by default • MILITARY favors AR/DMR/SR and armor.",10,MUTED))
 	settings.add_child(_label("DRAWN LAYER DETAIL",13,CYAN))
 	for i in map_editor_data.get("roads",[]).size():
 		var road:Dictionary=map_editor_data.roads[i]; var road_box:=HBoxContainer.new(); road_box.visible=map_editor_selected_kind=="road" and map_editor_selected_index==i; settings.add_child(road_box); road_box.add_child(_label("%s • %d WAYPOINTS"%[str(road.get("road_class","road")).to_upper(),road.get("path",[]).size()],12,TEXT)); _map_number_editor(road_box,"WIDTH",float(road.get("width",0.025)),0.008,0.18,0.004,func(value): map_editor_data.roads[i].width=value; _refresh_map_editor_preview()); _map_number_editor(road_box,"VEHICLE",float(road.get("vehicle_spawn_chance",0.25)),0.0,1.0,0.05,func(value): map_editor_data.roads[i].vehicle_spawn_chance=value); var remove_road:=_button("REMOVE",false); remove_road.pressed.connect(_remove_map_layer.bind("road",i)); road_box.add_child(remove_road)
 	for i in map_editor_data.get("terrain_strokes",[]).size():
-		var stroke:Dictionary=map_editor_data.terrain_strokes[i]; var stroke_box:=HBoxContainer.new(); stroke_box.visible=map_editor_selected_kind=="terrain_stroke" and map_editor_selected_index==i; settings.add_child(stroke_box); stroke_box.add_child(_label(str(stroke.get("terrain","terrain")).to_upper(),12,TEXT)); _map_number_editor(stroke_box,"WIDTH",float(stroke.get("width",0.05)),0.008,0.18,0.004,func(value): map_editor_data.terrain_strokes[i].width=value; _refresh_map_editor_preview()); _map_number_editor(stroke_box,"MOVE",float(stroke.get("movement_multiplier",0.5)),0.1,1.2,0.05,func(value): map_editor_data.terrain_strokes[i].movement_multiplier=value); _map_number_editor(stroke_box,"VISION",float(stroke.get("vision_multiplier",0.55)),0.1,1.0,0.05,func(value): map_editor_data.terrain_strokes[i].vision_multiplier=value); var remove_stroke:=_button("REMOVE",false); remove_stroke.pressed.connect(_remove_map_layer.bind("terrain_stroke",i)); stroke_box.add_child(remove_stroke)
+		var stroke:Dictionary=map_editor_data.terrain_strokes[i]; var stroke_box:=VBoxContainer.new(); stroke_box.visible=map_editor_selected_kind=="terrain_stroke" and map_editor_selected_index==i; settings.add_child(stroke_box); var stroke_row:=HBoxContainer.new(); stroke_box.add_child(stroke_row); stroke_row.add_child(_label(str(stroke.get("terrain","terrain")).to_upper(),12,TEXT)); _map_number_editor(stroke_row,"WIDTH",float(stroke.get("width",0.05)),0.008,0.18,0.004,func(value): map_editor_data.terrain_strokes[i].width=value; _refresh_map_editor_preview()); _map_number_editor(stroke_row,"MOVE",float(stroke.get("movement_multiplier",0.5)),0.1,1.2,0.05,func(value): map_editor_data.terrain_strokes[i].movement_multiplier=value); _map_number_editor(stroke_row,"VISION",float(stroke.get("vision_multiplier",0.68)),0.1,1.2,0.05,func(value): map_editor_data.terrain_strokes[i].vision_multiplier=value); var remove_stroke:=_button("REMOVE",false); remove_stroke.pressed.connect(_remove_map_layer.bind("terrain_stroke",i)); stroke_row.add_child(remove_stroke); var behavior:=HBoxContainer.new(); stroke_box.add_child(behavior); _map_number_editor(behavior,"DETECT",float(stroke.get("detection_multiplier",1.0)),0.1,1.2,0.05,func(value): map_editor_data.terrain_strokes[i].detection_multiplier=value); _map_number_editor(behavior,"HEARING",float(stroke.get("hearing_modifier",1.0)),0.1,1.2,0.05,func(value): map_editor_data.terrain_strokes[i].hearing_modifier=value); _map_number_editor(behavior,"COVER",float(stroke.get("cover_modifier",0.0)),0,0.8,0.05,func(value): map_editor_data.terrain_strokes[i].cover_modifier=value); _map_number_editor(behavior,"DENSITY",float(stroke.get("density",0.0)),0,1,0.05,func(value): map_editor_data.terrain_strokes[i].density=value)
 	for i in map_editor_data.get("buildings",[]).size():
-		var building:Dictionary=map_editor_data.buildings[i]; var building_box:=HBoxContainer.new(); building_box.visible=map_editor_selected_kind=="building" and map_editor_selected_index==i; settings.add_child(building_box); building_box.add_child(_label("HOUSE RECT",12,TEXT)); _map_number_editor(building_box,"COVER",float(building.get("cover_rating",0.25)),0.0,0.75,0.05,func(value): map_editor_data.buildings[i].cover_rating=value); _map_number_editor(building_box,"LOOT",float(building.get("loot_multiplier",0.75)),0.0,2.5,0.05,func(value): map_editor_data.buildings[i].loot_multiplier=value); _map_number_editor(building_box,"SLOTS",float(building.get("loot_slots",3)),1.0,30.0,1.0,func(value): map_editor_data.buildings[i].loot_slots=roundi(value)); var remove_building:=_button("REMOVE",false); remove_building.pressed.connect(_remove_map_layer.bind("building",i)); building_box.add_child(remove_building)
+		var building:Dictionary=map_editor_data.buildings[i]; var building_box:=VBoxContainer.new(); building_box.visible=map_editor_selected_kind=="building" and map_editor_selected_index==i; settings.add_child(building_box); var building_row:=HBoxContainer.new(); building_box.add_child(building_row); building_row.add_child(_label("BUILDING RECT",12,TEXT)); _map_number_editor(building_row,"COVER",float(building.get("cover_rating",0.25)),0.0,0.75,0.05,func(value): map_editor_data.buildings[i].cover_rating=value); _map_number_editor(building_row,"CONCEAL",float(building.get("concealment_rating",0.22)),0,0.8,0.05,func(value): map_editor_data.buildings[i].concealment_rating=value); _map_number_editor(building_row,"DETECT",float(building.get("detection_multiplier",0.72)),0.1,1.2,0.05,func(value): map_editor_data.buildings[i].detection_multiplier=value); var remove_building:=_button("REMOVE",false); remove_building.pressed.connect(_remove_map_layer.bind("building",i)); building_row.add_child(remove_building); var flags:=HBoxContainer.new(); building_box.add_child(flags); var los:=CheckButton.new(); los.text="LOS PENALTY"; los.button_pressed=bool(building.get("los_blocking",false)); los.toggled.connect(func(value): map_editor_data.buildings[i].los_blocking=value); flags.add_child(los); var loot_enabled:=CheckButton.new(); loot_enabled.text="EXPLICIT LOOT SOURCE"; loot_enabled.button_pressed=bool(building.get("loot_enabled",false)); loot_enabled.toggled.connect(func(value): map_editor_data.buildings[i].loot_enabled=value); flags.add_child(loot_enabled); _map_number_editor(flags,"OCCUPANCY",float(building.get("occupancy_capacity",4)),1,20,1,func(value): map_editor_data.buildings[i].occupancy_capacity=roundi(value)); building_box.add_child(_label("Default: cover/concealment only. Building ≠ loot unless explicitly enabled.",10,GOLD))
+	for i in map_editor_data.get("transport_nodes",[]).size():
+		var vehicle_node:Dictionary=map_editor_data.transport_nodes[i]; var vehicle_box:=HBoxContainer.new(); vehicle_box.visible=map_editor_selected_kind=="transport_node" and map_editor_selected_index==i; settings.add_child(vehicle_box); vehicle_box.add_child(_label("VEHICLE NODE",12,TEXT)); _map_number_editor(vehicle_box,"SPAWN",float(vehicle_node.get("spawn_chance",0.5)),0,1,0.05,func(value): map_editor_data.transport_nodes[i].spawn_chance=value); var remove_vehicle:=_button("REMOVE",false); remove_vehicle.pressed.connect(_remove_map_layer.bind("transport_node",i)); vehicle_box.add_child(remove_vehicle)
 	settings.add_child(_label("SIZE %sx%s KM  •  LOOT DENSITY ×%.2f  •  VEHICLE NEED ×%.2f\nOverlapping loot sources use only the highest multiplier; stock falls after every loot pass." % [str(map_editor_data.map_size_km[0]),str(map_editor_data.map_size_km[1]),map_catalog.loot_density_factor(map_editor_data),map_catalog.vehicle_need_factor(map_editor_data)],11,GOLD))
+	settings.move_child(master_list,settings.get_child_count()-1)
 	var traversal := _panel("TRAVERSAL RULES", PANEL); content.add_child(traversal)
 	for terrain in map_editor_data.get("terrain_rules", {}):
 		var rule: Dictionary = map_editor_data.terrain_rules[terrain]; var terrain_row := HBoxContainer.new(); terrain_row.add_theme_constant_override("separation", 10); traversal.add_child(terrain_row)
@@ -1329,14 +1360,16 @@ func _map_manager_page() -> void:
 		var vehicle_speed := SpinBox.new(); vehicle_speed.prefix="Vehicle ×"; vehicle_speed.min_value=0.0; vehicle_speed.max_value=1.5; vehicle_speed.step=0.05; vehicle_speed.value=float(rule.get("vehicle_speed",0.0)); vehicle_speed.value_changed.connect(func(value): map_editor_data.terrain_rules[terrain].vehicle_speed=value); terrain_row.add_child(vehicle_speed)
 
 func _map_number_editor(parent:Control,label_text:String,value:float,min_value:float,max_value:float,step:float,callback:Callable)->SpinBox:
-	var editor:=SpinBox.new(); editor.prefix=label_text+" "; editor.min_value=min_value; editor.max_value=max_value; editor.step=step; editor.value=value; editor.custom_minimum_size.x=105; editor.value_changed.connect(callback); parent.add_child(editor)
+	var editor:=SpinBox.new(); editor.prefix=label_text+" "; editor.min_value=min_value; editor.max_value=max_value; editor.step=step; editor.value=value; editor.custom_minimum_size.x=96; editor.value_changed.connect(callback); parent.add_child(editor)
 	return editor
 
 func _refresh_map_editor_preview()->void:
-	if match_lab_nodes.has("map_editor_overlay"): match_lab_nodes.map_editor_overlay.set_map(map_editor_data); match_lab_nodes.map_editor_overlay.set_editor_tool(map_editor_tool,map_editor_brush_width)
+	if match_lab_nodes.has("map_state_label"):
+		match_lab_nodes.map_state_label.text="CURRENT MAP  %s  •  %sx%s KM  |  MODE  EDIT  |  LAYER/TOOL  %s  |  SIZE  %dm"%[str(map_editor_data.get("name",map_editor_data.get("id","Map"))).to_upper(),str(map_editor_data.map_size_km[0]),str(map_editor_data.map_size_km[1]),map_editor_tool.replace("_"," ").to_upper(),roundi(map_editor_brush_width*float(map_editor_data.get("world_size_m",5000)))]
+	if match_lab_nodes.has("map_editor_overlay"): match_lab_nodes.map_editor_overlay.set_map(map_editor_data); match_lab_nodes.map_editor_overlay.editor_selection={"kind":map_editor_selected_kind,"index":map_editor_selected_index}; match_lab_nodes.map_editor_overlay.set_editor_tool(map_editor_tool,map_editor_brush_width); match_lab_nodes.map_editor_overlay.set_editor_view_options(map_editor_grid_visible,map_editor_layer_visibility)
 
 func _map_editor_collection(kind:String)->String:
-	return {"region":"regions","compound":"compounds","point":"points","road":"roads","terrain_stroke":"terrain_strokes","building":"buildings"}.get(kind,"")
+	return {"region":"regions","compound":"compounds","point":"points","loot_zone":"loot_zones","loot_node":"loot_nodes","road":"roads","terrain_stroke":"terrain_strokes","building":"buildings","transport_node":"transport_nodes"}.get(kind,"")
 
 func _select_map_editor_item(kind: String, index: int) -> void:
 	var collection: Array = map_editor_data.get(_map_editor_collection(kind), [])
@@ -1344,12 +1377,24 @@ func _select_map_editor_item(kind: String, index: int) -> void:
 	map_editor_selected_kind = kind; map_editor_selected_index = index
 	_show_page("map_manager")
 
+func _on_map_overlay_item_selected(kind:String,index:int)->void:
+	map_editor_selected_kind=kind; map_editor_selected_index=index
+	_refresh_map_editor_preview()
+
 func _on_map_editor_item_moved(kind:String,index:int,position:Vector2)->void:
 	var collection:Array=map_editor_data.get(_map_editor_collection(kind),[])
 	if index<0 or index>=collection.size(): return
 	map_editor_selected_kind=kind; map_editor_selected_index=index
 	if kind=="building":
 		var rect:Array=collection[index].get("rect",[0.45,0.45,0.1,0.1]); rect[0]=clampf(position.x-float(rect[2])*0.5,0.0,1.0-float(rect[2])); rect[1]=clampf(position.y-float(rect[3])*0.5,0.0,1.0-float(rect[3])); collection[index].rect=rect
+	elif kind in ["road","terrain_stroke"]:
+		var path:Array=collection[index].get("path",[]); if path.is_empty(): return
+		var center:=Vector2.ZERO
+		for point in path: center+=Vector2(float(point[0]),float(point[1]))
+		center/=path.size()
+		var path_shift:=position-center
+		for path_index in path.size(): path[path_index]=[clampf(float(path[path_index][0])+path_shift.x,0,1),clampf(float(path[path_index][1])+path_shift.y,0,1)]
+		collection[index].path=path
 	elif collection[index].has("position"): collection[index].position=[snappedf(position.x,0.001),snappedf(position.y,0.001)]
 	for axis in ["x","y"]:
 		var key:="%s:%d:%s"%[kind,index,axis]
@@ -1361,28 +1406,29 @@ func _on_map_brush_mode_selected(index:int,choice:OptionButton)->void:
 
 func _on_map_editor_map_selected(index:int,choice:OptionButton)->void:
 	map_editor_data=map_catalog.load_map(str(choice.get_item_metadata(index)))
-	map_editor_selected_kind="region"; map_editor_selected_index=0
+	map_editor_selected_kind="region"; map_editor_selected_index=0; map_editor_undo.clear(); map_editor_redo.clear(); map_editor_zoom=1.0
 	_show_page("map_manager")
 
 func _on_map_brush_size_changed(value:float)->void:
-	map_editor_brush_width=float(value); _refresh_map_editor_preview()
+	map_editor_brush_width=clampf(float(value),0.008,0.18); _refresh_map_editor_preview()
 
 func _on_map_editor_brush_completed(kind:String,path:Array,width:float)->void:
+	_map_editor_checkpoint()
 	if kind.begins_with("road_"):
 		var road_class:=kind.trim_prefix("road_"); var index:int=map_editor_data.roads.size(); map_editor_data.roads.append({"id":"custom_road_%02d"%(index+1),"name":"Custom %s %02d"%[road_class.capitalize(),index+1],"road_class":road_class,"width":width,"vehicle_speed":1.3 if road_class=="highway" else 1.1 if road_class=="secondary" else 0.82,"vehicle_spawn_chance":0.45 if road_class=="highway" else 0.25 if road_class=="secondary" else 0.08,"path":path}); map_editor_selected_kind="road"; map_editor_selected_index=index
 	elif kind in ["river","forest"]:
-		var index:int=map_editor_data.terrain_strokes.size(); map_editor_data.terrain_strokes.append({"id":"custom_%s_%02d"%[kind,index+1],"name":"Custom %s %02d"%[kind.capitalize(),index+1],"terrain":"water" if kind=="river" else "forest","width":width,"movement_multiplier":0.5 if kind=="river" else 0.82,"vision_multiplier":0.9 if kind=="river" else 0.55,"path":path}); map_editor_selected_kind="terrain_stroke"; map_editor_selected_index=index
+		var index:int=map_editor_data.terrain_strokes.size(); map_editor_data.terrain_strokes.append({"id":"custom_%s_%02d"%[kind,index+1],"name":"Custom %s %02d"%[kind.capitalize(),index+1],"terrain":"water" if kind=="river" else "forest","width":width,"movement_multiplier":0.5 if kind=="river" else 0.82,"vision_multiplier":0.9 if kind=="river" else 0.68,"detection_multiplier":0.92 if kind=="river" else 0.62,"hearing_modifier":1.0 if kind=="river" else 0.86,"cover_modifier":0.0 if kind=="river" else 0.16,"density":0.0 if kind=="river" else 0.7,"swim_allowed":kind=="river","vehicle_allowed":false,"path":path}); map_editor_selected_kind="terrain_stroke"; map_editor_selected_index=index
 	_refresh_map_editor_preview()
 
 func _on_map_editor_rect_completed(rect:Rect2)->void:
-	var index:int=map_editor_data.buildings.size(); map_editor_data.buildings.append({"id":"custom_building_%02d"%(index+1),"name":"House %02d"%(index+1),"building_type":"house","rect":[snappedf(rect.position.x,0.001),snappedf(rect.position.y,0.001),snappedf(rect.size.x,0.001),snappedf(rect.size.y,0.001)],"cover_rating":0.25,"loot_multiplier":0.75,"loot_slots":3,"enabled":true}); map_editor_selected_kind="building"; map_editor_selected_index=index; _refresh_map_editor_preview()
+	_map_editor_checkpoint(); var index:int=map_editor_data.buildings.size(); map_editor_data.buildings.append({"id":"custom_building_%02d"%(index+1),"name":"Building %02d"%(index+1),"building_type":"house","rect":[snappedf(rect.position.x,0.001),snappedf(rect.position.y,0.001),snappedf(rect.size.x,0.001),snappedf(rect.size.y,0.001)],"cover_rating":0.25,"concealment_rating":0.22,"detection_multiplier":0.72,"los_blocking":false,"occupancy_capacity":4,"loot_enabled":false,"enabled":true}); map_editor_selected_kind="building"; map_editor_selected_index=index; _refresh_map_editor_preview()
 
 func _remove_map_layer(kind:String,index:int)->void:
 	var collection_name:=_map_editor_collection(kind); var collection:Array=map_editor_data.get(collection_name,[])
-	if index>=0 and index<collection.size(): collection.remove_at(index); map_editor_data[collection_name]=collection; map_editor_selected_kind="region"; map_editor_selected_index=0; _show_page("map_manager")
+	if index>=0 and index<collection.size(): _map_editor_checkpoint(); collection.remove_at(index); map_editor_data[collection_name]=collection; map_editor_selected_kind="region"; map_editor_selected_index=0; _show_page("map_manager")
 
 func _add_map_region()->void:
-	var index:int=map_editor_data.get("regions",[]).size(); map_editor_data.regions.append({"id":"custom_region_%02d"%(index+1),"name":"Custom POI %02d"%(index+1),"poi_type":"village","position":[0.5,0.5],"radius":0.08,"loot_multiplier":1.0,"hotness":0.5,"terrain":"urban"}); map_editor_selected_kind="region"; map_editor_selected_index=index; _show_page("map_manager")
+	_map_editor_checkpoint(); var index:int=map_editor_data.get("regions",[]).size(); map_editor_data.regions.append({"id":"custom_region_%02d"%(index+1),"name":"Custom POI %02d"%(index+1),"poi_type":"village","position":[0.5,0.5],"radius":0.08,"loot_multiplier":1.0,"hotness":0.5,"terrain":"urban"}); map_editor_selected_kind="region"; map_editor_selected_index=index; _show_page("map_manager")
 
 func _add_map_compound()->void:
 	if map_editor_data.get("regions",[]).is_empty(): return
@@ -1391,14 +1437,70 @@ func _add_map_compound()->void:
 func _add_map_point()->void:
 	var index:int=map_editor_data.get("points",[]).size(); map_editor_data.points.append({"id":"custom_point_%02d"%(index+1),"name":"Custom Point %02d"%(index+1),"position":[0.5,0.5],"type":"house","loot_multiplier":1.0,"capacity":10,"enabled":true}); map_editor_selected_kind="point"; map_editor_selected_index=index; _show_page("map_manager")
 
+func _add_map_loot_zone()->void:
+	_map_editor_checkpoint(); var index:int=map_editor_data.loot_zones.size(); map_editor_data.loot_zones.append({"id":"custom_loot_zone_%02d"%(index+1),"name":"Loot Zone %02d"%(index+1),"position":[0.5,0.5],"radius":0.06,"source_type":"standard","loot_multiplier":1.0,"loot_slots":12,"hotness":0.5,"allowed_categories":[],"excluded_categories":[],"category_weights":{},"item_weights":{},"rarity_multiplier":1.0,"min_quantity":1,"max_quantity":3,"enabled":true}); map_editor_selected_kind="loot_zone"; map_editor_selected_index=index; _show_page("map_manager")
+
+func _add_map_loot_node()->void:
+	_map_editor_checkpoint(); var index:int=map_editor_data.loot_nodes.size(); map_editor_data.loot_nodes.append({"id":"custom_loot_node_%02d"%(index+1),"name":"Loot Node %02d"%(index+1),"position":[0.5,0.5],"radius":0.025,"source_type":"village","loot_multiplier":0.55,"loot_slots":3,"safety":0.8,"allowed_categories":[],"excluded_categories":[],"category_weights":{},"item_weights":{},"rarity_multiplier":0.75,"min_quantity":1,"max_quantity":2,"enabled":true}); map_editor_selected_kind="loot_node"; map_editor_selected_index=index; _show_page("map_manager")
+
+func _add_map_transport_node()->void:
+	_map_editor_checkpoint(); var index:int=map_editor_data.transport_nodes.size(); map_editor_data.transport_nodes.append({"id":"custom_transport_%02d"%(index+1),"name":"Vehicle Node %02d"%(index+1),"position":[0.5,0.5],"type":"garage","spawn_chance":0.5}); map_editor_selected_kind="transport_node"; map_editor_selected_index=index; _show_page("map_manager")
+
+func _parse_category_list(value:String)->Array:
+	var result:Array=[]
+	for item in value.split(","):
+		var normalized:=item.strip_edges().to_upper(); if not normalized.is_empty() and normalized not in result: result.append(normalized)
+	return result
+
+func _map_editor_checkpoint()->void:
+	if map_editor_data.is_empty(): return
+	map_editor_undo.append(map_editor_data.duplicate(true)); if map_editor_undo.size()>30: map_editor_undo.pop_front(); map_editor_redo.clear()
+
+func _map_editor_undo_action()->void:
+	if map_editor_undo.is_empty(): return
+	map_editor_redo.append(map_editor_data.duplicate(true)); map_editor_data=map_editor_undo.pop_back(); _show_page("map_manager")
+
+func _map_editor_redo_action()->void:
+	if map_editor_redo.is_empty(): return
+	map_editor_undo.append(map_editor_data.duplicate(true)); map_editor_data=map_editor_redo.pop_back(); _show_page("map_manager")
+
+func _reset_map_override()->void:
+	_map_editor_checkpoint(); var id:=str(map_editor_data.id); map_catalog.reset_override(id); map_editor_data=map_catalog.load_map(id); _show_page("map_manager")
+
+func _on_map_layer_visibility_changed(value:bool,layer_name:String)->void:
+	map_editor_layer_visibility[layer_name]=value; _refresh_map_editor_preview()
+
+func _change_map_editor_zoom(delta:float)->void:
+	map_editor_zoom=clampf(map_editor_zoom+delta,0.65,2.4); _show_page("map_manager")
+
+func _fit_map_editor()->void:
+	map_editor_zoom=1.0; _show_page("map_manager")
+
+func _zoom_map_editor_at_cursor(_position:Vector2,delta:float)->void:
+	_change_map_editor_zoom(delta)
+
+func _pan_map_editor(relative:Vector2)->void:
+	if not match_lab_nodes.has("map_editor_scroll"): return
+	var editor_scroll:ScrollContainer=match_lab_nodes.map_editor_scroll; editor_scroll.scroll_horizontal-=roundi(relative.x); editor_scroll.scroll_vertical-=roundi(relative.y)
+
+func _on_map_editor_cursor_moved(position:Vector2)->void:
+	map_editor_cursor=position
+	if match_lab_nodes.has("map_cursor_label"):
+		var meters:=float(map_editor_data.get("world_size_m",5000)); match_lab_nodes.map_cursor_label.text="X %.3f  Y %.3f  •  %dm, %dm"%[position.x,position.y,roundi(position.x*meters),roundi(position.y*meters)]
+	if match_lab_nodes.has("map_test_label"):
+		var profile:=map_catalog.gameplay_profile_at(map_editor_data,position); var road:=map_catalog.road_profile(map_editor_data,position); var source_name:="NONE"; var source_type:=""
+		for source in map_catalog.loot_sources(map_editor_data):
+			if position.distance_to(Vector2(float(source.position[0]),float(source.position[1])))<=float(source.get("radius",0.03)): source_name=str(source.get("name","Loot")); source_type=str(source.get("source_type","standard")); break
+		match_lab_nodes.map_test_label.text="GAMEPLAY PREVIEW • Terrain %s • Move ×%.2f • Vision ×%.2f • Detection ×%.2f • Cover %.2f • Building %s • Loot %s %s • Road %s • Vehicle roll %.0f%%"%[str(profile.terrain.get("terrain","OPEN")).to_upper(),float(profile.movement_multiplier),float(profile.vision_multiplier),float(profile.detection_multiplier),float(profile.cover_modifier),str(profile.occupancy_id) if not str(profile.occupancy_id).is_empty() else "NONE",source_name,source_type.to_upper(),str(road.road_class).to_upper(),float(road.vehicle_spawn_chance)*100.0]
+
 func _remove_map_region(index:int)->void:
-	if index>=0 and index<map_editor_data.regions.size(): map_editor_data.regions.remove_at(index); _show_page("map_manager")
+	_remove_map_layer("region",index)
 
 func _remove_map_compound(index:int)->void:
-	if index>=0 and index<map_editor_data.compounds.size(): map_editor_data.compounds.remove_at(index); _show_page("map_manager")
+	_remove_map_layer("compound",index)
 
 func _remove_map_point(index:int)->void:
-	if index>=0 and index<map_editor_data.points.size(): map_editor_data.points.remove_at(index); _show_page("map_manager")
+	_remove_map_layer("point",index)
 
 func _refresh_match_feed(events: Array) -> void:
 	if not match_lab_nodes.has("event_feed"): return
@@ -1664,7 +1766,7 @@ func _analytics_page() -> void:
 	var meta: Dictionary = game.data.get("meta_state", {}); var tiers: Dictionary = meta.get("tiers", {})
 	var next_match:Dictionary=game.get_next_match(true); var analyst_map_id:=_map_id_from_name(str(next_match.get("map","verdant_reach"))); var analyst_map_data:=map_catalog.load_map(analyst_map_id)
 	var analyst_panel:=_panel("ANALYST MAP • READ ONLY",PANEL_HIGH); content.add_child(analyst_panel); analyst_panel.add_child(_label("%s • %sx%s KM • POI / LOOT / ROAD / RIVER / FOREST / BUILDING / VEHICLE"%[str(analyst_map_data.get("display_name","Map")),str(analyst_map_data.get("map_size_km",[5,5])[0]),str(analyst_map_data.get("map_size_km",[5,5])[1])],12,CYAN))
-	var analyst_layer:=Control.new(); analyst_layer.custom_minimum_size=Vector2(620,620); analyst_panel.add_child(analyst_layer); var analyst_image:=_asset_preview(str(analyst_map_data.get("asset_id","match.map.verdant_reach")),Vector2(620,620)); analyst_image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); analyst_layer.add_child(analyst_image); var analyst_overlay:=MatchMapOverlayScript.new(); analyst_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE; analyst_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); analyst_overlay.set_map(analyst_map_data); analyst_overlay.set_design_layers_visible(true); analyst_layer.add_child(analyst_overlay)
+	var analyst_layer:=Control.new(); analyst_layer.custom_minimum_size=Vector2(620,620); analyst_panel.add_child(analyst_layer); var analyst_image:=_asset_preview(str(analyst_map_data.get("asset_id","match.map.verdant_reach")),Vector2(620,620)); analyst_image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); analyst_layer.add_child(analyst_image); var analyst_overlay:=MatchMapOverlayScript.new(); analyst_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE; analyst_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); analyst_overlay.set_map(analyst_map_data); analyst_overlay.set_design_layers_visible(true); analyst_layer.add_child(analyst_overlay); match_lab_nodes.analyst_overlay=analyst_overlay
 	if telemetry.is_empty():
 		var compact_layout := ResponsiveScript.is_compact(get_viewport_rect().size)
 		var waiting: BoxContainer = VBoxContainer.new() if compact_layout else HBoxContainer.new(); waiting.add_theme_constant_override("separation", 22); content.add_child(waiting)
@@ -2813,11 +2915,12 @@ func _update_nav() -> void:
 		b.add_theme_color_override("font_color", ACCENT if selected else TEXT)
 
 func _animate_page() -> void:
+	if bool(user_settings.values.get("reduce_motion",false)): content.modulate.a=1.0; content.position.x=0.0; return
 	content.modulate.a = 0.0; content.position.x = 12.0; var tween := create_tween().set_parallel(true); tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT); tween.tween_property(content, "modulate:a", 1.0, 0.2); tween.tween_property(content, "position:x", 0.0, 0.24)
 
 func _animate_progress(bar: ProgressBar) -> void:
 	if not is_instance_valid(bar): return
-	if not bool(bar.get_meta("animate",true)): bar.value=float(bar.get_meta("target_value",0)); return
+	if bool(user_settings.values.get("reduce_motion",false)) or not bool(bar.get_meta("animate",true)): bar.value=float(bar.get_meta("target_value",0)); return
 	create_tween().set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT).tween_property(bar, "value", float(bar.get_meta("target_value", 0)), 0.55)
 
 func _style_label(l: Label, font_size: int, color: Color) -> void: l.add_theme_font_size_override("font_size", font_size); l.add_theme_color_override("font_color", color)
@@ -2853,4 +2956,7 @@ func _advance_day() -> void:
 		_show_page(active_page)
 		var consequences: Array=result.get("consequences",[]); _notify("%s • %s" % [str(consequences[0].get("title","Advanced to %s" % str(game.data.current_date))),str(consequences[0].get("detail",""))] if not consequences.is_empty() else "Advanced to %s." % str(game.data.current_date))
 func _notify(message: String) -> void:
-	toast.text = message; toast.visible = true; toast.modulate.a = 0.0; create_tween().tween_property(toast, "modulate:a", 1.0, 0.15); get_tree().create_timer(2.5).timeout.connect(func(): if is_instance_valid(toast): toast.visible = false)
+	toast.text = message; toast.visible = true
+	if bool(user_settings.values.get("reduce_motion",false)): toast.modulate.a=1.0
+	else: toast.modulate.a = 0.0; create_tween().tween_property(toast, "modulate:a", 1.0, 0.15)
+	get_tree().create_timer(2.5).timeout.connect(func(): if is_instance_valid(toast): toast.visible = false)
